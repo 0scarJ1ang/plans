@@ -163,6 +163,13 @@ form.edit label{display:grid;gap:3px;font-size:12.5px;color:var(--muted)}
 .td input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;margin:0;flex:none}
 .td-t{flex:1 1 180px;min-width:0;font-size:14px;cursor:pointer;overflow-wrap:anywhere}
 .td.done .td-t{text-decoration:line-through;color:var(--muted)}
+button.td-t{border:0;background:none;padding:2px 4px;margin-left:-4px;text-align:left;color:inherit;font:inherit;font-size:14px;cursor:text;border-radius:5px}
+button.td-t:hover{background:var(--sunk)}
+.td-edit{flex:1 1 220px;min-width:0;display:flex}
+.td-edit .field{padding:4px 8px;font-size:14px}
+.pen{border:0;background:none;color:var(--muted);font-size:15px;line-height:1;padding:5px 6px;border-radius:6px;cursor:pointer;flex:none}
+.pen:hover,.pen:focus-visible{background:var(--sunk);color:var(--ink)}
+@media (hover:hover){.it-row .pen{opacity:0}.it-row:hover .pen,.it-row:focus-within .pen{opacity:1}}
 .td .x{border:0;background:none;color:var(--muted);font-size:16px;line-height:1;padding:2px 4px;cursor:pointer;border-radius:4px}
 .td .x:hover{color:var(--bad)}
 input.ddl{font:12px var(--f-mono);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:6px;padding:2px 5px;max-width:9.6em}
@@ -470,7 +477,7 @@ let D=null;                       // synced data (lives in the private repo)
 const CFG_KEY='phd-plans.github',CACHE_KEY='phd-plans.cache',UI_KEY='phd-plans.ui',PREVIEW_KEY='phd-plans.preview';
 const U=Object.assign({tab:'week',week:'',rf:'',rsort:false,ff:'hi',tf:'ddl',cfWho:'',cfTag:'',theme:'system',pickArea:'',paper:'C',draft:'',sub:'career'},ls.get(UI_KEY)||{});
 U.exp=U.exp||{};U.selView=U.selView||{};
-const T={ddlOpen:{},open:{},openLog:{},editBlock:'',editItem:'',adding:'',editConv:'',picker:false,confirm:'',connectErr:'',connectStage:'',stale:{}};
+const T={editTodo:'',ddlOpen:{},open:{},openLog:{},editBlock:'',editItem:'',adding:'',editConv:'',picker:false,confirm:'',connectErr:'',connectStage:'',stale:{}};
 const saveUI=()=>ls.set(UI_KEY,U);
 let IX={items:new Map(),todos:new Map(),byItem:new Map()};
 const adopt=x=>normalize(clone(x));
@@ -597,8 +604,9 @@ function todoLine(t,ctx,o={}){
   const ddl=o.noDdl?'':(t.ddl||T.ddlOpen[t.id])?`<input type="date" id="dd-${ctx}-${t.id}" class="ddl" data-act="ddl" data-id="${esc(t.id)}" value="${esc(t.ddl||'')}" aria-label="DDL：${esc(t.t)}">`:(t.done?'':`<button type="button" class="wkb" data-act="ddl-open" data-id="${esc(t.id)}" data-v="${ctx}">DDL</button>`);
   const inW=!o.noWeek&&!t.del&&inWeek(t.id,wk);
   return `<div class="td${t.done?' done':''}"${o.find?' data-find':''}>
-    <input type="checkbox" id="${cid}" data-act="done" data-id="${esc(t.id)}"${t.done?' checked':''}>
-    <label class="td-t" for="${cid}">${md(t.t)}${t.del?' <span class="tag">已删除</span>':''}</label>
+    <input type="checkbox" id="${cid}" data-act="done" data-id="${esc(t.id)}"${t.done?' checked':''} aria-label="完成：${esc(t.t)}">
+    ${T.editTodo===ctx+':'+t.id?`<form class="td-edit" data-form="todo-edit"><input class="field" id="te-${ctx}-${t.id}" name="t" value="${esc(t.t)}" aria-label="修改 To-Do" data-edit="todo" data-key="${ctx}:${esc(t.id)}" data-id="${esc(t.id)}" autocomplete="off"></form>`
+      :`<button type="button" class="td-t" data-act="todo-edit" data-id="${esc(t.id)}" data-v="${ctx}" title="点击修改">${md(t.t)}${t.del?' <span class="tag">已删除</span>':''}</button>`}
     ${o.chip&&it?itemChip(it):''}${dueBadge(t)}${inW?wkBtn(t,wk):''}
     <span class="act">${ddl}${o.noWeek||t.del||inW||t.done?'':wkBtn(t,wk)}${o.remove?`<button class="x" type="button" data-act="wk-remove" data-id="${esc(t.id)}" data-v="${o.wk}" aria-label="移出这周计划" title="移出这周">−</button>`:''}${o.noDel||t.del?'':`<button class="x" type="button" data-act="todo-del" data-id="${esc(t.id)}" aria-label="删除 To-Do：${esc(t.t)}">×</button>`}</span>
   </div>`}
@@ -640,7 +648,7 @@ function itemView(it,o={}){
     <div class="it-row">
       <button class="it-h" type="button" data-act="exp" data-id="${id}" aria-expanded="${exp}"><span class="car"></span>${proj?`<span class="proj-id">${id}</span>`:''}<span class="it-t" data-find>${esc(it.title)}</span>${proj&&it.target?`<span class="tgt">${esc(it.target)}</span>`:''}</button>
       <span class="it-meta">${openT.length?`<span>${openT.length} 项</span>`:''}${next?dueBadge(next):''}</span>
-      ${o.star?`<button class="star${it.sel?' on':''}" type="button" data-act="sel" data-id="${id}" aria-pressed="${!!it.sel}" title="${it.sel?'取消 Selected':'标为 Selected'}">${it.sel?'★':'☆'}</button>`:''}${o.noStatus?'':stSel(it)}
+      ${o.noEdit?'':`<button class="pen" type="button" data-act="item-edit" data-id="${id}" aria-label="编辑：${esc(it.title)}" title="编辑">✎</button>`}${o.star?`<button class="star${it.sel?' on':''}" type="button" data-act="sel" data-id="${id}" aria-pressed="${!!it.sel}" title="${it.sel?'取消 Selected':'标为 Selected'}">${it.sel?'★':'☆'}</button>`:''}${o.noStatus?'':stSel(it)}
     </div>
     <div class="xb"${exp?'':' hidden'}>
       ${body}
@@ -692,7 +700,7 @@ function note(id,o={}){
     <div class="btnrow"><button class="btn" type="submit">保存</button><button class="btn ghost" type="button" data-act="blk-cancel">取消</button></div></form></div></div>`;
   const k='blk:'+id;const open=isOpen(k,o.open);
   return `<div class="it note${open?' open':''}" id="b-${id}" data-key="${k}">
-    <div class="it-row"><button class="it-h" type="button" data-act="exp" data-id="${k}" data-def="${o.open?1:0}" aria-expanded="${open}"><span class="car"></span><span class="it-t" data-find>${esc(b.title)}</span>${b.badge?`<span class="rank">${esc(b.badge)}</span>`:''}</button></div>
+    <div class="it-row"><button class="it-h" type="button" data-act="exp" data-id="${k}" data-def="${o.open?1:0}" aria-expanded="${open}"><span class="car"></span><span class="it-t" data-find>${esc(b.title)}</span>${b.badge?`<span class="rank">${esc(b.badge)}</span>`:''}</button><button class="pen" type="button" data-act="blk-edit" data-id="${id}" aria-label="编辑：${esc(b.title)}" title="编辑">✎</button></div>
     <div class="xb"${open?'':' hidden'}>${blockBody(id,b)||'<p class="blank">空。</p>'}
       <div class="row-foot"><button class="linkbtn muted" type="button" data-act="blk-edit" data-id="${id}">编辑</button><button class="linkbtn danger" type="button" data-act="hide" data-id="${k}" data-v="${esc(b.title)}">删除</button></div></div>
   </div>`}
@@ -864,7 +872,7 @@ const THINK={
     return `
     ${steps?`<div class="list-i">${steps}</div>`:''}
     ${group('s-half','Half a Step Back',notes(['how','what','taste','watch','ptaste']))}
-    ${group('s-absorb','待吸收',`<div class="box">${D.absorb.map(x=>`<div class="td${x.done?' done':''}" data-find><input type="checkbox" id="ab-${esc(x.id)}" data-act="absorb" data-id="${esc(x.id)}"${x.done?' checked':''}><label class="td-t" for="ab-${esc(x.id)}">${md(x.t)}</label><span class="act"><button class="x" type="button" data-act="absorb-del" data-id="${esc(x.id)}" aria-label="删除">×</button></span></div>`).join('')}
+    ${group('s-absorb','待吸收',`<div class="box">${D.absorb.map(x=>`<div class="td${x.done?' done':''}" data-find><input type="checkbox" id="ab-${esc(x.id)}" data-act="absorb" data-id="${esc(x.id)}"${x.done?' checked':''}><span class="td-t">${md(x.t)}</span><span class="act"><button class="x" type="button" data-act="absorb-del" data-id="${esc(x.id)}" aria-label="删除">×</button></span></div>`).join('')}
       <form class="add slim" data-form="absorb"><input type="text" class="field" id="absorb-t" name="t" placeholder="+ 新的想法" required aria-label="新的想法"><button class="btn sm" type="submit">添加</button></form></div>`,{closed:true,count:D.absorb.filter(x=>!x.done).length,hide:'w:absorb'})}
     ${tl?group('s-tl','时间线'+(D.timeline.version?' '+esc(D.timeline.version):''),`<div class="box">${tl}</div>`,{closed:true,hide:'w:timeline'}):''}
     ${D.abilities.length?group('s-review','Periodic Review',`<div class="box">${D.abilities.map(a=>`<div class="rate" data-find><span class="rate-t">${esc(a.t)}</span><span class="dots">${[1,2,3,4,5].map(v=>`<button type="button" class="${(D.rate[a.id]||0)>=v?'on':''}" data-act="rate" data-id="${esc(a.id)}" data-v="${v}" aria-label="${v} 分">${v}</button>`).join('')}</span></div>`).join('')}${rated?`<p class="hint">上次自评：${esc(D.rateAt)}</p>`:''}</div>`,{closed:true,hide:'w:review'}):''}
@@ -996,7 +1004,7 @@ document.addEventListener('change',async e=>{
   const t=e.target,act=t.dataset&&t.dataset.act,id=t.dataset&&t.dataset.id;if(!act||!D&&act!=='seed-file')return;
   switch(act){
     case 'st':{const it=itemById(id);if(!it)return;const old=st(it);it.st=t.value;addLog(it.id,`状态：${old} → ${t.value}`,{auto:true});commit('状态');return}
-    case 'done':setDone(id,t.checked);commit(t.checked?'完成 To-Do':'取消完成');return;
+    case 'done':if(t.checked){snapshot();setDone(id,true);commit('完成 To-Do');toast('已完成',true)}else{setDone(id,false);commit('取消完成')}return;
     case 'ddl':{const td=todoById(id);if(td){td.ddl=t.value;delete T.ddlOpen[id];commit('DDL')}return}
     case 'check':D.checks[id]=t.checked;if(!t.checked)delete D.checks[id];commit('勾选');return;
     case 'routine':{const w=ensureWeek(t.dataset.v);if(t.checked)w.routine[id]=true;else delete w.routine[id];commit('每周例行');return}
@@ -1021,6 +1029,7 @@ document.addEventListener('submit',e=>{
   const refocus=id=>{const n=document.getElementById(id);if(n)n.focus()};
   switch(kind){
     case 'connect':{const cfg={owner:v('owner'),repo:v('repo'),path:v('path').replace(/^\/+/,''),branch:v('branch'),token:v('token')};doConnect(cfg);return}
+    case 'todo-edit':saveTodoEdit(f.elements.t);return;
     case 'todo-add':{const item=f.dataset.item;if(!v('t'))return;addTodo(item,v('t'),v('d'),'');U.exp[item]=true;commit('新 To-Do');refocus('add-t-'+item);return}
     case 'wk-quick':{if(!v('t'))return;addTodo(v('item'),v('t'),v('d'),f.dataset.wk);U.lastItem=v('item');saveUI();commit('周计划');refocus('wkq-t');return}
     case 'log-add':{if(!v('t'))return;addLog(f.dataset.item,v('t'),{d:v('d')||TODAY_ISO});U.exp['log:'+f.dataset.item]=true;commit('进展记录');refocus('log-t-'+f.dataset.item);return}
@@ -1056,6 +1065,7 @@ document.addEventListener('click',async e=>{
     case 'sel':{const it=itemById(id);if(!it)return;it.sel=!it.sel;commit(it.sel?'标为 Selected':'取消 Selected');return}
     case 'theme':U.theme=v;saveUI();applyTheme();render();return;
     case 'cf-who':U.cfWho=v;break; case 'cf-tag':U.cfTag=v;break; case 'pick-area':U.pickArea=v;break;
+    case 'todo-edit':{T.editTodo=v+':'+id;render();const n=document.getElementById('te-'+v+'-'+id);if(n){n.focus();n.select()}return}
     case 'ddl-open':{T.ddlOpen[id]=true;render();const n=document.getElementById('dd-'+v+'-'+id);if(n){n.focus();try{n.showPicker()}catch(err){}}return}
     case 'undo':if(undoSnap){D=adopt(undoSnap);undoSnap=null;document.getElementById('toast').hidden=true;commit('撤销');toast('已撤销')}return;
     case 'hide':snapshot();D.hidden=D.hidden||{};D.hidden[id]=v||id;commit('删除窗口');toast('已删除，可在设置里恢复',true);return;
@@ -1103,6 +1113,10 @@ document.addEventListener('click',async e=>{
 document.getElementById('sync').addEventListener('click',()=>{if(!D)return;if(/error|offline/.test(Sync.status)){Sync.push();return}if(Sync.status==='auth'){T.connectStage='';T.connectErr='Token 失效或被撤销，请重新粘贴一个。';renderConnect();return}setTab('settings')});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')Sync.refresh();else if(Sync.pending&&!Sync.pushing)Sync.push()});
 window.addEventListener('online',()=>{if(Sync.pending)Sync.push()});
+
+function saveTodoEdit(inp){const td=todoById(inp.dataset.id);T.editTodo='';const val=inp.value.trim();if(td&&val&&val!==td.t){td.t=val;commit('修改 To-Do')}else render()}
+document.addEventListener('focusout',e=>{const t=e.target;if(t.dataset&&t.dataset.edit==='todo'&&T.editTodo===t.dataset.key)saveTodoEdit(t)});
+document.addEventListener('keydown',e=>{const t=e.target;if(e.key==='Escape'&&t.dataset&&t.dataset.edit==='todo'){T.editTodo='';render()}});
 
 /* ============================== search ============================== */
 const q=document.getElementById('q'),res=document.getElementById('results');let hits=[];
