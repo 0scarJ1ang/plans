@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
+<meta name="app-build" content="1022-0645-a0d3dd">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -272,6 +273,7 @@ form.add select.field{flex:0 1 230px;width:auto}
 .inbox-i:first-child{border-top:0}
 .inbox-i p{margin:0;flex:1;min-width:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
 .inbox-i .x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px}
+.update{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(64px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;align-items:center;background:var(--surface);color:var(--ink);border:1px solid var(--accent);font:500 13.5px var(--f-body);padding:8px 10px 8px 14px;border-radius:10px;box-shadow:0 8px 24px var(--shadow);z-index:49;max-width:calc(100vw - 32px)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);font:500 13px var(--f-body);padding:9px 14px;border-radius:8px;z-index:50;max-width:calc(100vw - 32px)}
 .flash{outline:2px solid var(--p1);outline-offset:3px;border-radius:6px}
 @media (prefers-reduced-motion: no-preference){
@@ -345,6 +347,20 @@ textarea.goal{font-size:15px;min-height:0}
 .subtabs{display:flex;gap:6px;flex-wrap:wrap}
 .notes ul.list{font-size:14px}
 .linkbtn.danger{color:var(--bad)}
+.stus{padding:2px 14px}
+.stu{display:grid;gap:2px;padding:10px 0;border-top:1px solid var(--line);min-width:0}
+.stu:first-child{border-top:0}
+.stu-h{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}
+.stu-n{font-weight:600;min-width:7.5em}
+.pchips{display:flex;gap:5px;flex-wrap:wrap;align-items:center;flex:1 1 220px;min-width:0}
+.pchip{border:1px solid var(--line);background:var(--surface);color:var(--muted);font:600 12px var(--f-mono);min-width:30px;padding:4px 7px;border-radius:6px;cursor:pointer}
+.pchip:hover{border-color:var(--accent);color:var(--accent)}
+.pchip.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.pchip.wide{font:500 12px var(--f-body);max-width:18em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.act-r{display:flex;gap:2px;margin-left:auto}
+.stu .row-sub{margin:0}
+.pchips select.pill{max-width:11em}
+@media (hover:hover){.stu-h .act-r{opacity:0}.stu:hover .act-r,.stu:focus-within .act-r{opacity:1}}
 .tag.restore{display:inline-flex;gap:8px;align-items:center;padding:5px 9px;font-size:12px}
 .filters{display:grid;gap:8px}
 #settings-btn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
@@ -374,6 +390,7 @@ textarea.goal{font-size:15px;min-height:0}
   <div id="panels"></div>
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<div class="update" id="update" role="status" hidden>网页有新版本 <button class="btn sm" type="button" data-act="reload">刷新</button></div>
 
 <script>
 (function(){
@@ -402,7 +419,7 @@ const EMPTY={v:2,items:[],todos:[],logs:[],weeks:{},routines:[],
   steps:[{id:'hb',title:'退半步',en:'Half a Step Back',desc:'',items:[],checks:{},history:[]},{id:'fb',title:'退一步',en:'Full Step Back',desc:'',items:[],checks:{},history:[]}],
   timeline:{version:'',periods:[],always:[]},blocks:{},abilities:[],rate:{},rateAt:'',channels:[],
   launchTpl:[{g:'Open-source',items:['GitHub']},{g:'Advertisement',items:['ArXiv upload','Personal homepage','Social Media']},{g:'Connection Opportunity',items:['Email related researchers']}],
-  launch:{},letters:['','',''],absorb:[],checks:{},inbox:[],convs:[],hidden:{}};
+  launch:{},letters:['','',''],absorb:[],checks:{},inbox:[],convs:[],hidden:{},students:[]};
 
 /* ============================== utilities ============================== */
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -477,7 +494,7 @@ let D=null;                       // synced data (lives in the private repo)
 const CFG_KEY='phd-plans.github',CACHE_KEY='phd-plans.cache',UI_KEY='phd-plans.ui',PREVIEW_KEY='phd-plans.preview';
 const U=Object.assign({tab:'week',week:'',rf:'',rsort:false,ff:'hi',tf:'ddl',cfWho:'',cfTag:'',theme:'system',pickArea:'',paper:'C',draft:'',sub:'career'},ls.get(UI_KEY)||{});
 U.exp=U.exp||{};U.selView=U.selView||{};
-const T={editTodo:'',ddlOpen:{},open:{},openLog:{},editBlock:'',editItem:'',adding:'',editConv:'',picker:false,confirm:'',connectErr:'',connectStage:'',stale:{}};
+const T={editStudent:'',addingStudent:false,editTodo:'',ddlOpen:{},open:{},openLog:{},editBlock:'',editItem:'',adding:'',editConv:'',picker:false,confirm:'',connectErr:'',connectStage:'',stale:{}};
 const saveUI=()=>ls.set(UI_KEY,U);
 let IX={items:new Map(),todos:new Map(),byItem:new Map()};
 const adopt=x=>normalize(clone(x));
@@ -642,8 +659,9 @@ function itemView(it,o={}){
   const todos=todosOf(it);const openT=todos.filter(t=>!t.done);
   const next=openT.filter(t=>t.ddl).sort((a,b)=>a.ddl<b.ddl?-1:1)[0];
   const exp=isOpen(it.id);const proj=it.kind==='proj';
-  const body=proj?`${(it.people||'').split('\n').filter(Boolean).map(l=>`<div class="meta" data-find>${md(l)}</div>`).join('')}${it.notes?`<div class="notes">${renderText(it.notes)}</div>`:''}`
-    :(it.sub?`<p class="row-sub" data-find>${md(it.sub)}</p>`:'');
+  const stu=studentsOf(it);
+  const body=(stu.length?`<div class="meta" data-find>学生：${esc(stu.join('、'))}</div>`:'')+(proj?`${(it.people||'').split('\n').filter(Boolean).map(l=>`<div class="meta" data-find>${md(l)}</div>`).join('')}${it.notes?`<div class="notes">${renderText(it.notes)}</div>`:''}`
+    :(it.sub?`<p class="row-sub" data-find>${md(it.sub)}</p>`:''));
   return `<div class="it${exp?' open':''}${proj?' proj':''}" id="it-${id}" data-key="${id}">
     <div class="it-row">
       <button class="it-h" type="button" data-act="exp" data-id="${id}" aria-expanded="${exp}"><span class="car"></span>${proj?`<span class="proj-id">${id}</span>`:''}<span class="it-t" data-find>${esc(it.title)}</span>${proj&&it.target?`<span class="tgt">${esc(it.target)}</span>`:''}</button>
@@ -790,6 +808,29 @@ function renderWeek(){
   </div>`;
 }
 
+/* students: who works on which project */
+const studentsOf=it=>(D.students||[]).filter(s=>(s.projects||[]).includes(it.id)).map(s=>s.name);
+function studentsSection(){
+  const projs=areaItems('research','proj'),parts=areaItems('research','collab');const list=D.students||[];
+  const row=s=>{
+    if(T.editStudent===s.id)return `<div class="stu"><form class="edit" data-form="student" data-id="${esc(s.id)}">
+      <label>名字<input class="field" name="name" id="stu-name-${esc(s.id)}" value="${esc(s.name)}" required></label>
+      <label>备注<input class="field" name="note" id="stu-note-${esc(s.id)}" value="${esc(s.note||'')}"></label>
+      <div class="btnrow"><button class="btn" type="submit">保存</button><button class="btn ghost" type="button" data-act="student-cancel">取消</button></div></form></div>`;
+    const mine=s.projects||[];
+    const lead=projs.map(p=>{const on=mine.includes(p.id);return `<button type="button" class="pchip${on?' on':''}" data-act="stu-proj" data-id="${esc(s.id)}" data-v="${esc(p.id)}" aria-pressed="${on}" title="${esc(label(p))}">${esc(p.id)}</button>`}).join('');
+    const partOn=parts.filter(p=>mine.includes(p.id)).map(p=>`<button type="button" class="pchip on wide" data-act="stu-proj" data-id="${esc(s.id)}" data-v="${esc(p.id)}" aria-pressed="true" title="取消分配：${esc(p.title)}">${esc(p.title)} ×</button>`).join('');
+    const avail=parts.filter(p=>!mine.includes(p.id));
+    return `<div class="stu" id="stu-${esc(s.id)}">
+      <div class="stu-h"><span class="stu-n" data-find>${esc(s.name)}</span>
+        <div class="pchips">${lead}${partOn}${avail.length?`<select class="pill" id="stu-add-${esc(s.id)}" data-act="stu-add" data-id="${esc(s.id)}" aria-label="给 ${esc(s.name)} 加合作项目"><option value="">+ 合作项目</option>${avail.map(p=>`<option value="${esc(p.id)}">${esc(p.title)}</option>`).join('')}</select>`:''}</div>
+        <span class="act-r"><button class="pen" type="button" data-act="student-edit" data-id="${esc(s.id)}" aria-label="编辑 ${esc(s.name)}" title="编辑">✎</button><button class="wx" type="button" data-act="student-del" data-id="${esc(s.id)}" aria-label="删除 ${esc(s.name)}" title="删除">×</button></span></div>
+      ${s.note?`<p class="row-sub" data-find>${md(s.note)}</p>`:''}
+    </div>`};
+  const add=T.addingStudent?`<form class="edit" data-form="student-new"><label>名字<input class="field" name="name" id="stu-new" required></label>
+    <div class="btnrow"><button class="btn" type="submit">添加</button><button class="btn ghost" type="button" data-act="student-cancel">取消</button></div></form>`:'';
+  return group('r-stu','学生',`${add}${list.length?`<div class="box stus">${list.map(row).join('')}</div>`:'<p class="blank">还没有学生。</p>'}`,
+    {count:list.length,aside:`<button class="btn ghost sm" type="button" data-act="student-add">+</button>`})}
 function renderResearch(){
   const projs=areaItems('research','proj'),cols=areaItems('research','collab');
   const L=selList('lead',projs,'research','proj','例如：Self-improving policy'),P=selList('part',cols,'research','collab','例如：某合作');
@@ -797,6 +838,7 @@ function renderResearch(){
   ${pageHead('科研')}
   ${group('r-proj','Lead Project',L.body||'<p class="blank">还没有。</p>',{count:projs.length,aside:L.switch+addBtn('research','proj','+')})}
   ${group('r-collab','Participate Project',P.body||'<p class="blank">还没有。</p>',{count:cols.length,aside:P.switch+addBtn('research','collab','+')})}
+  ${studentsSection()}
   ${group('r-ref','资料',notes(['hero','students','bottomline','authorship']),{closed:true})}
   </div>`}
 function renderIntern(){const its=areaItems('intern');return `<div class="narrow stack">
@@ -907,6 +949,7 @@ function renderSettings(){
       ${Sync.mode==='github'?`<button class="btn danger" type="button" data-act="disconnect" style="margin-left:auto">${dis?'再点一次：移除这台设备的 token':'断开这台设备'}</button>`:''}
     </div></section>
   <section class="box"><h2 class="h-sm">外观</h2>${filterChips('theme',U.theme,[['system','跟随系统'],['light','浅色'],['dark','深色']])}</section>
+  <p class="hint">版本 ${esc(BUILD)}</p>
   <section class="box" id="settings-hidden"><h2 class="h-sm">已删除的窗口</h2>
     ${hidden.length?`<div class="chips">${hidden.map(([k,t])=>`<span class="tag restore">${esc(t)}<button class="linkbtn" type="button" data-act="unhide" data-id="${esc(k)}">恢复</button></span>`).join('')}</div>`:'<p class="blank">没有。</p>'}</section>
   </div>`}
@@ -1012,6 +1055,7 @@ document.addEventListener('change',async e=>{
     case 'absorb':{const x=D.absorb.find(a=>a.id===id);if(x){x.done=t.checked;commit('待吸收')}return}
     case 'ch-date':{const c=D.channels.find(x=>x.id===id);if(c){c.date=t.value;commit('曝光渠道')}return}
     case 'paper':U.paper=t.value;saveUI();render();return;
+    case 'stu-add':{const s=(D.students||[]).find(x=>x.id===id);if(s&&t.value){s.projects=[...(s.projects||[]),t.value];commit('学生分配')}return}
     case 'import':{try{T.pendingImport=await readFile(t);T.confirm='import';setTab('settings')}catch(err){toast(err.message)}t.value='';return}
     case 'seed-file':{try{const data=await readFile(t);await firstWrite(data)}catch(err){T.connectErr=err.message;renderConnect()}return}
   }
@@ -1043,6 +1087,8 @@ document.addEventListener('submit',e=>{
     case 'blk':{const id=f.dataset.id;const b=D.blocks[id]=Object.assign({type:'list'},D.blocks[id]||{});b.title=v('title');b.text=f.elements.text.value.replace(/\s+$/,'');T.editBlock='';U.exp['blk:'+id]=true;commit('编辑：'+(b.title||id));return}
     case 'routine':{const r=D.routines.find(x=>x.id===f.dataset.id);if(!r)return;r.title=v('title')||r.title;r.items=f.elements.text.value.split('\n').map(s=>s.trim()).filter(Boolean);T.editBlock='';commit('每周例行');return}
     case 'step':{const s=D.steps.find(x=>x.id===f.dataset.id);if(!s)return;s.desc=v('desc');s.items=f.elements.text.value.split('\n').map(x=>x.trim()).filter(Boolean);s.checks={};T.editBlock='';commit('退一步清单');return}
+    case 'student-new':{if(!v('name'))return;(D.students=D.students||[]).push({id:'st'+uid(),name:v('name'),projects:[],note:''});T.addingStudent=false;commit('学生');return}
+    case 'student':{const s=(D.students||[]).find(x=>x.id===f.dataset.id);if(!s)return;s.name=v('name')||s.name;s.note=v('note');T.editStudent='';commit('学生');return}
     case 'conv':{const id=f.dataset.id;const items=textToConvItems(f.elements.text.value);
       if(id==='new')D.convs.push({id:'c'+uid(),who:v('who'),p:v('who'),date:v('date'),items});
       else{const c=D.convs.find(x=>x.id===id);if(!c)return;if(c.who!==v('who'))c.p=v('who');c.who=v('who');c.date=v('date');c.items=items}
@@ -1094,12 +1140,18 @@ document.addEventListener('click',async e=>{
     case 'absorb-del':snapshot();D.absorb=D.absorb.filter(x=>x.id!==id);commit('待吸收');toast('已删除',true);return;
     case 'inbox-del':snapshot();D.inbox=D.inbox.filter(n=>n.id!==id);commit('随手记');toast('已删除',true);return;
     case 'ch-today':{const c=D.channels.find(x=>x.id===id);if(c){c.date=TODAY_ISO;commit('曝光渠道');toast('已记录：今天更新')}return}
+    case 'stu-proj':{const s=(D.students||[]).find(x=>x.id===id);if(!s)return;const p=s.projects||[];s.projects=p.includes(v)?p.filter(x=>x!==v):[...p,v];commit('学生分配');return}
+    case 'student-add':T.addingStudent=true;U.exp['r-stu']=true;render();{const n=document.getElementById('stu-new');if(n)n.focus()}return;
+    case 'student-edit':T.editStudent=id;render();{const n=document.getElementById('stu-name-'+id);if(n)n.focus()}return;
+    case 'student-cancel':T.addingStudent=false;T.editStudent='';render();return;
+    case 'student-del':snapshot();D.students=(D.students||[]).filter(x=>x.id!==id);commit('学生');toast('已删除学生',true);return;
     case 'conv-new':T.editConv='new';U.cfWho='';U.cfTag='';U.exp['n-talks']=true;render();{const n=document.getElementById('cv-who-new');if(n)n.focus()}return;
     case 'conv-edit':T.editConv=id;render();return;
     case 'conv-cancel':T.editConv='';render();return;
     case 'conv-del':snapshot();D.convs=D.convs.filter(c=>c.id!==id);T.editConv='';commit('对话记录');toast('已删除对话',true);return;
     case 'sync-now':Sync.pending?Sync.push():Sync.refresh().then(()=>{if(Sync.status==='ok')toast('已是最新')});return;
     case 'download':download();return;
+    case 'reload':location.replace(location.pathname+'?v='+encodeURIComponent(document.getElementById('update').dataset.v||Date.now())+location.hash);return;
     case 'import-confirm':if(T.pendingImport){D=adopt(T.pendingImport);T.pendingImport=null;T.confirm='';commit('导入备份');toast('已导入')}return;
     case 'import-cancel':T.pendingImport=null;T.confirm='';render();return;
     case 'connect':T.connectStage='';T.connectErr='';renderConnect();return;
@@ -1117,6 +1169,17 @@ window.addEventListener('online',()=>{if(Sync.pending)Sync.push()});
 function saveTodoEdit(inp){const td=todoById(inp.dataset.id);T.editTodo='';const val=inp.value.trim();if(td&&val&&val!==td.t){td.t=val;commit('修改 To-Do')}else render()}
 document.addEventListener('focusout',e=>{const t=e.target;if(t.dataset&&t.dataset.edit==='todo'&&T.editTodo===t.dataset.key)saveTodoEdit(t)});
 document.addEventListener('keydown',e=>{const t=e.target;if(e.key==='Escape'&&t.dataset&&t.dataset.edit==='todo'){T.editTodo='';render()}});
+
+const BUILD=(document.querySelector('meta[name="app-build"]')||{}).content||'dev';
+let lastCheck=0;
+async function checkUpdate(){
+  if(!/^https?:/.test(location.protocol)||Date.now()-lastCheck<60000)return;lastCheck=Date.now();
+  try{const r=await fetch(location.pathname+'?check='+Date.now(),{cache:'no-store'});if(!r.ok)return;
+    const m=/<meta name="app-build" content="([^"]+)"/.exec(await r.text());
+    if(m&&m[1]!==BUILD&&BUILD!=='dev'){const bar=document.getElementById('update');bar.dataset.v=m[1];bar.hidden=false}
+  }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 
 /* ============================== search ============================== */
 const q=document.getElementById('q'),res=document.getElementById('results');let hits=[];
@@ -1164,7 +1227,7 @@ async function boot(){
     Sync.mode='preview';D=normalize(ls.get(PREVIEW_KEY)||JSON.parse(seedEl.textContent));Sync.status='local';reindex();paintSync();render();
   }else{renderConnect()}
 }
-boot();
+boot().then(()=>setTimeout(checkUpdate,1500));
 })();
 </script>
 </body>
