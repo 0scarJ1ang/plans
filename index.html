@@ -1,0 +1,1131 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>PhD Plans and Thinking</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+/* Layout: an engineering lab notebook. Sticky masthead with sync chip + tab rail; the week sheet pulls
+   to-dos from every area; each area sheet is trackers (priority, status, to-do/DDL, progress log) then reference notes. */
+:root{
+  --bg:#F2F4F6; --surface:#FFFFFF; --sunk:#E8ECF0; --ink:#16202A; --muted:#58646F; --line:#D8DEE4; --grid:rgba(30,90,150,.07);
+  --accent:#1E5A96; --accent-soft:#E2ECF6; --on-accent:#FFFFFF;
+  --p0:#B3321F; --p0-bg:#FAE7E3; --p1:#94590A; --p1-bg:#F8EDD8; --p2:#1D6A56; --p2-bg:#E0F1EA; --p3:#5D6873; --p3-bg:#EAEEF1;
+  --ok:#1D7A4C; --warn:#94590A; --bad:#B3321F; --shadow:rgba(16,24,32,.14);
+  --f-display:"IBM Plex Sans Condensed","Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Noto Sans SC","PingFang SC","Microsoft YaHei",monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1318; --surface:#151C23; --sunk:#1C252E; --ink:#E3E8ED; --muted:#93A0AC; --line:#28333E; --grid:rgba(125,176,232,.06);
+  --accent:#7DB0E8; --accent-soft:#1A2B3D; --on-accent:#0E1318;
+  --p0:#F08B79; --p0-bg:#3A1E19; --p1:#E6B45E; --p1-bg:#33270F; --p2:#6BCBA8; --p2-bg:#122C24; --p3:#A3AEB9; --p3-bg:#222A33;
+  --ok:#62CB93; --warn:#E6B45E; --bad:#F08B79; --shadow:rgba(0,0,0,.5); color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E1318; --surface:#151C23; --sunk:#1C252E; --ink:#E3E8ED; --muted:#93A0AC; --line:#28333E; --grid:rgba(125,176,232,.06);
+  --accent:#7DB0E8; --accent-soft:#1A2B3D; --on-accent:#0E1318;
+  --p0:#F08B79; --p0-bg:#3A1E19; --p1:#E6B45E; --p1-bg:#33270F; --p2:#6BCBA8; --p2-bg:#122C24; --p3:#A3AEB9; --p3-bg:#222A33;
+  --ok:#62CB93; --warn:#E6B45E; --bad:#F08B79; --shadow:rgba(0,0,0,.5); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:120px}
+body{background:var(--bg);color:var(--ink);font:15px/1.65 var(--f-body);-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-underline-offset:2px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+button{font-family:inherit}
+.wrap{max-width:1160px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* masthead */
+.mast{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--line)}
+.mast-row{display:flex;align-items:center;gap:10px 14px;padding-block:10px 4px;flex-wrap:wrap}
+.brand{font:600 20px/1.1 var(--f-display);letter-spacing:.005em;margin:0}
+.brand small{display:block;font:400 11.5px/1.4 var(--f-mono);color:var(--muted);margin-top:3px}
+.mast-tools{display:flex;gap:8px;align-items:center;margin-left:auto;flex:1 1 300px;justify-content:flex-end;min-width:0}
+.search{position:relative;flex:1 1 200px;max-width:360px;min-width:0}
+.search input{width:100%;font:14px var(--f-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 34px 7px 11px}
+.search input:not(:placeholder-shown)+kbd{display:none}
+.search kbd{position:absolute;right:8px;top:50%;transform:translateY(-50%);font:11px var(--f-mono);color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 5px;pointer-events:none}
+.results{position:absolute;right:0;top:calc(100% + 6px);width:min(560px,calc(100vw - 32px));max-height:60vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px var(--shadow);padding:6px;z-index:40}
+.results button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--ink);font:13.5px/1.5 var(--f-body);padding:8px 10px;border-radius:6px;cursor:pointer}
+.results button:hover,.results button:focus-visible{background:var(--sunk)}
+.results .rt{font:500 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);display:block}
+.results mark{background:var(--p1-bg);color:var(--ink);border-radius:2px}
+.results .empty{padding:10px;color:var(--muted);font-size:13px}
+.iconbtn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;font:500 12px var(--f-mono);padding:7px 10px;cursor:pointer;white-space:nowrap}
+.sync{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;font:500 11.5px var(--f-mono);padding:6px 10px;cursor:pointer;white-space:nowrap}
+.sync[data-s="ok"]{color:var(--ok)} .sync[data-s="dirty"],.sync[data-s="saving"]{color:var(--warn)}
+.sync[data-s="error"],.sync[data-s="auth"],.sync[data-s="offline"]{color:var(--bad);border-color:var(--bad)}
+.tabs{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;margin-bottom:-1px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{appearance:none;border:0;background:none;padding:8px 11px 9px;font:500 14.5px var(--f-body);color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab:hover{color:var(--ink)}
+.tab .n{font:500 10.5px var(--f-mono);margin-left:4px;padding:1px 5px;border-radius:99px;background:var(--p0-bg);color:var(--p0)}
+
+/* sheet */
+main{padding-block:24px 72px}
+.panel{display:grid;gap:30px}
+.sec{display:grid;gap:12px;min-width:0;align-content:start}
+.sec-h{display:flex;align-items:baseline;gap:6px 12px;flex-wrap:wrap}
+.sec-h h2{font:600 19px/1.25 var(--f-display);margin:0;text-wrap:balance}
+.sec-h .aside{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+h3{font:600 16px/1.3 var(--f-display);margin:0;text-wrap:balance}
+.eyebrow{font:500 11px/1.3 var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);margin:0;max-width:72ch}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;min-width:0;display:grid;gap:10px;align-content:start}
+.box-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.box-h h3{flex:1;min-width:0}
+.grid2{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));align-items:start}
+.cols{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));align-items:start}
+.stack{display:grid;gap:20px;align-content:start;min-width:0}
+ul.list{margin:0;padding-left:1.15em;display:grid;gap:5px}
+ul.list li{min-width:0;overflow-wrap:anywhere}
+ul.list li::marker{color:var(--muted)}
+ul.list ul.list{margin-top:4px;color:var(--muted);font-size:14px}
+.para{margin:0;overflow-wrap:anywhere}
+strong{font-weight:600}
+.k{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)} .small{font-size:13px}
+.blank{color:var(--muted);font-style:italic;font-size:13.5px;margin:0}
+
+/* hero */
+.hero{background-color:var(--surface);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px;border:1px solid var(--line);border-radius:12px;padding:20px 22px;display:grid;gap:10px}
+.umb{font:600 clamp(22px,3.2vw,30px)/1.15 var(--f-display);margin:0;text-wrap:balance;max-width:30ch}
+.umb-sub{margin:0;color:var(--muted);max-width:72ch}
+.goal{margin:0;padding:2px 0 2px 14px;border-left:2px solid var(--accent);font-size:15.5px;max-width:72ch}
+.goal cite{display:block;font-style:normal;color:var(--muted);font-size:13px;margin-top:4px}
+
+/* controls */
+select.pill{appearance:none;-webkit-appearance:none;border:1px solid var(--line);background-color:var(--surface);color:var(--ink);font:500 12px/1.2 var(--f-mono);padding:4px 22px 4px 9px;border-radius:999px;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 11px) 52%,calc(100% - 7px) 52%;background-size:4px 4px;background-repeat:no-repeat;max-width:100%}
+select.pri[data-p="P0"]{color:var(--p0);background-color:var(--p0-bg);border-color:transparent}
+select.pri[data-p="P1"]{color:var(--p1);background-color:var(--p1-bg);border-color:transparent}
+select.pri[data-p="P2"]{color:var(--p2);background-color:var(--p2-bg);border-color:transparent}
+select.pri[data-p="P3"]{color:var(--p3);background-color:var(--p3-bg);border-color:transparent}
+select.pri[data-p="none"]{color:var(--muted);border-style:dashed}
+select.st{color:var(--muted)}
+.pdot{display:inline-block;font:500 11px/1 var(--f-mono);padding:3px 6px;border-radius:4px;vertical-align:1px}
+.pdot.P0{color:var(--p0);background:var(--p0-bg)} .pdot.P1{color:var(--p1);background:var(--p1-bg)}
+.pdot.P2{color:var(--p2);background:var(--p2-bg)} .pdot.P3{color:var(--p3);background:var(--p3-bg)} .pdot.none{color:var(--muted);background:var(--sunk)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chipbtn{border:1px solid var(--line);background:var(--surface);color:var(--muted);font:500 12px var(--f-mono);padding:4px 10px;border-radius:999px;cursor:pointer}
+.chipbtn[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.linkbtn{border:0;background:none;color:var(--accent);font:500 12.5px var(--f-body);padding:2px 0;cursor:pointer;justify-self:start;text-align:left}
+.linkbtn.muted{color:var(--muted)}
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);font:500 13px var(--f-body);padding:6px 12px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.danger{border-color:var(--bad);color:var(--bad);background:transparent}
+.btn.sm{font-size:12px;padding:3px 9px}
+.tag{font:500 10.5px/1 var(--f-mono);padding:3px 6px;border-radius:4px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.tags{display:inline-flex;gap:4px;flex-wrap:wrap;vertical-align:1px;margin-left:4px}
+.field,input.field,textarea.field,select.field{font:14px var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:6px 9px;min-width:0;width:100%}
+textarea.field{min-height:84px;resize:vertical;line-height:1.55}
+textarea.code{font:13px/1.55 var(--f-mono)}
+input[type=date].field{font:12.5px var(--f-mono);width:auto}
+form.edit{display:grid;gap:8px;padding:10px 12px;border:1px dashed var(--accent);border-radius:9px;background:var(--accent-soft)}
+form.edit label{display:grid;gap:3px;font-size:12.5px;color:var(--muted)}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hint{font-size:12px;color:var(--muted);margin:0}
+
+/* tracker rows & cards */
+.rows{display:grid;background:var(--surface);border:1px solid var(--line);border-radius:10px;min-width:0}
+.row{display:grid;gap:6px;padding:11px 14px;border-top:1px solid var(--line);min-width:0}
+.row:first-child{border-top:0}
+.row-top{display:flex;gap:8px 12px;align-items:flex-start;flex-wrap:wrap}
+.row-main{flex:1 1 260px;min-width:0}
+.row-title{font-weight:500}
+.row-sub{font-size:13.5px;color:var(--muted)}
+.row-ctl{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.row-foot{display:flex;gap:4px 14px;flex-wrap:wrap;align-items:center}
+.projs{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));align-items:start}
+.proj{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:10px;min-width:0}
+.proj-h{display:flex;gap:10px;align-items:baseline}
+.proj-id{font:600 13px/1 var(--f-mono);color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:4px 6px;flex:none}
+.proj-h h3{flex:1;min-width:0}
+.tgt{font:500 12px var(--f-mono);color:var(--muted);white-space:nowrap}
+.meta{font-size:13.5px;color:var(--muted)}
+.stages{display:flex;flex-wrap:wrap;gap:6px 14px;font:500 12.5px var(--f-mono);color:var(--muted)}
+.stages b{color:var(--ink);font-weight:600}
+.empty-card{border:1px dashed var(--line);border-radius:10px;padding:14px;color:var(--muted);font-size:13.5px}
+
+/* to-dos */
+.todos{display:grid;min-width:0}
+.td{display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;padding:6px 0;border-top:1px dashed var(--line);min-width:0}
+.todos > .td:first-child{border-top:0}
+.td input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;margin:0;flex:none}
+.td-t{flex:1 1 180px;min-width:0;font-size:14px;cursor:pointer;overflow-wrap:anywhere}
+.td.done .td-t{text-decoration:line-through;color:var(--muted)}
+.td .x{border:0;background:none;color:var(--muted);font-size:16px;line-height:1;padding:2px 4px;cursor:pointer;border-radius:4px}
+.td .x:hover{color:var(--bad)}
+input.ddl{font:12px var(--f-mono);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:6px;padding:2px 5px;max-width:9.6em}
+input.ddl:not(.has){opacity:.45}
+.due{font:500 11.5px/1 var(--f-mono);padding:4px 7px;border-radius:999px;white-space:nowrap}
+.due.over{background:var(--p0-bg);color:var(--p0)} .due.soon{background:var(--p1-bg);color:var(--p1)} .due.later{background:var(--sunk);color:var(--muted)}
+.wkb{border:1px solid var(--line);background:transparent;color:var(--muted);font:500 11px var(--f-mono);padding:3px 7px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.wkb.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.ichip{border:0;background:var(--sunk);color:var(--muted);font:500 11.5px var(--f-mono);padding:3px 7px;border-radius:5px;cursor:pointer;max-width:17em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ichip:hover{color:var(--ink)}
+form.add{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding-top:6px}
+form.add input[type=text]{flex:1 1 200px;width:auto}
+form.add select.field{flex:0 1 230px;width:auto}
+
+/* progress log */
+.log{display:grid;gap:0;font-size:13.5px}
+.log-e{display:grid;grid-template-columns:84px minmax(0,1fr) auto;gap:8px;padding:5px 0;border-top:1px dotted var(--line);align-items:baseline}
+.log-e:first-child{border-top:0}
+.log-e .d{font:500 12px var(--f-mono);color:var(--muted)}
+.log-e.auto .t{color:var(--muted)}
+.log-e .x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 4px}
+.lastlog{font-size:13px;color:var(--muted)}
+.lastlog .d{font-family:var(--f-mono);margin-right:6px}
+
+/* week */
+.wknav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.wklabel{font:600 22px/1.1 var(--f-display)}
+.wklabel small{font:500 13px var(--f-mono);color:var(--muted);margin-left:8px}
+.grp{display:grid;gap:2px}
+.grp-h{display:flex;gap:8px;align-items:baseline;padding-top:8px}
+.grp-h .k{color:var(--accent)}
+.meter{display:flex;align-items:center;gap:8px;font:500 12px var(--f-mono);color:var(--muted)}
+.bar{height:6px;border-radius:99px;background:var(--sunk);overflow:hidden;flex:1;min-width:60px}
+.bar i{display:block;height:100%;background:var(--accent)}
+.hist{display:grid}
+.hist button{display:grid;grid-template-columns:120px 1fr auto;gap:4px 14px;align-items:baseline;text-align:left;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);padding:10px 4px;cursor:pointer;font:14px var(--f-body)}
+.hist button:first-child{border-top:0}
+.hist button:hover{background:var(--sunk)}
+.hist .w{font:600 13px var(--f-mono)}
+.hist .w small{display:block;font-weight:400;color:var(--muted)}
+.hist .g{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.hist .s{font:500 12px var(--f-mono);color:var(--muted);white-space:nowrap}
+
+/* timeline */
+.tl-p{display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.tl-p:first-child{border-top:0}
+.tl-when{font:500 13px/1.4 var(--f-mono);padding-top:6px}
+.tl-p.now .tl-when{color:var(--accent)}
+.tl-p.now .tl-when::after{content:"现在";display:block;width:max-content;font-size:10.5px;letter-spacing:.06em;margin-top:4px;padding:2px 6px;border-radius:4px;background:var(--accent-soft)}
+.tl-p.past{opacity:.62}
+
+/* freshness */
+.fr{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;padding:9px 0;border-top:1px solid var(--line)}
+.fr:first-child{border-top:0}
+.fr-t{flex:1 1 160px;min-width:0;font-weight:500}
+.fr-t small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+.age{font:500 12px var(--f-mono);padding:3px 8px;border-radius:999px;white-space:nowrap}
+.age.ok{color:var(--ok);background:var(--p2-bg)} .age.warn{color:var(--warn);background:var(--p1-bg)} .age.bad{color:var(--bad);background:var(--p0-bg)} .age.na{color:var(--muted);background:var(--sunk)}
+
+/* conversations */
+.convs{columns:2 330px;column-gap:16px}
+.conv{break-inside:avoid;margin-bottom:16px}
+.conv-h{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.who{font:600 15px var(--f-display)}
+.date{font:500 12px var(--f-mono);color:var(--muted)}
+.conv ul.list{font-size:14px}
+
+/* career */
+.paths{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))}
+.box.primary{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.rank{font:500 11px var(--f-mono);padding:3px 7px;border-radius:4px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.formula{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.fx{display:grid;gap:2px;align-content:start}
+.fx b{font:600 40px/1 var(--f-display);color:var(--accent)}
+.fx span{font-weight:500}
+.fx small{color:var(--muted);font-size:12.5px}
+.slot{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:center}
+.slot b{font:600 18px var(--f-display);color:var(--accent);text-align:center}
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font:500 13px var(--f-mono)}
+.chain span{padding:4px 9px;border-radius:6px;background:var(--sunk)}
+.chain i{font-style:normal;color:var(--muted)}
+.lc{display:flex;gap:8px;align-items:flex-start;font-size:14px;padding:3px 0;cursor:pointer}
+.lc input{accent-color:var(--accent);margin-top:4px;flex:none}
+.lc.done span{color:var(--muted);text-decoration:line-through}
+
+/* rating, steps */
+.rate{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:7px 0;border-top:1px solid var(--line)}
+.rate:first-child{border-top:0}
+.rate-t{flex:1 1 260px;min-width:0;font-size:14px}
+.dots{display:flex;gap:4px}
+.dots button{width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);font:500 11px var(--f-mono);cursor:pointer;padding:0}
+.dots button.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.hist-dates{display:flex;gap:6px;flex-wrap:wrap}
+
+.inbox-i{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-top:1px dashed var(--line)}
+.inbox-i:first-child{border-top:0}
+.inbox-i p{margin:0;flex:1;min-width:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+.inbox-i .x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);font:500 13px var(--f-body);padding:9px 14px;border-radius:8px;z-index:50;max-width:calc(100vw - 32px)}
+.flash{outline:2px solid var(--p1);outline-offset:3px;border-radius:6px}
+@media (prefers-reduced-motion: no-preference){
+  .flash{animation:fl 1.6s ease-out forwards}
+  @keyframes fl{0%,60%{outline-color:var(--p1)}100%{outline-color:transparent}}
+}
+details.old summary{cursor:pointer;font-weight:500}
+details.old[open] summary{margin-bottom:8px}
+
+/* connect */
+.connect{max-width:620px;margin:20px auto 0;display:grid;gap:16px}
+.connect ol{margin:0;padding-left:1.3em;display:grid;gap:6px;font-size:14px}
+.connect code{font:12.5px var(--f-mono);background:var(--sunk);padding:1px 5px;border-radius:4px}
+.err{color:var(--bad);font-size:13.5px;margin:0}
+@media (max-width:560px){
+  .tl-p{grid-template-columns:68px minmax(0,1fr)}
+  .formula{gap:6px} .fx b{font-size:32px}
+  .hist button{grid-template-columns:96px 1fr}
+  .hist .s{grid-column:2}
+  .log-e{grid-template-columns:72px minmax(0,1fr) auto}
+}
+</style>
+</head>
+<body>
+<header class="mast">
+  <div class="wrap">
+    <div class="mast-row">
+      <h1 class="brand">PhD Plans and Thinking<small id="today-line">—</small></h1>
+      <div class="mast-tools">
+        <div class="search">
+          <input id="q" type="search" placeholder="搜索全部内容…" autocomplete="off" aria-label="搜索全部内容">
+          <kbd>/</kbd>
+          <div class="results" id="results" hidden></div>
+        </div>
+        <button class="sync" id="sync" type="button" data-s="none">—</button>
+        <button class="iconbtn" id="theme" type="button" aria-label="切换主题">主题：系统</button>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" id="tabs" aria-label="分区"></nav>
+  </div>
+</header>
+<main class="wrap" id="main">
+  <div id="panels"></div>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ============================== constants ============================== */
+const TABS=[['week','本周'],['overview','总览'],['research','研究'],['intern','实习'],['visit','访问'],['career','职业'],['profile','曝光'],['admin','杂事'],['step','退一步'],['talks','对话']];
+const TABNAME=Object.fromEntries(TABS);
+const AREAS=['research','intern','visit','career','profile','admin','step'];
+const AREANAME={research:'研究',intern:'实习',visit:'访问',career:'职业',profile:'曝光',admin:'杂事',step:'退一步'};
+const PRI=[['P0','P0 紧急'],['P1','P1 重要'],['P2','P2 推进'],['P3','P3 有空'],['','— 未设']];
+const PRANK={P0:0,P1:1,P2:2,P3:3,'':4};
+const SETS={
+  proj:['Maintaining','Submitting','Pushing','Starting','Paused','Done'],
+  collab:['参与中','待确认','观望','已结束'],
+  lead:['想法','待联系','聊过','合作中','放弃'],
+  intern:['想法','联系中','已投递','面试中','Offer','放弃'],
+  visit:['想法','联系中','申请中','已确定','放弃'],
+  app:['关注','准备中','已提交','有结果','放弃'],
+  todo:['想法','准备中','进行中','完成'],
+};
+const KIND_SET={proj:'proj',collab:'collab',lead:'lead',intern:'intern',visit:'visit',app:'app',todo:'todo',step:'todo'};
+const TAGS={r:'研究',i:'实习',v:'Visiting',c:'职业',p:'曝光',m:'心态'};
+const TAGCODE={'研究':'r','实习':'i','visiting':'v','访问':'v','职业':'c','曝光':'p','心态':'m'};
+const EMPTY={v:2,items:[],todos:[],logs:[],weeks:{},routines:[],
+  steps:[{id:'hb',title:'退半步',en:'Half a Step Back',desc:'',items:[],checks:{},history:[]},{id:'fb',title:'退一步',en:'Full Step Back',desc:'',items:[],checks:{},history:[]}],
+  timeline:{version:'',periods:[],always:[]},blocks:{},abilities:[],rate:{},rateAt:'',channels:[],
+  launchTpl:[{g:'Open-source',items:['GitHub']},{g:'Advertisement',items:['ArXiv upload','Personal homepage','Social Media']},{g:'Connection Opportunity',items:['Email related researchers']}],
+  launch:{},letters:['','',''],absorb:[],checks:{},inbox:[],convs:[]};
+
+/* ============================== utilities ============================== */
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function md(s){return esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')}
+const clone=x=>JSON.parse(JSON.stringify(x));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parseD=s=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||'');return m?new Date(+m[1],+m[2]-1,+m[3]):null};
+const NOW=new Date(), TODAY=new Date(NOW.getFullYear(),NOW.getMonth(),NOW.getDate());
+const TODAY_ISO=iso(TODAY), TODAY_YM=TODAY_ISO.slice(0,7);
+const daysTo=s=>{const d=parseD(s);return d?Math.round((d-TODAY)/864e5):null};
+const mdShort=s=>{const d=parseD(s);return d?(d.getMonth()+1)+'.'+d.getDate():''};
+const nowHM=()=>{const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())};
+function isoWeek(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const y=t.getUTCFullYear();const w=Math.ceil(((t-Date.UTC(y,0,1))/864e5+1)/7);return y+'-W'+pad(w)}
+function weekMonday(wk){const m=/^(\d{4})-W(\d{2})$/.exec(wk);const y=+m[1],w=+m[2];const jan4=new Date(y,0,4);const day=jan4.getDay()||7;return new Date(y,0,4-day+1+(w-1)*7)}
+function addWeeks(wk,n){const m=weekMonday(wk);m.setDate(m.getDate()+7*n);return isoWeek(m)}
+function weekRange(wk){const m=weekMonday(wk);const s=new Date(m);s.setDate(s.getDate()+6);return [iso(m),iso(s)]}
+const CUR_WK=isoWeek(TODAY);
+function hash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36)}
+const isObj=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
+const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+/* three-way merge: keeps changes made on this device and on others since the last sync */
+function merge3(b,l,r){
+  if(same(l,r))return l; if(same(b,l))return r; if(same(b,r))return l;
+  if(isObj(l)&&isObj(r)){const bb=isObj(b)?b:{};const out={};
+    for(const k of new Set([...Object.keys(l),...Object.keys(r)])){
+      const inL=k in l,inR=k in r,inB=k in bb;
+      if(inL&&inR)out[k]=merge3(bb[k],l[k],r[k]);
+      else if(inL){if(!(inB&&same(bb[k],l[k])))out[k]=l[k]}
+      else{if(!(inB&&same(bb[k],r[k])))out[k]=r[k]}}
+    return out}
+  if(Array.isArray(l)&&Array.isArray(r)){
+    const all=l.concat(r);
+    if(all.every(x=>isObj(x)&&typeof x.id==='string')){
+      const bm=new Map((Array.isArray(b)?b:[]).filter(x=>isObj(x)&&x.id).map(x=>[x.id,x]));
+      const lm=new Map(l.map(x=>[x.id,x])),rm=new Map(r.map(x=>[x.id,x]));const out=[];
+      for(const x of l){if(rm.has(x.id))out.push(merge3(bm.get(x.id),x,rm.get(x.id)));else if(!(bm.has(x.id)&&same(bm.get(x.id),x)))out.push(x)}
+      for(const x of r){if(!lm.has(x.id)&&!(bm.has(x.id)&&same(bm.get(x.id),x)))out.push(x)}
+      return out}
+    if(all.every(x=>typeof x==='string')){const bs=new Set(Array.isArray(b)?b:[]);
+      const out=l.filter(x=>!(bs.has(x)&&!r.includes(x)));for(const x of r)if(!out.includes(x)&&!bs.has(x))out.push(x);return out}
+  }
+  return l;
+}
+function b64enc(str){const bytes=new TextEncoder().encode(str);let bin='';for(let i=0;i<bytes.length;i+=0x8000)bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));return btoa(bin)}
+function b64dec(b64){const bin=atob(b64.replace(/\s/g,''));const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return new TextDecoder().decode(bytes)}
+const ls={get(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}}};
+
+/* line format used by every editable block:
+   "- text" bullet · "  - text" sub-bullet · "=> a → b" chain · other lines are paragraphs */
+function renderText(text){
+  const lines=String(text||'').split('\n');let html='',list=null;
+  const flush=()=>{if(list){html+=ulTree(list);list=null}};
+  for(const raw of lines){
+    if(!raw.trim()){flush();continue}
+    const m=/^(\s*)[-*]\s+(.*)$/.exec(raw);
+    if(m){const lvl=m[1].length>=2?1:0;list=list||[];
+      if(lvl===0||!list.length)list.push({t:m[2],sub:[]});else list[list.length-1].sub.push(m[2]);continue}
+    flush();
+    const c=/^=>\s*(.*)$/.exec(raw.trim());
+    if(c){html+=`<div class="chain">${c[1].split('→').map(s=>`<span>${md(s.trim())}</span>`).join('<i>→</i>')}</div>`;continue}
+    html+=`<p class="para" data-find>${md(raw.trim())}</p>`;
+  }
+  flush();return html}
+function ulTree(list){return `<ul class="list">${list.map(n=>`<li data-find>${md(n.t)}${n.sub.length?`<ul class="list">${n.sub.map(s=>`<li>${md(s)}</li>`).join('')}</ul>`:''}</li>`).join('')}</ul>`}
+
+/* ============================== state ============================== */
+let D=null;                       // synced data (lives in the private repo)
+const CFG_KEY='phd-plans.github',CACHE_KEY='phd-plans.cache',UI_KEY='phd-plans.ui',PREVIEW_KEY='phd-plans.preview';
+const U=Object.assign({tab:'week',week:'',rf:'',rsort:false,ff:'hi',tf:'open',cfWho:'',cfTag:'',theme:'system',pickArea:'',paper:'C',draft:''},ls.get(UI_KEY)||{});
+const T={ddlOpen:{},open:{},openLog:{},editBlock:'',editItem:'',adding:'',editConv:'',picker:false,confirm:'',connectErr:'',connectStage:'',stale:{}};
+const saveUI=()=>ls.set(UI_KEY,U);
+let IX={items:new Map(),todos:new Map(),byItem:new Map()};
+const adopt=x=>normalize(clone(x));
+function normalize(d){const out=Object.assign(clone(EMPTY),d||{});for(const k of Object.keys(EMPTY))if(out[k]==null)out[k]=clone(EMPTY[k]);return out}
+function reindex(){
+  IX={items:new Map(D.items.map(x=>[x.id,x])),todos:new Map(D.todos.map(t=>[t.id,t])),byItem:new Map()};
+  for(const t of D.todos){if(t.del)continue;if(!IX.byItem.has(t.item))IX.byItem.set(t.item,[]);IX.byItem.get(t.item).push(t)}
+}
+const itemById=id=>IX.items.get(id);
+const todoById=id=>IX.todos.get(id);
+const todosOf=it=>IX.byItem.get(it.id)||[];
+const liveTodos=()=>D.todos.filter(t=>!t.del&&IX.items.has(t.item));
+const label=it=>it.kind==='proj'?it.id+' · '+it.title:it.title;
+const pri=it=>it.pri||'';
+const st=it=>it.st||SETS[it.set||KIND_SET[it.kind]||'todo'][0];
+const setOf=it=>it.set||KIND_SET[it.kind]||'todo';
+const areaItems=(area,kind)=>D.items.filter(x=>x.area===area&&(!kind||x.kind===kind));
+const week=wk=>D.weeks[wk]||{plan:[],goals:'',review:'',routine:{}};
+function ensureWeek(wk){if(!D.weeks[wk])D.weeks[wk]={plan:[],goals:'',review:'',routine:{}};const w=D.weeks[wk];w.plan=w.plan||[];w.routine=w.routine||{};return w}
+const inWeek=(id,wk)=>(week(wk).plan||[]).includes(id);
+const block=id=>D.blocks[id]||{title:'',type:'list',text:''};
+const addLog=(item,t,extra)=>D.logs.push(Object.assign({id:uid(),item,d:TODAY_ISO,t},extra||{}));
+
+/* ============================== storage & sync ============================== */
+const GH={cfg:null,
+  base(){const c=this.cfg;return `https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}`},
+  url(){return this.base()+'/contents/'+this.cfg.path.split('/').map(encodeURIComponent).join('/')},
+  h(accept){return {'Authorization':'Bearer '+this.cfg.token,'Accept':accept||'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}},
+  async repo(){const r=await fetch(this.base(),{headers:this.h(),cache:'no-store'});if(!r.ok)throw await ghErr(r);return r.json()},
+  async get(){
+    const q='?ref='+encodeURIComponent(this.cfg.branch);
+    const r=await fetch(this.url()+q,{headers:this.h(),cache:'no-store'});
+    if(r.status===404)return {missing:true};
+    if(!r.ok)throw await ghErr(r);
+    const j=await r.json();let text;
+    if(j.encoding==='base64'&&j.content)text=b64dec(j.content);
+    else{const r2=await fetch(this.url()+q,{headers:this.h('application/vnd.github.raw+json'),cache:'no-store'});if(!r2.ok)throw await ghErr(r2);text=await r2.text()}
+    return {data:normalize(JSON.parse(text)),sha:j.sha}},
+  async put(data,sha,message){
+    const body={message,content:b64enc(JSON.stringify(data,null,1)+'\n'),branch:this.cfg.branch};if(sha)body.sha=sha;
+    const r=await fetch(this.url(),{method:'PUT',headers:Object.assign(this.h(),{'Content-Type':'application/json'}),body:JSON.stringify(body)});
+    if(!r.ok)throw await ghErr(r);return (await r.json()).content.sha}
+};
+async function ghErr(r){let m='';try{m=(await r.json()).message||''}catch(e){}const e=new Error(m||('HTTP '+r.status));e.status=r.status;return e}
+const cfgKey=c=>c?[c.owner,c.repo,c.branch,c.path].join('/'):'';
+
+const Sync={mode:'none',sha:null,base:null,status:'none',msg:'',lastAt:'',pending:false,pushing:false,again:false,timer:null,acts:[],
+  cache(){ls.set(CACHE_KEY,{key:cfgKey(GH.cfg),D,base:this.base,sha:this.sha,dirty:this.pending})},
+  changed(act){
+    if(this.mode==='preview'){ls.set(PREVIEW_KEY,D);this.status='local';this.lastAt=nowHM();paintSync();return}
+    if(this.mode!=='github')return;
+    this.pending=true;if(act&&!this.acts.includes(act))this.acts.push(act);
+    this.cache();if(!this.pushing)this.status='dirty';paintSync();
+    clearTimeout(this.timer);this.timer=setTimeout(()=>this.push(),1500)},
+  async push(){
+    if(this.mode!=='github')return;
+    if(this.pushing){this.again=true;return}
+    if(!this.pending){this.status='ok';paintSync();return}
+    clearTimeout(this.timer);this.pushing=true;this.status='saving';paintSync();
+    const acts=this.acts.splice(0);const msg='plans: '+(acts.slice(0,4).join('、')||'更新');
+    try{
+      for(let attempt=0;;attempt++){
+        const snap=clone(D);
+        try{const sha=await GH.put(snap,this.sha,msg);this.sha=sha;this.base=snap;this.pending=!same(D,snap);
+          this.status=this.pending?'dirty':'ok';this.lastAt=nowHM();this.cache();break}
+        catch(e){
+          if((e.status===409||e.status===422)&&attempt<3){
+            const remote=await GH.get();
+            if(remote.missing){this.sha=null;continue}
+            D=adopt(merge3(this.base,D,remote.data));this.base=remote.data;this.sha=remote.sha;reindex();renderSoft();continue}
+          throw e}
+      }
+    }catch(e){
+      this.acts.unshift(...acts);this.msg=e.message||'';
+      this.status=(e.status===401||e.status===403)?'auth':(navigator.onLine===false||!e.status)?'offline':'error';
+    }finally{this.pushing=false;paintSync();
+      if(this.again){this.again=false;if(this.pending){clearTimeout(this.timer);this.timer=setTimeout(()=>this.push(),800)}}}
+  },
+  async refresh(){
+    if(this.mode!=='github'||this.pushing)return;
+    try{const remote=await GH.get();if(remote.missing||remote.sha===this.sha)return;
+      D=adopt(this.pending?merge3(this.base,D,remote.data):remote.data);this.base=remote.data;this.sha=remote.sha;
+      reindex();this.cache();this.status=this.pending?'dirty':'ok';this.lastAt=nowHM();paintSync();renderSoft();
+      if(this.pending)this.push();
+    }catch(e){}
+  }
+};
+function paintSync(){
+  const b=document.getElementById('sync');const s=Sync.status;b.dataset.s=s;
+  b.textContent={none:'—',local:'本地预览',ok:'已同步 '+Sync.lastAt,dirty:'待保存…',saving:'保存中…',offline:'离线：改动存在本机',auth:'Token 失效',error:'同步出错，点我重试'}[s]||s;
+  b.title=Sync.msg||'';
+}
+
+/* ============================== mutations ============================== */
+function commit(act){reindex();Sync.changed(act);render()}
+function setDone(id,on){const t=todoById(id);if(!t)return;t.done=on;
+  if(on){t.doneAt=TODAY_ISO;addLog(t.item,'完成：'+t.t,{auto:true,todo:t.id})}
+  else{t.doneAt='';D.logs=D.logs.filter(l=>!(l.auto&&l.todo===id))}}
+function addTodo(item,t,ddl,wk){const td={id:uid(),item,t,ddl:ddl||'',done:false,created:TODAY_ISO};D.todos.push(td);if(wk)ensureWeek(wk).plan.push(td.id);return td}
+function deleteTodo(id){const t=todoById(id);if(!t)return;
+  const used=Object.values(D.weeks).some(w=>(w.plan||[]).includes(id));
+  if(used)t.del=true;else D.todos=D.todos.filter(x=>x.id!==id);
+  D.logs=D.logs.filter(l=>!(l.auto&&l.todo===id))}
+function nextProjId(){for(let c=65;c<91;c++){const id=String.fromCharCode(c);if(!itemById(id))return id}return 'P'+uid()}
+
+/* ============================== components ============================== */
+function priSel(it){const v=pri(it);return `<select class="pill pri" data-p="${v||'none'}" data-act="pri" data-id="${esc(it.id)}" aria-label="优先级：${esc(it.title)}">${PRI.map(([k,l])=>`<option value="${k}"${k===v?' selected':''}>${l}</option>`).join('')}</select>`}
+function stSel(it){const v=st(it);const opts=SETS[setOf(it)];return `<select class="pill st" data-act="st" data-id="${esc(it.id)}" aria-label="状态：${esc(it.title)}">${(opts.includes(v)?opts:[v,...opts]).map(k=>`<option${k===v?' selected':''}>${esc(k)}</option>`).join('')}</select>`}
+function dueBadge(t){if(t.done||!t.ddl)return '';const n=daysTo(t.ddl);if(n===null)return '';
+  if(n<0)return `<span class="due over">逾期 ${-n} 天</span>`;if(n===0)return `<span class="due over">今天</span>`;
+  return `<span class="due ${n<=7?'soon':'later'}">还剩 ${n} 天</span>`}
+function itemChip(it){return `<button class="ichip" type="button" data-act="goto" data-tab="${tabOf(it)}" data-target="it-${esc(it.id)}" title="${esc(label(it))}"><span class="pdot ${pri(it)||'none'}">${pri(it)||'—'}</span> ${esc(label(it))}</button>`}
+const tabOf=it=>it.area==='step'?'step':it.area;
+function wkBtn(t,wk){const on=inWeek(t.id,wk);return `<button type="button" class="wkb${on?' on':''}" data-act="wk-toggle" data-id="${esc(t.id)}" data-v="${wk}" aria-pressed="${on}" title="${on?'从这周计划移除':'加入这周计划'}">${on?(wk===CUR_WK?'本周 ✓':'已排 ✓'):(wk===CUR_WK?'+ 本周':'+ 这周')}</button>`}
+function todoLine(t,ctx,o={}){
+  const it=itemById(t.item);const cid=`cb-${ctx}-${t.id}`;
+  return `<div class="td${t.done?' done':''}"${o.find?' data-find':''}>
+    <input type="checkbox" id="${cid}" data-act="done" data-id="${esc(t.id)}"${t.done?' checked':''}>
+    <label class="td-t" for="${cid}">${md(t.t)}${t.del?' <span class="tag">已删除</span>':''}</label>
+    ${o.chip&&it?itemChip(it):''}${dueBadge(t)}
+    ${o.noDdl||t.done&&!t.ddl?'':(t.ddl||T.ddlOpen[t.id])?`<input type="date" id="dd-${ctx}-${t.id}" class="ddl${t.ddl?' has':''}" data-act="ddl" data-id="${esc(t.id)}" value="${esc(t.ddl||'')}" aria-label="DDL：${esc(t.t)}">`:`<button type="button" class="wkb" data-act="ddl-open" data-id="${esc(t.id)}" data-v="${ctx}" title="设置截止日期">DDL</button>`}
+    ${o.noWeek||t.del?'':wkBtn(t,o.wk||CUR_WK)}
+    ${o.remove?`<button class="x" type="button" data-act="wk-remove" data-id="${esc(t.id)}" data-v="${o.wk}" aria-label="移出这周计划">−</button>`:''}
+    ${o.noDel||t.del?'':`<button class="x" type="button" data-act="todo-del" data-id="${esc(t.id)}" aria-label="删除 To-Do：${esc(t.t)}">×</button>`}
+  </div>`}
+function todoBlock(it){
+  const list=todosOf(it);const open=!!T.open[it.id];
+  const sorted=[...list.filter(t=>!t.done),...list.filter(t=>t.done)];
+  return `<div class="todos">${sorted.map(t=>todoLine(t,it.area,{})).join('')}
+    ${open?`<form class="add" data-form="todo-add" data-item="${esc(it.id)}">
+      <input type="text" class="field" id="add-t-${esc(it.id)}" name="t" placeholder="新 To-Do…" aria-label="新 To-Do" required>
+      <input type="date" class="field" id="add-d-${esc(it.id)}" name="d" aria-label="DDL（可选）">
+      <label class="small muted" style="display:flex;gap:4px;align-items:center"><input type="checkbox" name="wk" id="add-w-${esc(it.id)}"> 加入本周</label>
+      <button class="btn" type="submit">添加</button></form>`:''}
+  </div>`}
+function logBlock(it,compact){
+  const logs=D.logs.filter(l=>l.item===it.id).sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:0);
+  const open=!!T.openLog[it.id];
+  if(!open){
+    const last=logs[0];
+    return compact?'':(last?`<div class="lastlog"><span class="d">${esc(mdShort(last.d))}</span>${md(last.t)}</div>`:'');
+  }
+  return `<div class="box" style="padding:10px 12px;background:var(--bg)">
+    <form class="add" data-form="log-add" data-item="${esc(it.id)}" style="padding-top:0">
+      <input type="date" class="field" name="d" id="log-d-${esc(it.id)}" value="${TODAY_ISO}" aria-label="日期">
+      <input type="text" class="field" name="t" id="log-t-${esc(it.id)}" placeholder="这次推进了什么、卡在哪、下一步…" aria-label="进展" required>
+      <button class="btn" type="submit">记录</button></form>
+    <div class="log">${logs.length?logs.map(l=>`<div class="log-e${l.auto?' auto':''}" data-find><span class="d">${esc(l.d)}</span><span class="t">${md(l.t)}</span>${l.auto?'<span></span>':`<button class="x" type="button" data-act="log-del" data-id="${esc(l.id)}" aria-label="删除这条进展">×</button>`}</div>`).join(''):'<p class="blank">还没有进展记录。完成 To-Do、改状态时会自动记一笔。</p>'}</div>
+  </div>`}
+function itemFoot(it){
+  const n=D.logs.filter(l=>l.item===it.id).length;
+  return `<div class="row-foot">
+    <button class="linkbtn" type="button" data-act="toggle-add" data-id="${esc(it.id)}">${T.open[it.id]?'收起':'+ To-Do'}</button>
+    <button class="linkbtn" type="button" data-act="toggle-log" data-id="${esc(it.id)}">${T.openLog[it.id]?'收起进展':`进展记录${n?` (${n})`:''}`}</button>
+    <button class="linkbtn muted" type="button" data-act="item-edit" data-id="${esc(it.id)}">编辑</button>
+  </div>`}
+function itemEdit(it){
+  const del=T.confirm==='del:'+it.id;
+  return `<form class="edit" data-form="item-edit" data-id="${esc(it.id)}">
+    <label>名称<input class="field" name="title" id="ie-title-${esc(it.id)}" value="${esc(it.title)}" required></label>
+    ${it.kind==='proj'?`<label>目标会议 / 期刊<input class="field" name="target" id="ie-target-${esc(it.id)}" value="${esc(it.target||'')}"></label>
+      <label>人员（每行一条，如「合作：某某」「学生：某某」）<textarea class="field" name="people" id="ie-people-${esc(it.id)}">${esc(it.people||'')}</textarea></label>
+      <label>笔记（「- 」开头为列表）<textarea class="field code" name="notes" id="ie-notes-${esc(it.id)}">${esc(it.notes||'')}</textarea></label>`
+    :`<label>说明<textarea class="field" name="sub" id="ie-sub-${esc(it.id)}">${esc(it.sub||'')}</textarea></label>`}
+    <div class="btnrow"><button class="btn" type="submit">保存</button><button class="btn ghost" type="button" data-act="item-edit-cancel">取消</button>
+    <button class="btn danger" type="button" data-act="item-del" data-id="${esc(it.id)}" style="margin-left:auto">${del?'再点一次：删除这个条目和它的 To-Do':'删除'}</button></div>
+  </form>`}
+function itemRow(it){
+  if(T.editItem===it.id)return `<div class="row" id="it-${esc(it.id)}">${itemEdit(it)}</div>`;
+  return `<div class="row" id="it-${esc(it.id)}">
+    <div class="row-top"><div class="row-main" data-find><div class="row-title">${md(it.title)}</div>${it.sub?`<div class="row-sub">${md(it.sub)}</div>`:''}</div>
+    <div class="row-ctl">${priSel(it)}${stSel(it)}</div></div>
+    ${todoBlock(it)}${logBlock(it,true)}${itemFoot(it)}</div>`}
+function projCard(p){
+  if(T.editItem===p.id)return `<article class="proj" id="it-${esc(p.id)}">${itemEdit(p)}</article>`;
+  return `<article class="proj" id="it-${esc(p.id)}">
+    <div data-find style="display:grid;gap:8px">
+      <div class="proj-h"><span class="proj-id">${esc(p.id)}</span><h3>${esc(p.title)}</h3>${p.target?`<span class="tgt">→ ${esc(p.target)}</span>`:''}</div>
+      ${(p.people||'').split('\n').filter(Boolean).map(l=>`<div class="meta">${md(l)}</div>`).join('')}
+      ${p.notes?renderText(p.notes).replace(/ data-find/g,''):''}
+    </div>
+    <div class="row-ctl">${priSel(p)}${stSel(p)}</div>
+    <div><span class="k">To-Do</span>${todoBlock(p)}</div>
+    ${logBlock(p,false)}${itemFoot(p)}
+  </article>`}
+function addForm(area,kind,ph){
+  const key=area+'|'+kind;
+  if(T.adding!==key)return '';
+  return `<form class="edit" data-form="item-add" data-area="${area}" data-kind="${kind}">
+    <label>名称<input class="field" name="title" id="na-title-${key}" placeholder="${esc(ph||'')}" required></label>
+    <label>${kind==='proj'?'目标会议 / 期刊':'说明（可选）'}<input class="field" name="sub" id="na-sub-${key}"></label>
+    <label>优先级<select class="field" name="pri" id="na-pri-${key}">${PRI.map(([k,l])=>`<option value="${k}"${k==='P2'?' selected':''}>${l}</option>`).join('')}</select></label>
+    <div class="btnrow"><button class="btn" type="submit">添加</button><button class="btn ghost" type="button" data-act="add-cancel">取消</button></div>
+  </form>`}
+const addBtn=(area,kind,txt)=>`<button class="btn ghost sm" type="button" data-act="add-open" data-v="${area}|${kind}">${txt}</button>`;
+function rows(list,area,kind,ph){
+  return `${addForm(area,kind,ph)}${list.length?`<div class="rows">${list.map(itemRow).join('')}</div>`:'<div class="empty-card">还没有条目。</div>'}`}
+function sec(title,body,o={}){return `<section class="sec"${o.id?` id="${o.id}"`:''}><div class="sec-h"><h2>${title}</h2>${o.eyebrow?`<span class="eyebrow">${o.eyebrow}</span>`:''}${o.aside?`<div class="aside">${o.aside}</div>`:''}</div>${o.lede?`<p class="lede">${o.lede}</p>`:''}${body}</section>`}
+function blockBox(id,o={}){
+  const b=block(id);
+  if(T.editBlock===id)return `<div class="box"><form class="edit" data-form="blk" data-id="${id}" style="border:0;padding:0;background:none">
+    <label>标题<input class="field" name="title" id="blk-title-${id}" value="${esc(b.title)}"></label>
+    <label>内容<textarea class="field code" name="text" id="blk-text-${id}" rows="${Math.min(22,Math.max(5,(b.text||'').split('\n').length+2))}">${esc(b.text)}</textarea></label>
+    <p class="hint">${b.type==='checks'?'每行一项。':b.type==='formula'?'「数字 | 标题 | 说明」一行一格，其余行是备注。':b.type==='hero'?'第 1 行 umbrella，第 2 行故事，第 3 行目标，第 4 行备注。':'「- 」开头是列表，「  - 」是子项，「=> a → b」画成链条，其它行是段落。**加粗**，[文字](链接)。'}</p>
+    <div class="btnrow"><button class="btn" type="submit">保存</button><button class="btn ghost" type="button" data-act="blk-cancel">取消</button></div></form></div>`;
+  let body;
+  if(b.type==='checks')body=String(b.text||'').split('\n').filter(s=>s.trim()).map(s=>{const k='blk:'+id+':'+hash(s.trim());const on=!!D.checks[k];
+    return `<label class="lc${on?' done':''}" data-find><input type="checkbox" data-act="check" data-id="${k}"${on?' checked':''}><span>${md(s.trim())}</span></label>`}).join('');
+  else if(b.type==='formula'){const ls_=String(b.text||'').split('\n').filter(s=>s.trim());const cells=[],notes=[];
+    for(const s of ls_){const m=/^\s*(\d+)\s*\|\s*([^|]*)\|?\s*(.*)$/.exec(s);if(m)cells.push(m);else notes.push(s)}
+    body=`<div class="formula">${cells.map(m=>`<div class="fx" data-find><b>${esc(m[1])}</b><span>${md(m[2].trim())}</span><small>${md(m[3])}</small></div>`).join('')}</div>${notes.map(n=>`<p class="para small muted" data-find>${md(n)}</p>`).join('')}`}
+  else body=renderText(b.text);
+  return `<div class="box${b.primary?' primary':''}"${o.id?` id="${o.id}"`:''}>
+    <div class="box-h"><h3>${esc(b.title)}</h3>${b.badge?`<span class="rank">${esc(b.badge)}</span>`:''}<button class="linkbtn muted" type="button" data-act="blk-edit" data-id="${id}">编辑</button></div>
+    ${body||'<p class="blank">空。点「编辑」写点什么。</p>'}</div>`}
+function filterChips(act,cur,opts){return `<div class="chips" role="group">${opts.map(([k,l])=>`<button class="chipbtn" type="button" data-act="${act}" data-v="${esc(k)}" aria-pressed="${cur===k}">${esc(l)}</button>`).join('')}</div>`}
+function convCard(c,items,o={}){
+  if(o.edit&&T.editConv===c.id)return convForm(c);
+  return `<article class="conv box"><header class="conv-h"><span class="who">${esc(c.who)}</span>${c.date?`<span class="date">${esc(c.date)}</span>`:''}
+    ${o.edit?`<button class="linkbtn muted" type="button" data-act="conv-edit" data-id="${esc(c.id)}" style="margin-left:auto">编辑</button>`:''}</header>
+  <ul class="list">${items.map(x=>`<li${o.find?' data-find':''}>${md(x.t)}${x.sub&&x.sub.length?`<ul class="list">${x.sub.map(s=>`<li>${md(s)}</li>`).join('')}</ul>`:''}${o.tags?`<span class="tags">${(x.tags||[]).map(t=>`<span class="tag">${TAGS[t]||t}</span>`).join('')}</span>`:''}</li>`).join('')}</ul></article>`}
+function convToText(c){return (c.items||[]).map(x=>`- ${x.t}${(x.tags||[]).map(t=>' #'+(TAGS[t]||t)).join('')}`+((x.sub||[]).map(s=>`\n  - ${s}`).join(''))).join('\n')}
+function textToConvItems(text){const out=[];
+  for(const raw of String(text||'').split('\n')){if(!raw.trim())continue;
+    const m=/^(\s*)[-*]?\s*(.*)$/.exec(raw);const sub=m[1].length>=2&&out.length;let t=m[2];
+    if(sub){out[out.length-1].sub.push(t.trim());continue}
+    const tags=[];t=t.replace(/#(\S+)/g,(all,g)=>{const c=TAGCODE[g.toLowerCase()]||TAGCODE[g];if(c){if(!tags.includes(c))tags.push(c);return ''}return all}).trim();
+    out.push({t,sub:[],tags})}
+  return out}
+function convForm(c){const isNew=!c;c=c||{id:'new',who:'',date:'',items:[]};const del=T.confirm==='cdel:'+c.id;
+  return `<form class="edit conv" data-form="conv" data-id="${esc(c.id)}" style="margin-bottom:16px">
+    <label>和谁<input class="field" name="who" id="cv-who-${esc(c.id)}" value="${esc(c.who)}" required></label>
+    <label>日期（随意写，如 10.22）<input class="field" name="date" id="cv-date-${esc(c.id)}" value="${esc(c.date)}"></label>
+    <label>要点（每行一条；行尾加 #研究 #实习 #Visiting #职业 #曝光 #心态 打标签；两个空格开头是子项）<textarea class="field code" name="text" id="cv-text-${esc(c.id)}" rows="8">${esc(convToText(c))}</textarea></label>
+    <div class="btnrow"><button class="btn" type="submit">${isNew?'添加':'保存'}</button><button class="btn ghost" type="button" data-act="conv-cancel">取消</button>
+    ${isNew?'':`<button class="btn danger" type="button" data-act="conv-del" data-id="${esc(c.id)}" style="margin-left:auto">${del?'再点一次：删除':'删除'}</button>`}</div></form>`}
+function related(tag){
+  const groups=D.convs.map(c=>({c,items:(c.items||[]).filter(x=>(x.tags||[]).includes(tag))})).filter(g=>g.items.length);
+  const n=groups.reduce((a,g)=>a+g.items.length,0);
+  if(!n)return '';
+  return sec('来自对话的相关建议',`<div class="convs">${groups.map(g=>convCard(g.c,g.items)).join('')}</div>`,
+    {eyebrow:`${n} 条 · 标签「${TAGS[tag]}」`,aside:`<button class="linkbtn" type="button" data-act="tab" data-v="talks">看全部对话 →</button>`})}
+function freshRow(c){
+  const n=c.date?-daysTo(c.date):null;const cls=n===null?'na':n<=30?'ok':n<=90?'warn':'bad';
+  return `<div class="fr" data-find><div class="fr-t">${esc(c.title)}${c.note?`<small>${md(c.note)}</small>`:''}</div>
+    <span class="age ${cls}">${n===null?'未记录':n===0?'今天':n+' 天前'}</span>
+    <input type="date" class="ddl has" id="ch-${esc(c.id)}" data-act="ch-date" data-id="${esc(c.id)}" value="${esc(c.date||'')}" aria-label="${esc(c.title)} 上次更新日期">
+    <button class="btn ghost sm" type="button" data-act="ch-today" data-id="${esc(c.id)}">今天更新了</button></div>`}
+function stepFresh(s){const last=(s.history||[]).slice(-1)[0];return {title:s.title+' '+(s.en||''),date:last||'',id:'step-'+s.id}}
+
+/* ============================== panels ============================== */
+function renderWeek(){
+  const wk=U.week||CUR_WK;const W=week(wk);const [mon,sun]=weekRange(wk);
+  const isCur=wk===CUR_WK,isPast=wk<CUR_WK;
+  const plan=(W.plan||[]).map(todoById).filter(Boolean);
+  const done=plan.filter(t=>t.done).length;
+  const byArea={};for(const t of plan){const it=itemById(t.item);const a=it?it.area:'other';(byArea[a]=byArea[a]||[]).push(t)}
+  const groups=[...AREAS,'other'].filter(a=>byArea[a]).map(a=>{
+    const byItem={};for(const t of byArea[a]){(byItem[t.item]=byItem[t.item]||[]).push(t)}
+    return `<div class="grp"><div class="grp-h"><span class="k">${AREANAME[a]||'其他'}</span></div>${Object.entries(byItem).map(([iid,ts])=>{const it=itemById(iid);
+      return `<div style="padding-left:2px"><div class="small" style="margin-top:4px">${it?itemChip(it):'<span class="tag">已删除的条目</span>'}</div><div class="todos">${ts.map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true})).join('')}</div></div>`}).join('')}</div>`}).join('');
+  const prev=addWeeks(wk,-1);const carry=(week(prev).plan||[]).map(todoById).filter(t=>t&&!t.done&&!t.del&&!inWeek(t.id,wk));
+  const open=liveTodos().filter(t=>!t.done&&!inWeek(t.id,wk));
+  const dueSoon=open.filter(t=>t.ddl&&t.ddl<=sun);
+  const pickList=open.filter(t=>{const it=itemById(t.item);return !U.pickArea||it.area===U.pickArea});
+  const pickByArea={};for(const t of pickList){const a=itemById(t.item).area;(pickByArea[a]=pickByArea[a]||[]).push(t)}
+  const pickLine=t=>`<div class="td"><span class="td-t">${md(t.t)}</span>${itemChip(itemById(t.item))}${dueBadge(t)}<button class="btn ghost sm" type="button" data-act="wk-add" data-id="${esc(t.id)}" data-v="${wk}">+ 加入</button></div>`;
+  const doneThisWeek=liveTodos().filter(t=>t.done&&t.doneAt&&t.doneAt>=mon&&t.doneAt<=sun);
+  const logsThisWeek=D.logs.filter(l=>!l.auto&&l.d>=mon&&l.d<=sun&&itemById(l.item));
+  const rTotal=D.routines.reduce((a,r)=>a+r.items.length,0);const rDone=D.routines.reduce((a,r)=>a+r.items.filter((_,i)=>W.routine&&W.routine[r.id+':'+i]).length,0);
+  const others=Object.keys(D.weeks).filter(k=>k!==wk).sort().reverse();
+  return `
+  <section class="sec">
+    <div class="wknav">
+      <button class="btn ghost sm" type="button" data-act="wk-go" data-v="${prev}">← 上周</button>
+      <span class="wklabel">${isCur?'本周':isPast?'往期':'未来'} ${wk.slice(5)}<small>${mdShort(mon)}–${mdShort(sun)}</small></span>
+      <button class="btn ghost sm" type="button" data-act="wk-go" data-v="${addWeeks(wk,1)}">下周 →</button>
+      ${isCur?'':`<button class="btn sm" type="button" data-act="wk-go" data-v="${CUR_WK}">回到本周</button>`}
+    </div>
+  </section>
+  <div class="grid2">
+    <div class="stack">
+      ${sec('这周目标',`<textarea class="field" id="wk-goals" data-wk="${wk}" data-field="goals" placeholder="这周最重要的 1–3 件事…" rows="3">${esc(W.goals||'')}</textarea>`)}
+      ${sec('计划',`
+        <div class="meter"><span>${done} / ${plan.length} 完成</span><div class="bar"><i style="width:${plan.length?Math.round(done/plan.length*100):0}%"></i></div></div>
+        <form class="add box" data-form="wk-quick" data-wk="${wk}" style="padding:10px 12px">
+          <select class="field" id="wkq-item" name="item" aria-label="属于哪个条目">${AREAS.map(a=>{const its=areaItems(a);return its.length?`<optgroup label="${AREANAME[a]}">${its.map(it=>`<option value="${esc(it.id)}"${it.id===U.lastItem?' selected':''}>${esc(label(it))}</option>`).join('')}</optgroup>`:''}).join('')}</select>
+          <input type="text" class="field" id="wkq-t" name="t" placeholder="直接新建一个 To-Do 放进这周…" required aria-label="新 To-Do">
+          <input type="date" class="field" id="wkq-d" name="d" aria-label="DDL（可选）">
+          <button class="btn" type="submit">添加</button></form>
+        ${carry.length?`<div class="btnrow"><button class="btn ghost sm" type="button" data-act="wk-carry" data-v="${wk}">把上周没完成的 ${carry.length} 项移过来</button></div>`:''}
+        <div class="box" style="padding:8px 14px">${groups||'<p class="blank">这周还没有计划。用上面的框新建，或者从下面「从各分区挑选」里拉进来。</p>'}</div>
+        <button class="linkbtn" type="button" data-act="picker">${T.picker?'收起挑选面板':`从各分区挑选（${open.length} 个未完成的 To-Do）`}</button>
+        ${T.picker?`<div class="box">
+          ${filterChips('pick-area',U.pickArea,[['','全部'],...AREAS.map(a=>[a,AREANAME[a]])])}
+          ${Object.keys(pickByArea).length?AREAS.filter(a=>pickByArea[a]).map(a=>`<div class="grp"><div class="grp-h"><span class="k">${AREANAME[a]}</span></div><div class="todos">${pickByArea[a].map(pickLine).join('')}</div></div>`).join(''):'<p class="blank">没有可挑选的 To-Do。</p>'}
+        </div>`:''}`,{eyebrow:'从每个分区拉取 To-Do'})}
+      ${dueSoon.length?sec('这周到期 / 已逾期，还没排进计划',`<div class="box" style="padding:8px 14px"><div class="todos">${dueSoon.sort((a,b)=>a.ddl<b.ddl?-1:1).map(pickLine).join('')}</div></div>`):''}
+    </div>
+    <div class="stack">
+      ${sec('每周例行',`<div class="box">${D.routines.length?D.routines.map(r=>{const n=r.items.filter((_,i)=>W.routine&&W.routine[r.id+':'+i]).length;
+        return `<div class="grp"><div class="grp-h"><span class="k">${esc(r.title)}</span><span class="date">${n}/${r.items.length}</span></div>${r.items.map((s,i)=>{const k=r.id+':'+i;const on=!!(W.routine&&W.routine[k]);
+          return `<label class="lc${on?' done':''}"><input type="checkbox" data-act="routine" data-id="${esc(k)}" data-v="${wk}"${on?' checked':''}><span>${md(s)}</span></label>`}).join('')}</div>`}).join(''):'<p class="blank">在「杂事」里设置每周例行。</p>'}</div>`,{eyebrow:`${rDone}/${rTotal}`,aside:`<button class="linkbtn" type="button" data-act="tab" data-v="admin">编辑例行 →</button>`})}
+      ${sec('这周完成 & 进展',`<div class="box">${doneThisWeek.length||logsThisWeek.length?`<div class="log">${[...doneThisWeek.map(t=>({d:t.doneAt,t:'✓ '+t.t,it:itemById(t.item)})),...logsThisWeek.map(l=>({d:l.d,t:l.t,it:itemById(l.item)}))].sort((a,b)=>a.d<b.d?1:-1).map(e=>`<div class="log-e"><span class="d">${esc(mdShort(e.d))}</span><span class="t">${md(e.t)}</span><span>${e.it?itemChip(e.it):''}</span></div>`).join('')}</div>`:'<p class="blank">这周还没有勾掉的 To-Do 或进展记录。</p>'}</div>`)}
+      ${sec('这周复盘',`<textarea class="field" id="wk-review" data-wk="${wk}" data-field="review" placeholder="做得好的、没做完的原因、下周要调整的…" rows="5">${esc(W.review||'')}</textarea>`)}
+    </div>
+  </div>
+  ${sec('往期周计划',`<div class="box" style="padding:6px 14px"><div class="hist">${others.length?others.map(k=>{const w=week(k);const p=(w.plan||[]).map(todoById).filter(Boolean);const d=p.filter(t=>t.done).length;const [m,s]=weekRange(k);
+    const rd=D.routines.reduce((a,r)=>a+r.items.filter((_,i)=>w.routine&&w.routine[r.id+':'+i]).length,0);
+    return `<button type="button" data-act="wk-go" data-v="${k}"><span class="w">${k}${k>CUR_WK?' · 未来':k===CUR_WK?' · 本周':''}<small>${mdShort(m)}–${mdShort(s)}</small></span><span class="g">${esc((w.goals||w.review||'').split('\n')[0]||'—')}</span><span class="s">计划 ${d}/${p.length} · 例行 ${rd}/${rTotal}</span></button>`}).join(''):'<p class="blank" style="padding:8px 0">还没有其他周的记录。每周的计划、例行和复盘都会留在这里。</p>'}</div></div>`,{eyebrow:'点开可以查看或补写'})}`;
+}
+
+function renderOverview(){
+  const hero=block('hero');const hl=String(hero.text||'').split('\n');
+  const hi=U.ff==='hi';
+  const focus=D.items.filter(it=>it.area!=='step'&&(hi?(pri(it)==='P0'||pri(it)==='P1'):pri(it)!=='')).sort((a,b)=>PRANK[pri(a)]-PRANK[pri(b)]);
+  const all=liveTodos();const open=all.filter(t=>!t.done);
+  let list=U.tf==='done'?all.filter(t=>t.done):open;
+  if(U.tf==='week')list=list.filter(t=>{const n=daysTo(t.ddl);return n!==null&&n<=7});
+  if(U.tf==='over')list=list.filter(t=>{const n=daysTo(t.ddl);return n!==null&&n<0});
+  list=[...list].sort((a,b)=>{const da=a.ddl||'9999',db=b.ddl||'9999';if(da!==db)return da<db?-1:1;return PRANK[pri(itemById(a.item))]-PRANK[pri(itemById(b.item))]});
+  if(U.tf==='done')list=list.slice(0,40);
+  const nOver=open.filter(t=>{const n=daysTo(t.ddl);return n!==null&&n<0}).length;
+  const nWeek=open.filter(t=>{const n=daysTo(t.ddl);return n!==null&&n>=0&&n<=7}).length;
+  const P=D.timeline.periods||[];
+  const tl=P.map((p,i)=>{const next=P.slice(i+1).find(q=>q.ym>p.ym);const now=p.ym<=TODAY_YM&&(!next||next.ym>TODAY_YM);const past=!now&&p.ym<TODAY_YM;
+    const items=[...(p.refs||[]).map(todoById).filter(t=>t&&!t.del).map(t=>todoLine(t,'tl',{chip:true,noDel:true})),
+      ...(p.extra||[]).map(x=>{const k='tl:'+x.id;const on=!!D.checks[k];return `<div class="td${on?' done':''}"><input type="checkbox" id="cb-tl-${esc(x.id)}" data-act="check" data-id="${k}"${on?' checked':''}><label class="td-t" for="cb-tl-${esc(x.id)}">${md(x.t)}</label></div>`})];
+    return `<div class="tl-p${now?' now':''}${past?' past':''}"><div class="tl-when">${esc(p.label)}</div><div class="todos">${items.join('')||'<p class="blank">—</p>'}</div></div>`}).join('');
+  const fresh=[...D.channels.filter(c=>c.date),...D.steps.map(stepFresh)];
+  const recent=D.logs.filter(l=>itemById(l.item)).sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:0).slice(0,12);
+  return `
+  ${T.editBlock==='hero'?blockBox('hero'):`<section class="hero">
+    <div class="box-h"><span class="eyebrow" style="flex:1">${esc(hero.title||'Research umbrella')}</span><button class="linkbtn muted" type="button" data-act="blk-edit" data-id="hero">编辑</button></div>
+    <p class="umb" data-find>${md(hl[0]||'')}</p>${hl[1]?`<p class="umb-sub" data-find>${md(hl[1])}</p>`:''}
+    ${hl[2]?`<blockquote class="goal" data-find>${md(hl[2])}${hl[3]?`<cite>${md(hl[3])}</cite>`:''}</blockquote>`:''}
+  </section>`}
+  <div class="grid2">
+    ${sec('To-Do & DDL',`
+      ${filterChips('tf',U.tf,[['open','未完成'],['week','7 天内'],['over','已逾期'],['done','已完成']])}
+      <div class="box" style="padding:6px 14px"><div class="todos">${list.length?list.map(t=>todoLine(t,'ov',{chip:true,find:true})).join(''):'<p class="blank">这里暂时没有 To-Do。</p>'}</div></div>`,
+      {eyebrow:`未完成 ${open.length} · 逾期 ${nOver} · 7 天内 ${nWeek}`})}
+    <div class="stack">
+      ${sec('优先级焦点',`${filterChips('ff',U.ff,[['hi','P0 + P1'],['all','所有已设优先级']])}
+        <div class="rows">${focus.length?focus.map(it=>`<div class="row"><div class="row-top"><div class="row-main"><span class="tag">${AREANAME[it.area]}</span> <button class="linkbtn" type="button" data-act="goto" data-tab="${tabOf(it)}" data-target="it-${esc(it.id)}" style="color:var(--ink);font-size:14.5px">${esc(label(it))}</button></div><div class="row-ctl">${priSel(it)}${stSel(it)}</div></div></div>`).join(''):'<div class="row"><p class="blank">没有符合条件的条目。</p></div>'}</div>`,
+        {eyebrow:'跨所有分区'})}
+      ${sec('最近进展',`<div class="box">${recent.length?`<div class="log">${recent.map(l=>`<div class="log-e${l.auto?' auto':''}"><span class="d">${esc(mdShort(l.d))}</span><span class="t">${md(l.t)}</span><span>${itemChip(itemById(l.item))}</span></div>`).join('')}</div>`:'<p class="blank">还没有进展记录。在任一条目下点「进展记录」写一笔，或者勾掉 To-Do。</p>'}</div>`)}
+    </div>
+  </div>
+  <div class="grid2">
+    ${sec('时间线',`<div class="box"><div>${tl||'<p class="blank">没有时间线。</p>'}</div>${(D.timeline.always||[]).length?`<div class="small muted"><span class="k">一直</span><ul class="list">${D.timeline.always.map(s=>`<li data-find>${md(s)}</li>`).join('')}</ul></div>`:''}</div>`,{eyebrow:D.timeline.version?'计划版本 '+esc(D.timeline.version):'',lede:'月份级的计划先把 DDL 设成了月底，可以直接改。'})}
+    <div class="stack">
+      ${sec('新鲜度',`<div class="box">${fresh.map(f=>{const n=f.date?-daysTo(f.date):null;const cls=n===null?'na':n<=30?'ok':n<=90?'warn':'bad';return `<div class="fr"><div class="fr-t">${esc(f.title)}</div><span class="age ${cls}">${n===null?'未记录':n===0?'今天':n+' 天前'}</span></div>`}).join('')}
+        <div class="btnrow"><button class="linkbtn" type="button" data-act="goto" data-tab="profile" data-target="channels">更新曝光渠道 →</button><button class="linkbtn" type="button" data-act="tab" data-v="step">去退一步 →</button></div></div>`,{eyebrow:'距离上次'})}
+      ${sec('随手记 Inbox',`<div class="box">
+        <form data-form="inbox" style="display:grid;gap:8px"><textarea class="field" id="inbox-text" placeholder="和谁聊了什么、突然的想法……先记下来，之后再整理进对应分区。" aria-label="随手记">${esc(U.draft||'')}</textarea><div><button class="btn" type="submit">记下</button></div></form>
+        <div>${D.inbox.length?D.inbox.map(n=>`<div class="inbox-i" data-find><span class="date">${esc(mdShort(n.d))}</span><p>${esc(n.t)}</p><button class="x" type="button" data-act="inbox-del" data-id="${esc(n.id)}" aria-label="删除这条">×</button></div>`).join(''):'<p class="blank">还没有记录。</p>'}</div></div>`)}
+    </div>
+  </div>
+  ${renderSettings()}`;
+}
+
+function renderSettings(){
+  const c=GH.cfg;const dis=T.confirm==='disconnect';const imp=T.confirm==='import';
+  return sec('数据 & 同步',`<div class="box">
+    ${Sync.mode==='github'?`<p class="para small">数据存在私有仓库 <strong>${esc(c.owner)}/${esc(c.repo)}</strong> 的 <code>${esc(c.path)}</code>（分支 ${esc(c.branch)}）。每次保存是一次 commit，历史版本都在仓库里。</p>
+      <p class="para small muted">状态：${esc(document.getElementById('sync').textContent)}${Sync.msg?' · '+esc(Sync.msg):''}</p>`
+    :`<p class="para small">现在是<strong>本地预览</strong>：改动只存在这个浏览器里。连接私有仓库后，手机和电脑就能同步。</p>`}
+    <div class="btnrow">
+      ${Sync.mode==='github'?`<button class="btn" type="button" data-act="sync-now">立即同步</button>`:`<button class="btn" type="button" data-act="connect">连接 GitHub 私有仓库</button>`}
+      <button class="btn ghost" type="button" data-act="download">下载 JSON 备份</button>
+      ${imp?`<button class="btn danger" type="button" data-act="import-confirm">确认：用这个文件覆盖全部数据</button><button class="btn ghost" type="button" data-act="import-cancel">取消导入</button>`:`<label class="btn ghost" for="import-file" style="display:inline-block">导入 JSON</label>`}
+      <input type="file" id="import-file" accept="application/json,.json" data-act="import" hidden>
+      ${Sync.mode==='github'?`<button class="btn danger" type="button" data-act="disconnect" style="margin-left:auto">${dis?'再点一次：从这台设备移除 token':'断开这台设备'}</button>`:''}
+    </div>
+    <p class="hint">Token 只存在这台设备的浏览器里，不会写进仓库。在公用电脑上用完记得断开。</p>
+  </div>`,{id:'settings'})}
+
+function renderResearch(){
+  const filt=it=>!U.rf||(U.rf==='none'?!pri(it):pri(it)===U.rf);
+  const sortP=a=>U.rsort?[...a].sort((x,y)=>PRANK[pri(x)]-PRANK[pri(y)]):a;
+  const projs=sortP(areaItems('research','proj').filter(filt)),cols=sortP(areaItems('research','collab').filter(filt)),leads=sortP(areaItems('research','lead').filter(filt));
+  const counts={};areaItems('research','proj').forEach(p=>{counts[st(p)]=(counts[st(p)]||0)+1});
+  const stages=['Maintaining','Submitting','Pushing','Starting'].map(s=>`<span><b>${counts[s]||0}</b> ${s}</span>`).join('<span>·</span>');
+  return `
+  ${sec('Graduating Work',`
+    <div class="chips" style="justify-content:space-between">
+      ${filterChips('rf',U.rf,[['','全部'],['P0','P0'],['P1','P1'],['P2','P2'],['P3','P3'],['none','未设']])}
+      <button class="chipbtn" type="button" data-act="rsort" aria-pressed="${U.rsort}">按优先级排序</button></div>
+    ${addForm('research','proj','例如：F. Self-improving policy')}
+    <div class="projs">${projs.length?projs.map(projCard).join(''):'<div class="empty-card">这个优先级下没有主项目。</div>'}</div>`,
+    {eyebrow:'Research Portfolio：Maintaining · Submitting · Pushing · Starting',lede:`<span class="stages">${stages}</span>`,aside:addBtn('research','proj','+ 新项目')})}
+  <div class="grid2">${blockBox('students')}${blockBox('narrative')}</div>
+  ${sec('Other Participating Projects',rows(cols,'research','collab'),{eyebrow:'参与的合作项目',aside:addBtn('research','collab','+ 参与项目')})}
+  ${sec('Other Cooperations · 合作线索',rows(leads,'research','lead'),{eyebrow:'Other cooperations!',aside:addBtn('research','lead','+ 合作线索')})}
+  <div class="grid2">${blockBox('bottomline')}${blockBox('authorship')}</div>
+  ${related('r')}`}
+function renderIntern(){return `
+  ${sec('实习追踪',rows(areaItems('intern'),'intern','intern','例如：Google DeepMind Robotics'),{aside:addBtn('intern','intern','+ 实习目标')})}
+  ${blockBox('intern_intro')}
+  ${related('i')}`}
+function renderVisit(){return `
+  ${sec('Visiting 追踪',rows(areaItems('visit'),'visit','visit','例如：某组 Visiting'),{aside:addBtn('visit','visit','+ Visiting 目标')})}
+  ${blockBox('visit_intro')}
+  ${related('v')}`}
+function renderCareer(){
+  return `
+  ${sec('三条线：现在低成本维护',`${blockBox('career_lede')}<div class="paths">${blockBox('path_academia')}${blockBox('path_industry')}${blockBox('path_startup')}</div>`,{eyebrow:'Career Positioning'})}
+  <div class="grid2">${blockBox('formula')}${blockBox('ap_checks')}</div>
+  <div class="grid2">
+    ${sec('推荐信 × 3',`<div class="box">${[0,1,2].map(i=>`<div class="slot"><b>${i+1}</b><input class="field" id="letter-${i}" data-act="letter" data-id="${i}" value="${esc(D.letters[i]||'')}" aria-label="推荐信 ${i+1}"></div>`).join('')}
+      <p class="hint">Recommendation letter and Relationship management。直接在框里改，自动保存。</p></div>`)}
+    ${blockBox('connection')}
+  </div>
+  ${sec('博后 Post Doc · Funding',`${blockBox('postdoc')}${rows(areaItems('career'),'career','app','例如：某 fellowship')}`,{aside:addBtn('career','app','+ 博后 / Funding')})}
+  ${blockBox('career_other')}
+  ${related('c')}`}
+function renderProfile(){
+  const papers=areaItems('research','proj');const pid=papers.some(p=>p.id===U.paper)?U.paper:(papers[0]&&papers[0].id);
+  const tpl=D.launchTpl||[];const keys=tpl.flatMap((g,gi)=>g.items.map((_,ii)=>`launch:${pid}:${gi}:${ii}`));const n=keys.filter(k=>D.checks[k]).length;
+  return `
+  ${sec('全部指标',`<div class="grid2">${blockBox('ind_big')}${blockBox('ind_small')}</div>`,{eyebrow:'Profile & Visibility'})}
+  ${sec('渠道新鲜度',`<div class="box">${D.channels.map(freshRow).join('')}</div>`,{id:'channels',eyebrow:'Personal ID & visibility 知名度',lede:'超过 30 天变黄，超过 90 天变红。发完内容点「今天更新了」。'})}
+  ${pid?sec('论文发布清单',`<div class="box">
+    <div class="chips"><label class="k" for="paper-sel">论文</label>
+      <select class="pill" id="paper-sel" data-act="paper">${papers.map(p=>`<option value="${esc(p.id)}"${p.id===pid?' selected':''}>${esc(label(p))}</option>`).join('')}</select>
+      <span class="small muted">${n} / ${keys.length}</span></div>
+    <div class="meter"><div class="bar"><i style="width:${keys.length?Math.round(n/keys.length*100):0}%"></i></div></div>
+    ${tpl.map((g,gi)=>`<div class="grp"><span class="k">${esc(g.g)}</span>${g.items.map((s,ii)=>{const k=`launch:${pid}:${gi}:${ii}`;const on=!!D.checks[k];return `<label class="lc${on?' done':''}"><input type="checkbox" data-act="check" data-id="${k}"${on?' checked':''}><span>${md(s)}</span></label>`}).join('')}</div>`).join('')}
+  </div>`,{eyebrow:'Paper management（after acceptance!）'}):''}
+  ${sec('奖项 · Fellowship · Workshop',rows(areaItems('profile'),'profile','app','例如：某奖项'),{eyebrow:'Dimensions to watch',aside:addBtn('profile','app','+ 申请 / 奖项')})}
+  ${sec('其他维度',`<div class="cols">${['dim_service','dim_teaching','dim_talk','dim_indep','dim_other'].map(id=>blockBox(id)).join('')}</div>`)}
+  ${related('p')}`}
+function renderAdmin(){
+  const W=week(CUR_WK);
+  return `
+  ${sec('每周例行',`<div class="cols">${D.routines.map(r=>{
+    if(T.editBlock==='rt:'+r.id)return `<div class="box"><form class="edit" data-form="routine" data-id="${esc(r.id)}" style="border:0;padding:0;background:none">
+      <label>名称<input class="field" name="title" id="rt-title-${esc(r.id)}" value="${esc(r.title)}" required></label>
+      <label>每行一项<textarea class="field" name="text" id="rt-text-${esc(r.id)}" rows="${r.items.length+2}">${esc(r.items.join('\n'))}</textarea></label>
+      <div class="btnrow"><button class="btn" type="submit">保存</button><button class="btn ghost" type="button" data-act="blk-cancel">取消</button>
+      <button class="btn danger" type="button" data-act="routine-del" data-id="${esc(r.id)}" style="margin-left:auto">${T.confirm==='rdel:'+r.id?'再点一次：删除':'删除'}</button></div></form></div>`;
+    const n=r.items.filter((_,i)=>W.routine&&W.routine[r.id+':'+i]).length;
+    return `<div class="box"><div class="box-h"><h3>${esc(r.title)}</h3><span class="date">本周 ${n}/${r.items.length}</span><button class="linkbtn muted" type="button" data-act="routine-edit" data-id="${esc(r.id)}">编辑</button></div>
+      ${r.items.map((s,i)=>{const k=r.id+':'+i;const on=!!(W.routine&&W.routine[k]);return `<label class="lc${on?' done':''}" data-find><input type="checkbox" data-act="routine" data-id="${esc(k)}" data-v="${CUR_WK}"${on?' checked':''}><span>${md(s)}</span></label>`}).join('')}</div>`}).join('')}</div>`,
+    {eyebrow:`${CUR_WK} · 每周一自动清空`,aside:`<button class="btn ghost sm" type="button" data-act="routine-add">+ 例行清单</button>`})}
+  ${sec('杂事追踪',rows(areaItems('admin'),'admin','todo','例如：组会 slides、报销'),{eyebrow:'TA · RA · 组会 · 学校杂事',aside:addBtn('admin','todo','+ 杂事')})}
+  ${blockBox('dim_teaching')}`}
+function renderStep(){
+  const card=s=>{const it=itemById(s.id);const last=(s.history||[]).slice(-1)[0];const n=last?-daysTo(last):null;const cls=n===null?'na':n<=14?'ok':n<=45?'warn':'bad';
+    const nChecked=s.items.filter((_,i)=>s.checks&&s.checks[i]).length;
+    return `<div class="box" id="it-${esc(s.id)}">
+      <div class="box-h"><h3>${esc(s.title)} <span class="eyebrow">${esc(s.en||'')}</span></h3><span class="age ${cls}">${n===null?'未记录':n===0?'今天':'上次 '+n+' 天前'}</span></div>
+      ${s.desc?`<p class="para small muted">${md(s.desc)}</p>`:''}
+      <div>${s.items.map((x,i)=>{const on=!!(s.checks&&s.checks[i]);return `<label class="lc${on?' done':''}" data-find><input type="checkbox" data-act="step-check" data-id="${esc(s.id)}" data-v="${i}"${on?' checked':''}><span>${md(x)}</span></label>`}).join('')}</div>
+      <div class="btnrow"><button class="btn sm" type="button" data-act="step-done" data-id="${esc(s.id)}">完成这一轮（${nChecked}/${s.items.length}）</button>
+        <button class="linkbtn muted" type="button" data-act="step-edit" data-id="${esc(s.id)}">编辑清单</button></div>
+      ${T.editBlock==='st:'+s.id?`<form class="edit" data-form="step" data-id="${esc(s.id)}"><label>说明<input class="field" name="desc" id="st-desc-${esc(s.id)}" value="${esc(s.desc||'')}"></label>
+        <label>清单（每行一项）<textarea class="field" name="text" id="st-text-${esc(s.id)}" rows="${s.items.length+2}">${esc(s.items.join('\n'))}</textarea></label>
+        <div class="btnrow"><button class="btn" type="submit">保存</button><button class="btn ghost" type="button" data-act="blk-cancel">取消</button></div></form>`:''}
+      ${(s.history||[]).length?`<div><span class="k">做过的轮次</span><div class="hist-dates" style="margin-top:4px">${s.history.slice(-10).reverse().map(d=>`<span class="tag">${esc(d)}</span>`).join('')}</div></div>`:''}
+      ${it?`<div><span class="k">这一轮的具体事项</span>${todoBlock(it)}</div>${logBlock(it,true)}${itemFoot(it).replace(/<button class="linkbtn muted" type="button" data-act="item-edit"[^>]*>编辑<\/button>/,'')}`:''}
+    </div>`};
+  const rated=D.abilities.filter(a=>D.rate[a.id]).length;
+  return `
+  ${blockBox('motto')}
+  ${sec('退半步 · 退一步',`<div class="grid2">${D.steps.map(card).join('')}</div>`,{lede:'定期停下来想一想。勾完清单点「完成这一轮」，会记下日期并清空勾选；这一轮里冒出来的具体事情记成 To-Do。'})}
+  ${sec('Half a Step Back：怎么发 & 发什么',`<div class="cols">${['how','what','taste','watch','ptaste'].map(id=>blockBox(id)).join('')}</div>`)}
+  <div class="grid2">
+    ${sec('Periodic Review',`<div class="box">
+      <p class="para small muted">博士毕业时，想把自己训练成什么样的人？这一层比论文更重要，因为它决定博士之后的上限。给自己打分 1–5。</p>
+      <div>${D.abilities.map(a=>`<div class="rate" data-find><span class="rate-t">${esc(a.t)}</span><span class="dots">${[1,2,3,4,5].map(v=>`<button type="button" class="${(D.rate[a.id]||0)>=v?'on':''}" data-act="rate" data-id="${esc(a.id)}" data-v="${v}" aria-label="${v} 分">${v}</button>`).join('')}</span></div>`).join('')}</div>
+      <p class="hint">${rated?'上次自评：'+esc(D.rateAt):'还没有自评。'}</p></div>`,{eyebrow:'Personal Growth'})}
+    ${sec('随机记录，待吸收',`<div class="box">
+      ${D.absorb.map(x=>`<div class="td${x.done?' done':''}" data-find><input type="checkbox" id="ab-${esc(x.id)}" data-act="absorb" data-id="${esc(x.id)}"${x.done?' checked':''}><label class="td-t" for="ab-${esc(x.id)}">${md(x.t)}</label><button class="x" type="button" data-act="absorb-del" data-id="${esc(x.id)}" aria-label="删除">×</button></div>`).join('')}
+      <form class="add" data-form="absorb"><input type="text" class="field" id="absorb-t" name="t" placeholder="新的想法…" required aria-label="新的想法"><button class="btn" type="submit">添加</button></form></div>`,{lede:'吸收进对应分区后打勾。'})}
+  </div>
+  ${blockBox('reflection_0811')}
+  ${sec('旧版计划',`<details class="old box"><summary>${esc(block('old_0813').title||'旧版')}</summary>${blockBox('old_0813')}</details>`,{eyebrow:'Old timelines'})}`}
+function renderTalks(){
+  const person=c=>c.p||c.who;const whos=[...new Set(D.convs.map(person))];
+  const convs=D.convs.map(c=>({c,items:(c.items||[]).filter(x=>!U.cfTag||(x.tags||[]).includes(U.cfTag))})).filter(g=>(g.items.length||T.editConv===g.c.id)&&(!U.cfWho||person(g.c)===U.cfWho));
+  return sec('对话记录',`
+    <div style="display:grid;gap:8px">${filterChips('cf-tag',U.cfTag,[['','全部话题'],...Object.entries(TAGS)])}${filterChips('cf-who',U.cfWho,[['','所有人'],...whos.map(w=>[w,w])])}</div>
+    ${T.editConv==='new'?convForm(null):''}
+    <div class="convs">${[...convs].reverse().map(g=>convCard(g.c,g.items,{find:true,tags:true,edit:true})).join('')||'<p class="blank">没有符合筛选的记录。</p>'}</div>`,
+    {id:'convs',eyebrow:'Talk to many people · 新的在前',lede:'每条都有话题标签，对应分区底部会自动出现相关条目。',aside:`<button class="btn sm" type="button" data-act="conv-new">+ 新对话</button>`})}
+
+/* ============================== connect screen ============================== */
+function renderConnect(){
+  const c=GH.cfg||ls.get(CFG_KEY)||{};const stage=T.connectStage;
+  document.getElementById('tabs').innerHTML='';document.querySelector('.search').hidden=true;
+  document.getElementById('panels').dataset.ready='';
+  document.getElementById('panels').innerHTML=`<div class="connect">
+    <div class="hero"><p class="umb">连接你的私有数据仓库</p><p class="umb-sub">这个网页本身不含任何内容。所有计划都存在你自己的 private repo 里，只有持有 token 的设备能读写。</p></div>
+    ${stage==='missing'?`<div class="box"><h3>仓库连上了，但里面还没有数据文件</h3>
+      <p class="para small">第一次用：选择我发给你的 <code>seed.json</code>，它会作为 <code>${esc(c.path||'data.json')}</code> 写进仓库。也可以选一份之前下载的备份。</p>
+      <div class="btnrow"><label class="btn" for="seed-file">选择 JSON 文件</label><input type="file" id="seed-file" accept="application/json,.json" data-act="seed-file" hidden>
+      <button class="btn ghost" type="button" data-act="start-empty">从空白开始</button></div>${T.connectErr?`<p class="err">${esc(T.connectErr)}</p>`:''}</div>`:`
+    <form class="box" data-form="connect" style="gap:12px">
+      <label class="small muted" style="display:grid;gap:3px">GitHub 用户名<input class="field" name="owner" id="cn-owner" value="${esc(c.owner||'')}" required autocomplete="username"></label>
+      <label class="small muted" style="display:grid;gap:3px">私有仓库名<input class="field" name="repo" id="cn-repo" value="${esc(c.repo||'phd-plans-data')}" required></label>
+      <div class="grid2" style="gap:12px"><label class="small muted" style="display:grid;gap:3px">文件路径<input class="field" name="path" id="cn-path" value="${esc(c.path||'data.json')}" required></label>
+      <label class="small muted" style="display:grid;gap:3px">分支<input class="field" name="branch" id="cn-branch" value="${esc(c.branch||'main')}" required></label></div>
+      <label class="small muted" style="display:grid;gap:3px">Fine-grained token<input class="field" type="password" name="token" id="cn-token" value="" placeholder="github_pat_…" required autocomplete="off"></label>
+      <div class="btnrow"><button class="btn" type="submit">${stage==='busy'?'连接中…':'连接'}</button>${D?`<button class="btn ghost" type="button" data-act="connect-cancel">返回</button>`:''}</div>
+      ${T.connectErr?`<p class="err">${esc(T.connectErr)}</p>`:''}
+    </form>
+    <div class="box"><h3>第一次设置（约 3 分钟）</h3><ol>
+      <li>在 GitHub 新建一个 <strong>Private</strong> 仓库，例如 <code>phd-plans-data</code>，勾选 Add a README。</li>
+      <li>Settings → Developer settings → Personal access tokens → <strong>Fine-grained tokens</strong> → Generate new token。Repository access 选 Only select repositories，只选这个仓库；Permissions 里把 <strong>Contents</strong> 设为 Read and write。</li>
+      <li>把 token 粘贴到上面。每台设备粘贴一次，之后自动记住。</li></ol>
+      <p class="hint">Token 只存在这台设备的浏览器里，不会写进任何仓库。丢了或泄露了，去 GitHub 删掉重建就行。</p></div>`}
+  </div>`;
+}
+async function doConnect(cfg){
+  T.connectErr='';T.connectStage='busy';GH.cfg=cfg;renderConnect();
+  try{await GH.repo()}catch(e){T.connectStage='';T.connectErr=e.status===401?'Token 无效，请检查是否复制完整。':e.status===404?'找不到这个仓库：检查用户名、仓库名，以及 token 是否勾选了这个仓库。':'连接失败：'+e.message;renderConnect();return}
+  let remote;try{remote=await GH.get()}catch(e){T.connectStage='';T.connectErr=e.status===403?'Token 没有 Contents 读写权限。':'读取失败：'+e.message;renderConnect();return}
+  ls.set(CFG_KEY,cfg);Sync.mode='github';
+  if(remote.missing){T.connectStage='missing';renderConnect();return}
+  T.connectStage='';D=adopt(remote.data);Sync.base=remote.data;Sync.sha=remote.sha;Sync.pending=false;Sync.status='ok';Sync.lastAt=nowHM();Sync.cache();reindex();paintSync();render();toast('已连接 '+cfg.owner+'/'+cfg.repo);
+}
+async function firstWrite(data){
+  D=adopt(data);reindex();Sync.mode='github';Sync.sha=null;Sync.base={};Sync.pending=true;Sync.acts=['初始化数据'];
+  await Sync.push();
+  if(Sync.status==='ok'){T.connectStage='';render();toast('数据已写进仓库')}else{T.connectErr='写入失败：'+(Sync.msg||Sync.status);renderConnect()}
+}
+
+/* ============================== app shell ============================== */
+const PANELS={week:renderWeek,overview:renderOverview,research:renderResearch,intern:renderIntern,visit:renderVisit,career:renderCareer,profile:renderProfile,admin:renderAdmin,step:renderStep,talks:renderTalks};
+function renderTabs(){
+  const over=D?liveTodos().filter(t=>!t.done&&t.ddl&&daysTo(t.ddl)<0).length:0;
+  document.getElementById('tabs').innerHTML=TABS.map(([id,zh])=>`<button class="tab" type="button" role="tab" id="tab-${id}" aria-controls="p-${id}" aria-selected="${U.tab===id}" data-act="tab" data-v="${id}">${zh}${id==='overview'&&over?`<span class="n" title="已逾期">${over}</span>`:''}</button>`).join('');
+}
+function ensurePanels(){const host=document.getElementById('panels');if(host.dataset.ready)return;
+  host.innerHTML=TABS.map(([id])=>`<div class="panel" data-panel="${id}" id="p-${id}" role="tabpanel" aria-labelledby="tab-${id}" hidden></div>`).join('');host.dataset.ready='1'}
+function renderPanel(id){const el=document.getElementById('p-'+id);el.innerHTML=PANELS[id]();T.stale[id]=false}
+function render(){
+  if(!D)return;ensurePanels();document.querySelector('.search').hidden=false;
+  const a=document.activeElement;const aid=a&&a.id;const key=a&&a.dataset&&a.dataset.act?[a.dataset.act,a.dataset.id||'',a.dataset.v||'']:null;
+  renderTabs();
+  for(const [id] of TABS){const el=document.getElementById('p-'+id);el.hidden=U.tab!==id;if(id===U.tab)renderPanel(id);else T.stale[id]=true}
+  let el=aid&&document.getElementById(aid);
+  if(!el&&key){const sel=`[data-act="${key[0]}"]`+(key[1]?`[data-id="${CSS.escape(key[1])}"]`:'')+(key[2]?`[data-v="${CSS.escape(key[2])}"]`:'');el=document.getElementById('p-'+U.tab).querySelector(sel)}
+  if(el&&el!==document.body)el.focus({preventScroll:true});
+}
+function renderAllPanels(){for(const [id] of TABS)if(T.stale[id]!==false)renderPanel(id)}
+let softPending=false;
+function renderSoft(){const a=document.activeElement;if(a&&(a.tagName==='TEXTAREA'||(a.tagName==='INPUT'&&a.type==='text'))){softPending=true;return}render()}
+document.addEventListener('focusout',()=>{if(softPending){softPending=false;setTimeout(()=>{const a=document.activeElement;if(!(a&&(a.tagName==='TEXTAREA'||(a.tagName==='INPUT'&&a.type==='text'))))render();else softPending=true},0)}});
+function setTab(id){if(!PANELS[id])return;U.tab=id;saveUI();T.picker=T.picker&&id==='week';try{history.replaceState(null,'','#'+id)}catch(e){}render()}
+function goto(tab,target){setTab(tab);requestAnimationFrame(()=>{const el=document.getElementById(target);if(el)flash(el);else window.scrollTo({top:0})})}
+function flash(el){el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),1700)}
+let toastT,undoSnap=null;const snapshot=()=>{undoSnap=clone(D)};
+function toast(msg,undo){const t=document.getElementById('toast');t.innerHTML=esc(msg)+(undo?' <button type="button" class="linkbtn" data-act="undo" style="color:inherit;text-decoration:underline;margin-left:8px">撤销</button>':'');t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true},undo?6000:2400)}
+function applyTheme(){const r=document.documentElement;if(U.theme==='system')r.removeAttribute('data-theme');else r.setAttribute('data-theme',U.theme);
+  document.getElementById('theme').textContent='主题：'+({system:'系统',light:'浅色',dark:'深色'}[U.theme])}
+function download(){const blob=new Blob([JSON.stringify(D,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='phd-plans-'+TODAY_ISO+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+function readFile(input){return new Promise((res,rej)=>{const f=input.files&&input.files[0];if(!f)return rej(new Error('没有选择文件'));const r=new FileReader();r.onload=()=>{try{res(JSON.parse(r.result))}catch(e){rej(new Error('不是有效的 JSON 文件'))}};r.onerror=()=>rej(new Error('读取文件失败'));r.readAsText(f)})}
+
+/* ============================== events ============================== */
+document.addEventListener('change',async e=>{
+  const t=e.target,act=t.dataset&&t.dataset.act,id=t.dataset&&t.dataset.id;if(!act||!D&&act!=='seed-file')return;
+  switch(act){
+    case 'pri':{const it=itemById(id);if(!it)return;const old=pri(it);it.pri=t.value;if(old!==t.value)addLog(it.id,`优先级：${old||'—'} → ${t.value||'—'}`,{auto:true});commit('优先级');return}
+    case 'st':{const it=itemById(id);if(!it)return;const old=st(it);it.st=t.value;addLog(it.id,`状态：${old} → ${t.value}`,{auto:true});commit('状态');return}
+    case 'done':setDone(id,t.checked);commit(t.checked?'完成 To-Do':'取消完成');return;
+    case 'ddl':{const td=todoById(id);if(td){td.ddl=t.value;delete T.ddlOpen[id];commit('DDL')}return}
+    case 'check':D.checks[id]=t.checked;if(!t.checked)delete D.checks[id];commit('勾选');return;
+    case 'routine':{const w=ensureWeek(t.dataset.v);if(t.checked)w.routine[id]=true;else delete w.routine[id];commit('每周例行');return}
+    case 'step-check':{const s=D.steps.find(x=>x.id===id);if(!s)return;s.checks=s.checks||{};if(t.checked)s.checks[t.dataset.v]=true;else delete s.checks[t.dataset.v];commit('退一步清单');return}
+    case 'absorb':{const x=D.absorb.find(a=>a.id===id);if(x){x.done=t.checked;commit('待吸收')}return}
+    case 'ch-date':{const c=D.channels.find(x=>x.id===id);if(c){c.date=t.value;commit('曝光渠道')}return}
+    case 'paper':U.paper=t.value;saveUI();render();return;
+    case 'import':{try{T.pendingImport=await readFile(t);T.confirm='import';render();goto('overview','settings')}catch(err){toast(err.message)}t.value='';return}
+    case 'seed-file':{try{const data=await readFile(t);await firstWrite(data)}catch(err){T.connectErr=err.message;renderConnect()}return}
+  }
+});
+let typeTimer;
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.dataset&&t.dataset.act==='letter'&&D){D.letters[+t.dataset.id]=t.value;clearTimeout(typeTimer);typeTimer=setTimeout(()=>Sync.changed('推荐信'),600);return}
+  if(t.id==='inbox-text'){U.draft=t.value;saveUI();return}
+  if(t.dataset&&t.dataset.wk&&t.dataset.field&&D){ensureWeek(t.dataset.wk)[t.dataset.field]=t.value;clearTimeout(typeTimer);typeTimer=setTimeout(()=>Sync.changed('周计划'),600)}
+});
+document.addEventListener('submit',e=>{
+  const f=e.target;const kind=f.dataset&&f.dataset.form;if(!kind)return;e.preventDefault();
+  const v=n=>{const el=f.elements[n];return el?(el.type==='checkbox'?el.checked:String(el.value).trim()):''};
+  switch(kind){
+    case 'connect':{const cfg={owner:v('owner'),repo:v('repo'),path:v('path').replace(/^\/+/,''),branch:v('branch'),token:v('token')};doConnect(cfg);return}
+    case 'todo-add':{const item=f.dataset.item;if(!v('t'))return;addTodo(item,v('t'),v('d'),v('wk')?CUR_WK:'');commit('新 To-Do');const n=document.getElementById('add-t-'+item);if(n)n.focus();toast('已添加');return}
+    case 'wk-quick':{if(!v('t'))return;const td=addTodo(v('item'),v('t'),v('d'),f.dataset.wk);U.lastItem=td.item;saveUI();commit('周计划');const n=document.getElementById('wkq-t');if(n)n.focus();toast('已放进这周计划');return}
+    case 'log-add':{if(!v('t'))return;addLog(f.dataset.item,v('t'),{d:v('d')||TODAY_ISO});commit('进展记录');const n=document.getElementById('log-t-'+f.dataset.item);if(n)n.focus();return}
+    case 'item-add':{const area=f.dataset.area,k=f.dataset.kind;const it={id:k==='proj'?nextProjId():'n'+uid(),area,kind:k,set:KIND_SET[k],title:v('title'),pri:v('pri'),created:TODAY_ISO};
+      it.st=SETS[it.set][k==='proj'?3:0];if(k==='proj'){it.target=v('sub');it.people='';it.notes=''}else it.sub=v('sub');
+      D.items.push(it);T.adding='';commit('新条目');requestAnimationFrame(()=>{const el=document.getElementById('it-'+it.id);if(el)flash(el)});return}
+    case 'item-edit':{const it=itemById(f.dataset.id);if(!it)return;it.title=v('title')||it.title;
+      if(it.kind==='proj'){it.target=v('target');it.people=f.elements.people.value.trim();it.notes=f.elements.notes.value.replace(/\s+$/,'')}else it.sub=v('sub');
+      T.editItem='';T.confirm='';commit('编辑条目');return}
+    case 'blk':{const id=f.dataset.id;const b=D.blocks[id]=Object.assign({type:'list'},D.blocks[id]||{});b.title=v('title');b.text=f.elements.text.value.replace(/\s+$/,'');T.editBlock='';commit('编辑：'+(b.title||id));return}
+    case 'routine':{const r=D.routines.find(x=>x.id===f.dataset.id);if(!r)return;r.title=v('title')||r.title;r.items=f.elements.text.value.split('\n').map(s=>s.trim()).filter(Boolean);T.editBlock='';commit('每周例行');return}
+    case 'step':{const s=D.steps.find(x=>x.id===f.dataset.id);if(!s)return;s.desc=v('desc');s.items=f.elements.text.value.split('\n').map(x=>x.trim()).filter(Boolean);s.checks={};T.editBlock='';commit('退一步清单');return}
+    case 'conv':{const id=f.dataset.id;const items=textToConvItems(f.elements.text.value);
+      if(id==='new'){D.convs.push({id:'c'+uid(),who:v('who'),p:v('who'),date:v('date'),items})}
+      else{const c=D.convs.find(x=>x.id===id);if(!c)return;if(c.who!==v('who'))c.p=v('who');c.who=v('who');c.date=v('date');c.items=items}
+      T.editConv='';T.confirm='';commit('对话记录');return}
+    case 'absorb':{if(!v('t'))return;D.absorb.push({id:'x'+uid(),t:v('t'),done:false});commit('待吸收');const n=document.getElementById('absorb-t');if(n)n.focus();return}
+    case 'inbox':{const t=f.elements[0].value.trim();if(!t)return;D.inbox.unshift({id:uid(),t,d:TODAY_ISO});U.draft='';saveUI();commit('随手记');toast('已记下');return}
+  }
+});
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('[data-act]');if(!b||b.tagName==='SELECT'||b.tagName==='INPUT')return;
+  const act=b.dataset.act,id=b.dataset.id,v=b.dataset.v;
+  const twoStep=key=>{if(T.confirm===key)return true;T.confirm=key;render();return false};
+  if(!/^(item-del|conv-del|routine-del|disconnect|import-confirm|import-cancel)$/.test(act)){if(T.confirm==='import')T.pendingImport=null;T.confirm=''}
+  switch(act){
+    case 'tab':setTab(v);window.scrollTo({top:0});return;
+    case 'goto':goto(b.dataset.tab,b.dataset.target);return;
+    case 'rf':U.rf=v;break; case 'rsort':U.rsort=!U.rsort;break; case 'ff':U.ff=v;break; case 'tf':U.tf=v;break;
+    case 'cf-who':U.cfWho=v;break; case 'cf-tag':U.cfTag=v;break; case 'pick-area':U.pickArea=v;break;
+    case 'picker':T.picker=!T.picker;render();return;
+    case 'ddl-open':{T.ddlOpen[id]=true;render();const n=document.getElementById('dd-'+v+'-'+id);if(n){n.focus();try{n.showPicker()}catch(err){}}return}
+    case 'undo':if(undoSnap){D=adopt(undoSnap);undoSnap=null;document.getElementById('toast').hidden=true;commit('撤销');toast('已撤销')}return;
+    case 'toggle-add':T.open[id]=!T.open[id];render();{const n=document.getElementById('add-t-'+id);if(n&&T.open[id])n.focus()}return;
+    case 'toggle-log':T.openLog[id]=!T.openLog[id];render();{const n=document.getElementById('log-t-'+id);if(n&&T.openLog[id])n.focus()}return;
+    case 'item-edit':T.editItem=id;render();return;
+    case 'item-edit-cancel':T.editItem='';render();return;
+    case 'item-del':if(!twoStep('del:'+id))return;snapshot();D.items=D.items.filter(x=>x.id!==id);for(const t of D.todos)if(t.item===id)t.del=true;T.editItem='';T.confirm='';commit('删除条目');toast('已删除条目',true);return;
+    case 'add-open':T.adding=v;render();{const n=document.getElementById('na-title-'+v);if(n)n.focus()}return;
+    case 'add-cancel':T.adding='';render();return;
+    case 'todo-del':snapshot();deleteTodo(id);commit('删除 To-Do');toast('已删除 To-Do',true);return;
+    case 'log-del':snapshot();D.logs=D.logs.filter(l=>l.id!==id);commit('删除进展');toast('已删除进展',true);return;
+    case 'wk-toggle':{const w=ensureWeek(v);if(w.plan.includes(id))w.plan=w.plan.filter(x=>x!==id);else w.plan.push(id);commit('周计划');return}
+    case 'wk-add':ensureWeek(v).plan.push(id);commit('周计划');return;
+    case 'wk-remove':{const w=ensureWeek(v);w.plan=w.plan.filter(x=>x!==id);commit('周计划');return}
+    case 'wk-go':U.week=v===CUR_WK?'':v;saveUI();if(U.tab!=='week')U.tab='week';render();window.scrollTo({top:0});return;
+    case 'wk-carry':{const w=ensureWeek(v);const prev=week(addWeeks(v,-1));for(const tid of prev.plan||[]){const t=todoById(tid);if(t&&!t.done&&!t.del&&!w.plan.includes(tid))w.plan.push(tid)}commit('周计划');toast('已移过来');return}
+    case 'blk-edit':T.editBlock=id;render();{const n=document.getElementById('blk-text-'+id);if(n)n.focus()}return;
+    case 'blk-cancel':T.editBlock='';render();return;
+    case 'routine-edit':T.editBlock='rt:'+id;render();return;
+    case 'routine-add':{const r={id:'r'+uid(),title:'新的例行清单',items:['第一项']};D.routines.push(r);T.editBlock='rt:'+r.id;commit('每周例行');return}
+    case 'routine-del':if(!twoStep('rdel:'+id))return;snapshot();D.routines=D.routines.filter(r=>r.id!==id);T.editBlock='';T.confirm='';commit('每周例行');toast('已删除例行清单',true);return;
+    case 'step-edit':T.editBlock=T.editBlock==='st:'+id?'':'st:'+id;render();return;
+    case 'step-done':{const s=D.steps.find(x=>x.id===id);if(!s)return;s.history=s.history||[];if(s.history.slice(-1)[0]!==TODAY_ISO)s.history.push(TODAY_ISO);
+      const n=s.items.filter((_,i)=>s.checks&&s.checks[i]).length;s.checks={};if(itemById(s.id))addLog(s.id,`完成一轮${s.title}（${n}/${s.items.length}）`,{auto:true});commit(s.title);toast('已记录这一轮');return}
+    case 'rate':D.rate[id]=+v;D.rateAt=TODAY_ISO;commit('自评');return;
+    case 'absorb-del':snapshot();D.absorb=D.absorb.filter(x=>x.id!==id);commit('待吸收');toast('已删除',true);return;
+    case 'inbox-del':snapshot();D.inbox=D.inbox.filter(n=>n.id!==id);commit('随手记');toast('已删除',true);return;
+    case 'ch-today':{const c=D.channels.find(x=>x.id===id);if(c){c.date=TODAY_ISO;commit('曝光渠道');toast('已记录：今天更新')}return}
+    case 'conv-new':T.editConv='new';U.cfWho='';U.cfTag='';render();{const n=document.getElementById('cv-who-new');if(n)n.focus()}return;
+    case 'conv-edit':T.editConv=id;render();return;
+    case 'conv-cancel':T.editConv='';render();return;
+    case 'conv-del':if(!twoStep('cdel:'+id))return;snapshot();D.convs=D.convs.filter(c=>c.id!==id);T.editConv='';T.confirm='';commit('对话记录');toast('已删除对话',true);return;
+    case 'sync-now':Sync.pending?Sync.push():Sync.refresh().then(()=>{if(Sync.status==='ok')toast('已是最新')});return;
+    case 'download':download();return;
+    case 'import-confirm':if(T.pendingImport){D=adopt(T.pendingImport);T.pendingImport=null;T.confirm='';commit('导入备份');toast('已导入')}return;
+    case 'import-cancel':T.pendingImport=null;T.confirm='';render();return;
+    case 'connect':T.connectStage='';T.connectErr='';renderConnect();return;
+    case 'connect-cancel':T.connectErr='';document.getElementById('panels').dataset.ready='';render();return;
+    case 'disconnect':if(!twoStep('disconnect'))return;ls.del(CFG_KEY);ls.del(CACHE_KEY);location.reload();return;
+    case 'start-empty':await firstWrite(clone(EMPTY));return;
+    default:return;
+  }
+  saveUI();render();
+});
+document.getElementById('theme').addEventListener('click',()=>{U.theme={system:'light',light:'dark',dark:'system'}[U.theme]||'system';saveUI();applyTheme()});
+document.getElementById('sync').addEventListener('click',()=>{if(!D)return;if(/error|offline/.test(Sync.status)){Sync.push();return}if(Sync.status==='auth'){T.connectStage='';T.connectErr='Token 失效或被撤销，请重新粘贴一个。';renderConnect();return}goto('overview','settings')});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')Sync.refresh();else if(Sync.pending&&!Sync.pushing)Sync.push()});
+window.addEventListener('online',()=>{if(Sync.pending)Sync.push()});
+
+/* ============================== search ============================== */
+const q=document.getElementById('q'),res=document.getElementById('results');let hits=[];
+function textOf(el){let s='';const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest('select,button.x,.due,input,.wkb,.ichip')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});while(w.nextNode())s+=w.currentNode.nodeValue+' ';return s.replace(/\s+/g,' ').trim()}
+function doSearch(){
+  const term=q.value.trim().toLowerCase();if(!term||!D){res.hidden=true;return}
+  renderAllPanels();hits=[];
+  for(const el of document.querySelectorAll('#panels [data-find]')){const txt=textOf(el);const i=txt.toLowerCase().indexOf(term);if(i<0)continue;
+    hits.push({el,txt,i,tab:el.closest('[data-panel]').dataset.panel});if(hits.length>=50)break}
+  res.innerHTML=hits.length?hits.map((h,k)=>{const a=Math.max(0,h.i-36),b=Math.min(h.txt.length,h.i+term.length+60);
+    return `<button type="button" data-hit="${k}"><span class="rt">${TABNAME[h.tab]}</span>${a>0?'…':''}${esc(h.txt.slice(a,h.i))}<mark>${esc(h.txt.slice(h.i,h.i+term.length))}</mark>${esc(h.txt.slice(h.i+term.length,b))}${b<h.txt.length?'…':''}</button>`}).join('')
+    :`<div class="empty">没有找到「${esc(q.value.trim())}」。</div>`;
+  res.hidden=false}
+q.addEventListener('input',doSearch);
+q.addEventListener('focus',()=>{if(q.value.trim())doSearch()});
+q.addEventListener('keydown',e=>{if(e.key==='Escape'){q.value='';res.hidden=true;q.blur()}if(e.key==='Enter'){const f=res.querySelector('button');if(f)f.click()}});
+res.addEventListener('click',e=>{const b=e.target.closest('[data-hit]');if(!b)return;const h=hits[+b.dataset.hit];res.hidden=true;if(!h)return;
+  U.tab=h.tab;saveUI();try{history.replaceState(null,'','#'+h.tab)}catch(e){}renderTabs();for(const [id] of TABS)document.getElementById('p-'+id).hidden=id!==h.tab;requestAnimationFrame(()=>flash(h.el))});
+document.addEventListener('click',e=>{if(!e.target.closest('.search'))res.hidden=true});
+document.addEventListener('keydown',e=>{if(e.key==='/'&&!/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)){e.preventDefault();q.focus()}});
+
+/* ============================== boot ============================== */
+async function boot(){
+  const h=(location.hash||'').slice(1);if(PANELS[h])U.tab=h;U.week='';
+  document.getElementById('today-line').textContent='今天 '+TODAY_ISO.replace(/-/g,'.')+' · '+CUR_WK;
+  applyTheme();
+  const cfg=ls.get(CFG_KEY);const seedEl=document.getElementById('seed');
+  if(cfg&&cfg.token){
+    GH.cfg=cfg;Sync.mode='github';
+    const cache=ls.get(CACHE_KEY);
+    if(cache&&cache.D&&cache.key===cfgKey(cfg)){D=normalize(cache.D);Sync.base=cache.base;Sync.sha=cache.sha;Sync.pending=!!cache.dirty;Sync.status=Sync.pending?'dirty':'ok';reindex();paintSync();render()}
+    else{const host=document.getElementById('panels');host.dataset.ready='';host.innerHTML='<p class="blank">正在从私有仓库读取数据…</p>'}
+    try{const remote=await GH.get();
+      if(remote.missing){if(!D){T.connectStage='missing';renderConnect();return}Sync.sha=null;Sync.base={};Sync.pending=true;Sync.push();return}
+      D=adopt(D&&Sync.pending?merge3(Sync.base,D,remote.data):remote.data);
+      Sync.base=remote.data;Sync.sha=remote.sha;Sync.lastAt=nowHM();Sync.status=Sync.pending?'dirty':'ok';Sync.cache();reindex();paintSync();render();
+      if(Sync.pending)Sync.push();
+    }catch(e){
+      if(D){Sync.status=(e.status===401||e.status===403)?'auth':'offline';Sync.msg=e.message;paintSync()}
+      else{T.connectErr=(e.status===401?'Token 无效或已过期。':'读取失败：'+e.message);renderConnect()}
+    }
+  }else if(seedEl){
+    Sync.mode='preview';D=normalize(ls.get(PREVIEW_KEY)||JSON.parse(seedEl.textContent));Sync.status='local';reindex();paintSync();render();
+  }else{renderConnect()}
+}
+boot();
+})();
+</script>
+</body>
+</html>
