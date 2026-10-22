@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1022-0703-7a2801">
+<meta name="app-build" content="1022-0712-fafdcc">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -684,7 +684,7 @@ function itemView(it,o={}){
     </div>
     <div class="xb"${exp?'':' hidden'}>
       ${body}
-      <div class="todos">${wkly.map(w=>weeklyLine(it,w,it.area)).join('')}${[...todos.filter(t=>!t.done),...todos.filter(t=>t.done)].map(t=>todoLine(t,it.area,{})).join('')}</div>
+      <div class="todos">${wkly.map(w=>weeklyLine(it,w,it.area)).join('')}${todos.map(t=>todoLine(t,it.area,{})).join('')}</div>
       ${todoAdd(it)}
       ${logPart(it)}
       ${o.extra||''}
@@ -773,13 +773,11 @@ function renderWeek(){
   const done=plan.filter(t=>t.done).length+doneW.length,total=plan.length+allW.length;
   const openPlan=plan.filter(t=>!t.done),donePlan=plan.filter(t=>t.done);
   const byArea={};const slot=(it,iid)=>{const a=it?it.area:'other';const A=byArea[a]=byArea[a]||{};return A[iid]=A[iid]||{w:[],t:[]}};
-  for(const x of openW)slot(x.it,x.it.id).w.push(x.w);
-  for(const t of openPlan)slot(itemById(t.item),t.item).t.push(t);
+  for(const x of allW)slot(x.it,x.it.id).w.push(x.w);
+  for(const t of plan)slot(itemById(t.item),t.item).t.push(t);
   const planHtml=[...AREAS,'other'].filter(a=>byArea[a]).map(a=>`<div class="grp"><div class="grp-k">${AREANAME[a]||'其他'}</div>${
     Object.entries(byArea[a]).map(([iid,g])=>{const it=itemById(iid);const [tab,sub]=it?(AREA_TAB[it.area]||['week','']):['week',''];
-      return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${esc(label(it))}</button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${g.w.map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true})).join('')}${g.t.map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true})).join('')}</div></div>`}).join('')}</div>`).join('')
-    +(donePlan.length+doneW.length?`<div class="sub-x${isOpen('wk-donelist')?' open':''}" data-key="wk-donelist"><div class="it-row"><button class="mini-h" type="button" data-act="exp" data-id="wk-donelist" aria-expanded="${isOpen('wk-donelist')}"><span class="car"></span>已完成 <span class="cnt">${donePlan.length+doneW.length}</span></button></div>
-      <div class="xb"${isOpen('wk-donelist')?'':' hidden'}><div class="todos">${doneW.map(x=>weeklyLine(x.it,x.w,'wk',{wk,chip:true,noDel:true,find:true})).join('')}${donePlan.map(t=>todoLine(t,'wk',{wk,chip:true,remove:true,noWeek:true,noDel:true,find:true})).join('')}</div></div></div>`:'');
+      return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${esc(label(it))}</button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${g.w.map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true})).join('')}${g.t.map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true})).join('')}</div></div>`}).join('')}</div>`).join('');
   const prev=addWeeks(wk,-1);const carry=(week(prev).plan||[]).map(todoById).filter(t=>t&&!t.done&&!t.del&&!inWeek(t.id,wk));
   const open=liveTodos().filter(t=>!t.done&&!inWeek(t.id,wk));
   const pickList=open.filter(t=>!U.pickArea||itemById(t.item).area===U.pickArea);
