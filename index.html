@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1022-0718-f6f9fb">
+<meta name="app-build" content="1022-0741-26f6d0">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -694,7 +694,7 @@ function itemView(it,o={}){
     </div>
     <div class="xb"${exp?'':' hidden'}>
       ${body}
-      <div class="todos">${wkly.map(w=>weeklyLine(it,w,it.area)).join('')}${todos.map(t=>todoLine(t,it.area,{})).join('')}</div>
+      <div class="todos">${[false,true].map(fin=>wkly.filter(w=>recOn(CUR_WK,w.id)===fin).map(w=>weeklyLine(it,w,it.area)).join('')+todos.filter(t=>!!t.done===fin).map(t=>todoLine(t,it.area,{})).join('')).join('')}</div>
       ${todoAdd(it)}
       ${logPart(it)}
       ${o.extra||''}
@@ -787,7 +787,7 @@ function renderWeek(){
   for(const t of plan)slot(itemById(t.item),t.item).t.push(t);
   const planHtml=[...AREAS,'other'].filter(a=>byArea[a]).map(a=>`<div class="grp"><div class="grp-k">${AREANAME[a]||'其他'}</div>${
     Object.entries(byArea[a]).map(([iid,g])=>{const it=itemById(iid);const [tab,sub]=it?(AREA_TAB[it.area]||['week','']):['week',''];
-      return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${esc(label(it))}</button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${g.w.map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true})).join('')}${g.t.map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true})).join('')}</div></div>`}).join('')}</div>`).join('');
+      return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${esc(label(it))}</button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${[false,true].map(fin=>g.w.filter(w=>recOn(wk,w.id)===fin).map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true})).join('')+g.t.filter(t=>!!t.done===fin).map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true})).join('')).join('')}</div></div>`}).join('')}</div>`).join('');
   const prev=addWeeks(wk,-1);const carry=(week(prev).plan||[]).map(todoById).filter(t=>t&&!t.done&&!t.del&&!inWeek(t.id,wk));
   const open=liveTodos().filter(t=>!t.done&&!inWeek(t.id,wk));
   const pickList=open.filter(t=>!U.pickArea||itemById(t.item).area===U.pickArea);
