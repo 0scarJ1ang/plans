@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1022-0813-e6721f">
+<meta name="app-build" content="1022-0830-6037ff">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -526,7 +526,7 @@ const adopt=x=>normalize(clone(x));
 function normalize(d){const out=Object.assign(clone(EMPTY),d||{});for(const k of Object.keys(EMPTY))if(out[k]==null)out[k]=clone(EMPTY[k]);
   for(const it of out.items){if(it.kind==='lead'){it.kind='collab';it.set='collab'}if(it.area==='intern'||it.area==='visit')it.area='exp'}
   return out}
-function reindex(){
+function reindex(){PLAN_CACHE={};
   IX={items:new Map(D.items.map(x=>[x.id,x])),todos:new Map(D.todos.map(t=>[t.id,t])),byItem:new Map()};
   for(const t of D.todos){if(t.del)continue;if(!IX.byItem.has(t.item))IX.byItem.set(t.item,[]);IX.byItem.get(t.item).push(t)}
 }
@@ -540,8 +540,15 @@ const st=it=>it.st||SETS[it.set||KIND_SET[it.kind]||'todo'][0];
 const setOf=it=>it.set||KIND_SET[it.kind]||'todo';
 const areaItems=(area,kind)=>D.items.filter(x=>x.area===area&&(!kind||x.kind===kind));
 const week=wk=>D.weeks[wk]||{plan:[],goals:'',review:'',rec:{},focus:{}};
-function ensureWeek(wk){if(!D.weeks[wk])D.weeks[wk]={plan:[],goals:'',review:'',routine:{}};const w=D.weeks[wk];w.plan=w.plan||[];w.rec=w.rec||{};w.focus=w.focus||{};return w}
-const inWeek=(id,wk)=>(week(wk).plan||[]).includes(id);
+function ensureWeek(wk){if(!D.weeks[wk])D.weeks[wk]={plan:[],goals:'',review:'',rec:{},focus:{}};const w=D.weeks[wk];w.plan=w.plan||[];w.rec=w.rec||{};w.focus=w.focus||{};PLAN_CACHE={};return w}
+let PLAN_CACHE={};
+function planIds(wk){if(PLAN_CACHE[wk])return PLAN_CACHE[wk];
+  const W=week(wk);const [mon,sun]=weekRange(wk);const skip=W.skip||{};
+  const auto=liveTodos().filter(t=>t.ddl&&!skip[t.id]&&((t.ddl>=mon&&t.ddl<=sun)||(wk===CUR_WK&&t.ddl<mon&&!t.done))).sort((a,b)=>a.ddl<b.ddl?-1:1).map(t=>t.id);
+  const ids=[...(W.plan||[]).filter(id=>!skip[id]),...auto];return PLAN_CACHE[wk]=[...new Set(ids)]}
+const inWeek=(id,wk)=>planIds(wk).includes(id);
+function weekAdd(wk,id){const w=ensureWeek(wk);w.skip=w.skip||{};delete w.skip[id];if(!w.plan.includes(id))w.plan.push(id)}
+function weekRemove(wk,id){const w=ensureWeek(wk);w.plan=w.plan.filter(x=>x!==id);const t=todoById(id);if(t&&t.ddl){w.skip=w.skip||{};w.skip[id]=true}}
 const block=id=>D.blocks[id]||{title:'',type:'list',text:''};
 const addLog=(item,t,extra)=>D.logs.push(Object.assign({id:uid(),item,d:TODAY_ISO,t},extra||{}));
 
@@ -794,7 +801,7 @@ const pageHead=(title,aside)=>`<div class="page-h"><h1>${title}</h1>${aside?`<di
 function renderWeek(){
   const wk=U.week||CUR_WK;const W=week(wk);const [mon,sun]=weekRange(wk);
   const isCur=wk===CUR_WK,isPast=wk<CUR_WK;
-  const plan=(W.plan||[]).map(todoById).filter(Boolean);
+  const plan=planIds(wk).map(todoById).filter(Boolean);
   const allW=weeklyFor(wk);const openW=allW.filter(x=>!recOn(wk,x.w.id)),doneW=allW.filter(x=>recOn(wk,x.w.id));
   const done=plan.filter(t=>t.done).length+doneW.length,total=plan.length+allW.length;
   const openPlan=plan.filter(t=>!t.done),donePlan=plan.filter(t=>t.done);
@@ -806,7 +813,7 @@ function renderWeek(){
       return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${esc(label(it))}</button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${[false,true].map(fin=>g.w.filter(w=>recOn(wk,w.id)===fin).map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true,focus:true})).join('')+g.t.filter(t=>!!t.done===fin).map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true,focus:true})).join('')).join('')}</div></div>`}).join('')}</div>`).join('');
   const focHtml=Object.keys(W.focus||{}).map(fid=>{const t=todoById(fid);if(t&&!t.del&&itemById(t.item))return todoLine(t,'fo',{wk,chip:true,noWeek:true,noDel:true,focus:true});
     const x=allW.find(x=>x.w.id===fid);return x?weeklyLine(x.it,x.w,'fo',{wk,chip:true,noDel:true,focus:true}):''}).join('');
-  const prev=addWeeks(wk,-1);const carry=(week(prev).plan||[]).map(todoById).filter(t=>t&&!t.done&&!t.del&&!inWeek(t.id,wk));
+  const prev=addWeeks(wk,-1);const carry=planIds(prev).map(todoById).filter(t=>t&&!t.done&&!t.del&&!inWeek(t.id,wk));
   const open=liveTodos().filter(t=>!t.done&&!inWeek(t.id,wk));
   const pickList=open.filter(t=>!U.pickArea||itemById(t.item).area===U.pickArea);
   const pickLine=t=>`<div class="td"><span class="td-t">${md(t.t)}</span>${itemChip(itemById(t.item))}${dueBadge(t)}<button class="btn ghost sm" type="button" data-act="wk-add" data-id="${esc(t.id)}" data-v="${wk}">加入</button></div>`;
@@ -839,12 +846,12 @@ function renderWeek(){
       </section>
       ${open.length===0?'':group('wk-pick',`从各分区挑选`,`${filterChips('pick-area',U.pickArea,[['','全部'],...AREAS.map(a=>[a,AREANAME[a]])])}<div class="todos">${pickList.map(pickLine).join('')||'<p class="blank">没有可挑选的 To-Do。</p>'}</div>`,{closed:true,count:open.length})}
       ${group('wk-review','复盘',`<textarea class="field" id="wk-review" data-wk="${wk}" data-field="review" placeholder="做得好的、没做完的原因、下周要调整的…" rows="4">${esc(W.review||'')}</textarea>`,{closed:!W.review})}
-      ${others.length?group('wk-hist','往期周计划',`<div class="hist">${others.map(k=>{const w=week(k);const p=(w.plan||[]).map(todoById).filter(Boolean);const kw=weeklyFor(k);const d=p.filter(t=>t.done).length+kw.filter(x=>recOn(k,x.w.id)).length;const pt=p.length+kw.length;const [m,s]=weekRange(k);
+      ${others.length?group('wk-hist','往期周计划',`<div class="hist">${others.map(k=>{const w=week(k);const p=planIds(k).map(todoById).filter(Boolean);const kw=weeklyFor(k);const d=p.filter(t=>t.done).length+kw.filter(x=>recOn(k,x.w.id)).length;const pt=p.length+kw.length;const [m,s]=weekRange(k);
         return `<button type="button" data-act="wk-go" data-v="${k}"><span class="w">${k.slice(5)}<small>${mdShort(m)}–${mdShort(s)}</small></span><span class="g">${esc((w.goals||w.review||'').split('\n')[0]||'—')}</span><span class="s">完成 ${d}/${pt}</span></button>`}).join('')}</div>`,{closed:true,count:others.length}):''}
     </div>
     <aside class="stack">
 
-      ${upcoming.length?`<section class="box"><h2 class="h-sm">两周内到期 · 还没排进这周</h2><div class="todos">${upcoming.map(t=>todoLine(t,'up',{chip:true,noDel:true,find:true})).join('')}</div></section>`:''}
+      ${upcoming.length?`<section class="box"><h2 class="h-sm">接下来两周到期</h2><div class="todos">${upcoming.map(t=>todoLine(t,'up',{chip:true,noDel:true,find:true})).join('')}</div></section>`:''}
       ${doneThisWeek.length+logsThisWeek.length===0?'':group('wk-done','这周完成',`<div class="log">${[...doneThisWeek.map(t=>({d:t.doneAt,t:'✓ '+t.t,it:itemById(t.item)})),...logsThisWeek.map(l=>({d:l.d,t:l.t,it:itemById(l.item)}))].sort((a,b)=>a.d<b.d?1:-1).map(e=>`<div class="log-e"><span class="d">${esc(mdShort(e.d))}</span><span class="t">${md(e.t)}</span><span>${e.it?itemChip(e.it):''}</span></div>`).join('')||'<p class="blank">还没有。</p>'}</div>`,{closed:true,count:doneThisWeek.length+logsThisWeek.length})}
     </aside>
   </div>`;
@@ -875,7 +882,7 @@ function studentsSection(){
     {count:list.length,aside:`<button class="btn ghost sm" type="button" data-act="student-add">+ 添加</button>`})}
 function renderResearch(){
   const projs=areaItems('research','proj'),cols=areaItems('research','collab');
-  const L=selList('lead',projs,'research','proj','例如：Self-improving policy'),P=selList('part',cols,'research','collab','例如：某合作');
+  const L=selList('lead',projs,'research','proj','例如：一个新的研究方向'),P=selList('part',cols,'research','collab','例如：某合作');
   return `<div class="narrow stack">
   ${pageHead('科研')}
   ${group('r-proj','Lead Project',L.body||'<p class="blank">还没有。</p>',{count:projs.length,aside:L.switch+addBtn('research','proj','+ 添加')})}
@@ -1170,11 +1177,11 @@ document.addEventListener('click',async e=>{
     case 'wkly-del':{const it=itemById(b.dataset.item);if(!it)return;snapshot();it.weekly=(it.weekly||[]).filter(x=>x.id!==id);commit('删除每周任务');toast('已删除每周任务',true);return}
     case 'todo-del':snapshot();deleteTodo(id);commit('删除 To-Do');toast('已删除 To-Do',true);return;
     case 'log-del':snapshot();D.logs=D.logs.filter(l=>l.id!==id);commit('删除进展');toast('已删除进展',true);return;
-    case 'wk-toggle':{const w=ensureWeek(v);if(w.plan.includes(id))w.plan=w.plan.filter(x=>x!==id);else w.plan.push(id);commit('周计划');return}
-    case 'wk-add':ensureWeek(v).plan.push(id);commit('周计划');return;
-    case 'wk-remove':{const w=ensureWeek(v);w.plan=w.plan.filter(x=>x!==id);commit('周计划');return}
+    case 'wk-toggle':{if(inWeek(id,v))weekRemove(v,id);else weekAdd(v,id);commit('周计划');return}
+    case 'wk-add':weekAdd(v,id);commit('周计划');return;
+    case 'wk-remove':weekRemove(v,id);commit('周计划');return;
     case 'wk-go':U.week=v===CUR_WK?'':v;saveUI();if(U.tab!=='week')U.tab='week';render();window.scrollTo({top:0});return;
-    case 'wk-carry':{const w=ensureWeek(v);const prev=week(addWeeks(v,-1));for(const tid of prev.plan||[]){const t=todoById(tid);if(t&&!t.done&&!t.del&&!w.plan.includes(tid))w.plan.push(tid)}commit('周计划');toast('已移过来');return}
+    case 'wk-carry':{const w=ensureWeek(v);for(const tid of planIds(addWeeks(v,-1))){const t=todoById(tid);if(t&&!t.done&&!t.del&&!inWeek(tid,v))weekAdd(v,tid)}commit('周计划');toast('已移过来');return}
     case 'blk-edit':T.editBlock=id;render();{const n=document.getElementById('blk-text-'+id);if(n)n.focus()}return;
     case 'blk-cancel':T.editBlock='';render();return;
     case 'step-edit':T.editBlock=T.editBlock==='st:'+id?'':'st:'+id;render();return;
