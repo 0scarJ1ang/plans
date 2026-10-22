@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1022-0758-458784">
+<meta name="app-build" content="1022-0808-696d8f">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -416,10 +416,10 @@ form.add select.field{max-width:100%}
 'use strict';
 
 /* ============================== constants ============================== */
-const TABS=[['week','本周'],['research','科研'],['intern','实习'],['visit','访问'],['admin','杂事'],['think','思考']];
+const TABS=[['week','本周'],['research','科研'],['exp','经历'],['admin','杂事'],['think','思考']];
 const TABNAME=Object.fromEntries(TABS);
-const AREAS=['research','intern','visit','admin','career','profile','step'];
-const AREANAME={research:'科研',intern:'实习',visit:'访问',career:'职业',profile:'曝光',admin:'杂事',step:'退一步'};
+const AREAS=['research','exp','admin','career','profile','step'];
+const AREANAME={research:'科研',exp:'经历',intern:'经历',visit:'经历',career:'职业',profile:'曝光',admin:'杂事',step:'退一步'};
 const PRI=[['P0','P0 紧急'],['P1','P1 重要'],['P2','P2 推进'],['P3','P3 有空'],['','— 未设']];
 const PRANK={P0:0,P1:1,P2:2,P3:3,'':4};
 const SETS={
@@ -518,7 +518,7 @@ const saveUI=()=>ls.set(UI_KEY,U);
 let IX={items:new Map(),todos:new Map(),byItem:new Map()};
 const adopt=x=>normalize(clone(x));
 function normalize(d){const out=Object.assign(clone(EMPTY),d||{});for(const k of Object.keys(EMPTY))if(out[k]==null)out[k]=clone(EMPTY[k]);
-  for(const it of out.items)if(it.kind==='lead'){it.kind='collab';it.set='collab'}
+  for(const it of out.items){if(it.kind==='lead'){it.kind='collab';it.set='collab'}if(it.area==='intern'||it.area==='visit')it.area='exp'}
   return out}
 function reindex(){
   IX={items:new Map(D.items.map(x=>[x.id,x])),todos:new Map(D.todos.map(t=>[t.id,t])),byItem:new Map()};
@@ -627,7 +627,7 @@ function nextProjId(){for(let c=65;c<91;c++){const id=String.fromCharCode(c);if(
 const isHidden=k=>!!(D.hidden&&D.hidden[k]);
 const isOpen=(k,def)=>k in U.exp?!!U.exp[k]:!!def;
 const hasContent=h=>/<(input|textarea|select|button)\b/.test(h)||h.replace(/<[^>]+>/g,'').trim()!=='';
-const AREA_TAB={research:['research',''],intern:['intern',''],visit:['visit',''],admin:['admin',''],career:['think','career'],profile:['think','profile'],step:['think','step']};
+const AREA_TAB={research:['research',''],exp:['exp',''],intern:['exp',''],visit:['exp',''],admin:['admin',''],career:['think','career'],profile:['think','profile'],step:['think','step']};
 const plain=s=>String(s||'').replace(/\*\*/g,'');
 function stSel(it){const v=st(it);const opts=SETS[setOf(it)];return `<select class="pill st" data-act="st" data-id="${esc(it.id)}" aria-label="状态：${esc(it.title)}">${(opts.includes(v)?opts:[v,...opts]).map(k=>`<option${k===v?' selected':''}>${esc(k)}</option>`).join('')}</select>`}
 function dueBadge(t){if(t.done||!t.ddl)return '';const n=daysTo(t.ddl);if(n===null)return '';
@@ -695,7 +695,7 @@ function itemView(it,o={}){
   const exp=isOpen(it.id);const proj=it.kind==='proj';
   const stu=studentsOf(it);
   const body=(stu.length?`<div class="meta" data-find>学生：${esc(stu.join('、'))}</div>`:'')+(proj?`${(it.people||'').split('\n').filter(Boolean).map(l=>`<div class="meta" data-find>${md(l)}</div>`).join('')}${it.notes?`<div class="notes">${renderText(it.notes)}</div>`:''}`
-    :(it.sub?`<p class="row-sub" data-find>${md(it.sub)}</p>`:''));
+    :(it.sub?`<div class="row-sub">${renderText(it.sub)}</div>`:''));
   return `<div class="it${exp?' open':''}${proj?' proj':''}" id="it-${id}" data-key="${id}">
     <div class="it-row">
       <button class="it-h" type="button" data-act="exp" data-id="${id}" aria-expanded="${exp}"><span class="car"></span>${proj?`<span class="proj-id">${id}</span>`:''}<span class="it-t" data-find>${esc(it.title)}</span>${proj&&it.target?`<span class="tgt">${esc(it.target)}</span>`:''}</button>
@@ -877,14 +877,10 @@ function renderResearch(){
   ${studentsSection()}
   ${group('r-ref','资料',notes(['hero','students','bottomline','authorship']),{closed:true})}
   </div>`}
-function renderIntern(){const its=areaItems('intern');return `<div class="narrow stack">
-  ${pageHead('实习',addBtn('intern','intern','+ 实习目标'))}
-  ${itemList(its,'intern','intern','例如：Google DeepMind Robotics')}
-  ${group('i-ref','资料',notes(['intern_intro']),{closed:true})}</div>`}
-function renderVisit(){const its=areaItems('visit');return `<div class="narrow stack">
-  ${pageHead('访问',addBtn('visit','visit','+ Visiting 目标'))}
-  ${itemList(its,'visit','visit','例如：某组 Visiting')}
-  ${group('v-ref','资料',notes(['visit_intro']),{closed:true})}</div>`}
+function renderExp(){const its=areaItems('exp');return `<div class="narrow stack">
+  ${pageHead('经历',addBtn('exp','intern','+ 添加'))}
+  ${itemList(its,'exp','intern','例如：某公司实习、某组访问')}
+  ${group('e-ref','资料',notes(['intern_intro','visit_intro']),{closed:true})}</div>`}
 function renderAdmin(){
   const its=areaItems('admin');
 
@@ -1024,7 +1020,7 @@ async function firstWrite(data){
 }
 
 /* ============================== app shell ============================== */
-const PANELS={week:renderWeek,research:renderResearch,intern:renderIntern,visit:renderVisit,admin:renderAdmin,think:renderThink,settings:renderSettings};
+const PANELS={week:renderWeek,research:renderResearch,exp:renderExp,admin:renderAdmin,think:renderThink,settings:renderSettings};
 const PANEL_IDS=Object.keys(PANELS);
 function renderTabs(){
   const over=D?liveTodos().filter(t=>!t.done&&t.ddl&&daysTo(t.ddl)<0).length:0;
@@ -1238,7 +1234,7 @@ document.addEventListener('keydown',e=>{if(e.key==='/'&&!/^(INPUT|TEXTAREA|SELEC
 
 /* ============================== boot ============================== */
 async function boot(){
-  const h=(location.hash||'').slice(1);if(PANELS[h])U.tab=h;if(!PANELS[U.tab])U.tab='week';U.week='';
+  const h0=(location.hash||'').slice(1);const h=(h0==='intern'||h0==='visit')?'exp':h0;if(U.tab==='intern'||U.tab==='visit')U.tab='exp';if(PANELS[h])U.tab=h;if(!PANELS[U.tab])U.tab='week';U.week='';
   document.getElementById('today-line').textContent='今天 '+TODAY_ISO.replace(/-/g,'.')+' · '+CUR_WK;
   applyTheme();
   const cfg=ls.get(CFG_KEY);const seedEl=document.getElementById('seed');
