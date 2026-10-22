@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1022-0830-6037ff">
+<meta name="app-build" content="1022-0904-700162">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -16,7 +16,8 @@
 /* Layout: an engineering lab notebook. Sticky masthead with sync chip + tab rail; the week sheet pulls
    to-dos from every area; each area sheet is trackers (priority, status, to-do/DDL, progress log) then reference notes. */
 :root{
-  --bg:#F2F4F6; --surface:#FFFFFF; --sunk:#E8ECF0; --ink:#16202A; --muted:#58646F; --line:#D8DEE4; --grid:rgba(30,90,150,.07);
+  --bg:#F2F4F6; --surface:#FFFFFF; --sunk:#E8ECF0; --ink:#16202A; --muted:#58646F; --line:#D8DEE4; --hair:#E7EBEF; --grid:rgba(30,90,150,.07);
+  --c-research:#1E5A96; --c-exp:#1D6A56; --c-admin:#6F45A6; --c-think:#7A6236;
   --accent:#1E5A96; --accent-soft:#E2ECF6; --on-accent:#FFFFFF;
   --p0:#B3321F; --p0-bg:#FAE7E3; --p1:#94590A; --p1-bg:#F8EDD8; --p2:#1D6A56; --p2-bg:#E0F1EA; --p3:#5D6873; --p3-bg:#EAEEF1;
   --ok:#1D7A4C; --warn:#94590A; --bad:#B3321F; --shadow:rgba(16,24,32,.14);
@@ -25,13 +26,15 @@
   --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Noto Sans SC","PingFang SC","Microsoft YaHei",monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0E1318; --surface:#151C23; --sunk:#1C252E; --ink:#E3E8ED; --muted:#93A0AC; --line:#28333E; --grid:rgba(125,176,232,.06);
+  --bg:#0E1318; --surface:#151C23; --sunk:#1C252E; --ink:#E3E8ED; --muted:#93A0AC; --line:#28333E; --hair:#202A34; --grid:rgba(125,176,232,.06);
+  --c-research:#7DB0E8; --c-exp:#6BCBA8; --c-admin:#B79AE6; --c-think:#D4BE92;
   --accent:#7DB0E8; --accent-soft:#1A2B3D; --on-accent:#0E1318;
   --p0:#F08B79; --p0-bg:#3A1E19; --p1:#E6B45E; --p1-bg:#33270F; --p2:#6BCBA8; --p2-bg:#122C24; --p3:#A3AEB9; --p3-bg:#222A33;
   --ok:#62CB93; --warn:#E6B45E; --bad:#F08B79; --shadow:rgba(0,0,0,.5); color-scheme:dark;
 }}
 :root[data-theme="dark"]{
-  --bg:#0E1318; --surface:#151C23; --sunk:#1C252E; --ink:#E3E8ED; --muted:#93A0AC; --line:#28333E; --grid:rgba(125,176,232,.06);
+  --bg:#0E1318; --surface:#151C23; --sunk:#1C252E; --ink:#E3E8ED; --muted:#93A0AC; --line:#28333E; --hair:#202A34; --grid:rgba(125,176,232,.06);
+  --c-research:#7DB0E8; --c-exp:#6BCBA8; --c-admin:#B79AE6; --c-think:#D4BE92;
   --accent:#7DB0E8; --accent-soft:#1A2B3D; --on-accent:#0E1318;
   --p0:#F08B79; --p0-bg:#3A1E19; --p1:#E6B45E; --p1-bg:#33270F; --p2:#6BCBA8; --p2-bg:#122C24; --p3:#A3AEB9; --p3-bg:#222A33;
   --ok:#62CB93; --warn:#E6B45E; --bad:#F08B79; --shadow:rgba(0,0,0,.5); color-scheme:dark;
@@ -160,7 +163,7 @@ form.edit label{display:grid;gap:3px;font-size:12.5px;color:var(--muted)}
 
 /* to-dos */
 .todos{display:grid;min-width:0}
-.td{display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;padding:6px 0;border-top:1px dashed var(--line);min-width:0}
+.td{display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;padding:6px 0;border-top:1px solid var(--hair);min-width:0}
 .todos > .td:first-child{border-top:0}
 .td input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;margin:0;flex:none}
 .td-t{flex:1 1 180px;min-width:0;font-size:14px;cursor:pointer;overflow-wrap:anywhere}
@@ -192,7 +195,7 @@ form.add select.field{flex:0 1 230px;width:auto}
 
 /* progress log */
 .log{display:grid;gap:0;font-size:13.5px}
-.log-e{display:grid;grid-template-columns:84px minmax(0,1fr) auto;gap:8px;padding:5px 0;border-top:1px dotted var(--line);align-items:baseline}
+.log-e{display:grid;grid-template-columns:84px minmax(0,1fr) auto;gap:8px;padding:5px 0;border-top:1px solid var(--hair);align-items:baseline}
 .log-e:first-child{border-top:0}
 .log-e .d{font:500 12px var(--f-mono);color:var(--muted)}
 .log-e.auto .t{color:var(--muted)}
@@ -270,7 +273,7 @@ form.add select.field{flex:0 1 230px;width:auto}
 .dots button.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .hist-dates{display:flex;gap:6px;flex-wrap:wrap}
 
-.inbox-i{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-top:1px dashed var(--line)}
+.inbox-i{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--hair)}
 .inbox-i:first-child{border-top:0}
 .inbox-i p{margin:0;flex:1;min-width:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
 .inbox-i .x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px}
@@ -313,7 +316,7 @@ details.old[open] summary{margin-bottom:8px}
 .open>.it-row .car,.open>.grp-hd .car{transform:rotate(90deg)}
 @media (prefers-reduced-motion: reduce){.car{transition:none}}
 .xb{display:grid;gap:10px;min-width:0}
-.it>.xb{border-top:1px dashed var(--line);padding:12px 16px 14px 34px}
+.it>.xb{border-top:1px solid var(--hair);padding:12px 16px 14px 34px}
 .grp-s{display:grid;gap:10px;min-width:0}
 .grp-hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .grp-btn{display:flex;align-items:center;gap:8px;border:0;background:none;color:var(--ink);cursor:pointer;padding:4px 2px;font:inherit}
@@ -339,8 +342,11 @@ form.add.slim textarea{min-height:0}
 .wklabel span{font:500 13px var(--f-mono);color:var(--muted);margin-left:6px}
 textarea.goal{font-size:15px;min-height:0}
 .plan.box{gap:6px}
-.wk-it{display:grid;padding-top:2px}
-.wk-it-h{justify-self:start;border:0;background:none;padding:4px 0 0;font:500 12.5px var(--f-body);color:var(--muted);cursor:pointer;text-align:left}
+.wk-it{display:grid;padding:8px 0 2px}
+.wk-it+.wk-it{border-top:1px solid var(--line)}
+.wk-it .todos{padding-left:16px}
+.wk-it-h{justify-self:start;display:flex;gap:7px;align-items:center;border:0;background:none;padding:2px 0 4px;font:600 14px/1.35 var(--f-body);color:var(--ink);cursor:pointer;text-align:left}
+.wk-it-h .proj-id{font-size:11px;padding:2px 5px}
 .wk-it-h:hover{color:var(--accent)}
 .it.proj{padding:0;display:block;gap:0}
 .grp-k{font:500 11.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);padding-top:6px}
@@ -367,14 +373,24 @@ textarea.goal{font-size:15px;min-height:0}
 .td.focus .td-t{font-weight:600}
 .wkb.foc.on{color:var(--p1);font-weight:600}
 .tag.foc{color:var(--p1);background:var(--p1-bg)}
-.focus-box{border-color:var(--p1)}
-.focus-box .h-sm{color:var(--p1)}
 .ch-box{padding:4px 16px}
 .ch-box .fr{padding:8px 0}
 .ch-box .fr-t{font-weight:500;font-size:14.5px}
 .ch-box .age{min-width:5.5em;text-align:center}
 .cluster{display:grid;gap:10px}
 .cluster-k{font:500 11.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:8px;border-top:1px solid var(--line)}
+.plan{display:grid;gap:14px}
+.plan-sum{display:grid;gap:6px}
+.wk-area{--c:var(--c-think);gap:0;padding:14px 18px 8px}
+.wk-area[data-c="research"]{--c:var(--c-research)} .wk-area[data-c="exp"]{--c:var(--c-exp)} .wk-area[data-c="admin"]{--c:var(--c-admin)}
+.wk-area-h{display:flex;align-items:center;gap:10px;padding-bottom:8px;border-bottom:2px solid var(--c)}
+.wk-area-h h2{font:600 18px/1.2 var(--f-display);margin:0;color:var(--c)}
+.wk-area-h .cnt{margin-left:auto;font:500 12.5px var(--f-mono);color:var(--muted)}
+.dot{width:10px;height:10px;border-radius:3px;background:var(--c);flex:none}
+.quick-box{padding:10px 14px}
+#tab-research[aria-selected="true"]{border-bottom-color:var(--c-research)} #tab-exp[aria-selected="true"]{border-bottom-color:var(--c-exp)}
+#tab-admin[aria-selected="true"]{border-bottom-color:var(--c-admin)} #tab-think[aria-selected="true"]{border-bottom-color:var(--c-think)}
+@media (max-width:560px){.wk-area{padding:12px 12px 6px}.wk-it .todos{padding-left:6px}}
 .tag.rep{color:var(--accent);background:var(--accent-soft)}
 .rep-l{display:flex;gap:4px;align-items:center;font-size:12.5px;color:var(--muted);white-space:nowrap;cursor:pointer}
 .it-row select.st{border-color:transparent;background-color:transparent}
@@ -808,11 +824,12 @@ function renderWeek(){
   const byArea={};const slot=(it,iid)=>{const a=it?it.area:'other';const A=byArea[a]=byArea[a]||{};return A[iid]=A[iid]||{w:[],t:[]}};
   for(const x of allW)slot(x.it,x.it.id).w.push(x.w);
   for(const t of plan)slot(itemById(t.item),t.item).t.push(t);
-  const planHtml=[...AREAS,'other'].filter(a=>byArea[a]).map(a=>`<div class="grp"><div class="grp-k">${AREANAME[a]||'其他'}</div>${
-    Object.entries(byArea[a]).map(([iid,g])=>{const it=itemById(iid);const [tab,sub]=it?tabFor(it):['week',''];
-      return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${esc(label(it))}</button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${[false,true].map(fin=>g.w.filter(w=>recOn(wk,w.id)===fin).map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true,focus:true})).join('')+g.t.filter(t=>!!t.done===fin).map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true,focus:true})).join('')).join('')}</div></div>`}).join('')}</div>`).join('');
-  const focHtml=Object.keys(W.focus||{}).map(fid=>{const t=todoById(fid);if(t&&!t.del&&itemById(t.item))return todoLine(t,'fo',{wk,chip:true,noWeek:true,noDel:true,focus:true});
-    const x=allW.find(x=>x.w.id===fid);return x?weeklyLine(x.it,x.w,'fo',{wk,chip:true,noDel:true,focus:true}):''}).join('');
+  const AREA_C={research:'research',exp:'exp',admin:'admin'};
+  const planHtml=[...AREAS,'other'].filter(a=>byArea[a]).map(a=>{const groups=Object.entries(byArea[a]);
+    let tot=0,dn=0;for(const [,g] of groups){tot+=g.w.length+g.t.length;dn+=g.w.filter(w=>recOn(wk,w.id)).length+g.t.filter(t=>t.done).length}
+    return `<section class="box wk-area" data-c="${AREA_C[a]||'think'}"><div class="wk-area-h"><span class="dot" aria-hidden="true"></span><h2>${AREANAME[a]||'其他'}</h2><span class="cnt">${dn}/${tot}</span></div>${
+    groups.map(([iid,g])=>{const it=itemById(iid);const [tab,sub]=it?tabFor(it):['week',''];
+      return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${it.kind==='proj'?`<span class="proj-id">${esc(it.id)}</span>`:''}<span>${esc(it.title)}</span></button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${[false,true].map(fin=>g.w.filter(w=>recOn(wk,w.id)===fin).map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true,focus:true})).join('')+g.t.filter(t=>!!t.done===fin).map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true,focus:true})).join('')).join('')}</div></div>`}).join('')}</section>`}).join('');
   const prev=addWeeks(wk,-1);const carry=planIds(prev).map(todoById).filter(t=>t&&!t.done&&!t.del&&!inWeek(t.id,wk));
   const open=liveTodos().filter(t=>!t.done&&!inWeek(t.id,wk));
   const pickList=open.filter(t=>!U.pickArea||itemById(t.item).area===U.pickArea);
@@ -837,22 +854,25 @@ function renderWeek(){
   <div class="wkgrid">
     <div class="stack">
       <textarea class="field goal" id="wk-goals" data-wk="${wk}" data-field="goals" placeholder="这周最重要的事…" rows="2" aria-label="这周目标">${esc(W.goals||'')}</textarea>
-      ${focHtml?`<section class="box focus-box"><h2 class="h-sm">这周重点</h2><div class="todos">${focHtml}</div></section>`:''}
-      <section class="plan box">
-        <div class="meter"><span>计划 ${done}/${total}</span><div class="bar"><i style="width:${total?Math.round(done/total*100):0}%"></i></div></div>
-        ${planHtml||'<p class="blank">这周还没有计划。</p>'}
-        ${quick}
+      <div class="plan-sum">
+        <div class="meter"><span>本周完成 ${done}/${total}</span><div class="bar"><i style="width:${total?Math.round(done/total*100):0}%"></i></div></div>
         ${carry.length?`<button class="linkbtn" type="button" data-act="wk-carry" data-v="${wk}" title="只挪普通待办（还是同一条，不会新建）；每周任务本来就会自动出现">把上周没完成的 ${carry.length} 项移过来</button>`:''}
-      </section>
+      </div>
+      <div class="plan">${planHtml||'<p class="blank">这周还没有计划。</p>'}</div>
+
+
+
+
+    </div>
+    <aside class="stack">
+      <section class="box quick-box">${quick}</section>
+
+      ${upcoming.length?`<section class="box"><h2 class="h-sm">接下来两周到期</h2><div class="todos">${upcoming.map(t=>todoLine(t,'up',{chip:true,noDel:true,find:true})).join('')}</div></section>`:''}
+      ${doneThisWeek.length+logsThisWeek.length===0?'':group('wk-done','这周完成',`<div class="log">${[...doneThisWeek.map(t=>({d:t.doneAt,t:'✓ '+t.t,it:itemById(t.item)})),...logsThisWeek.map(l=>({d:l.d,t:l.t,it:itemById(l.item)}))].sort((a,b)=>a.d<b.d?1:-1).map(e=>`<div class="log-e"><span class="d">${esc(mdShort(e.d))}</span><span class="t">${md(e.t)}</span><span>${e.it?itemChip(e.it):''}</span></div>`).join('')||'<p class="blank">还没有。</p>'}</div>`,{closed:true,count:doneThisWeek.length+logsThisWeek.length})}
       ${open.length===0?'':group('wk-pick',`从各分区挑选`,`${filterChips('pick-area',U.pickArea,[['','全部'],...AREAS.map(a=>[a,AREANAME[a]])])}<div class="todos">${pickList.map(pickLine).join('')||'<p class="blank">没有可挑选的 To-Do。</p>'}</div>`,{closed:true,count:open.length})}
       ${group('wk-review','复盘',`<textarea class="field" id="wk-review" data-wk="${wk}" data-field="review" placeholder="做得好的、没做完的原因、下周要调整的…" rows="4">${esc(W.review||'')}</textarea>`,{closed:!W.review})}
       ${others.length?group('wk-hist','往期周计划',`<div class="hist">${others.map(k=>{const w=week(k);const p=planIds(k).map(todoById).filter(Boolean);const kw=weeklyFor(k);const d=p.filter(t=>t.done).length+kw.filter(x=>recOn(k,x.w.id)).length;const pt=p.length+kw.length;const [m,s]=weekRange(k);
         return `<button type="button" data-act="wk-go" data-v="${k}"><span class="w">${k.slice(5)}<small>${mdShort(m)}–${mdShort(s)}</small></span><span class="g">${esc((w.goals||w.review||'').split('\n')[0]||'—')}</span><span class="s">完成 ${d}/${pt}</span></button>`}).join('')}</div>`,{closed:true,count:others.length}):''}
-    </div>
-    <aside class="stack">
-
-      ${upcoming.length?`<section class="box"><h2 class="h-sm">接下来两周到期</h2><div class="todos">${upcoming.map(t=>todoLine(t,'up',{chip:true,noDel:true,find:true})).join('')}</div></section>`:''}
-      ${doneThisWeek.length+logsThisWeek.length===0?'':group('wk-done','这周完成',`<div class="log">${[...doneThisWeek.map(t=>({d:t.doneAt,t:'✓ '+t.t,it:itemById(t.item)})),...logsThisWeek.map(l=>({d:l.d,t:l.t,it:itemById(l.item)}))].sort((a,b)=>a.d<b.d?1:-1).map(e=>`<div class="log-e"><span class="d">${esc(mdShort(e.d))}</span><span class="t">${md(e.t)}</span><span>${e.it?itemChip(e.it):''}</span></div>`).join('')||'<p class="blank">还没有。</p>'}</div>`,{closed:true,count:doneThisWeek.length+logsThisWeek.length})}
     </aside>
   </div>`;
 }
