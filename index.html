@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1022-0904-700162">
+<meta name="app-build" content="1022-0908-4c29a2">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -441,7 +441,11 @@ form.add select.field{max-width:100%}
 const TABS=[['week','本周'],['research','科研'],['exp','经历'],['admin','杂事'],['think','思考']];
 const TABNAME=Object.fromEntries(TABS);
 const AREAS=['research','exp','admin','career','profile','step'];
-const AREANAME={research:'科研',exp:'经历',intern:'经历',visit:'经历',career:'职业',profile:'曝光',admin:'杂事',step:'退一步'};
+const AREANAME={research:'科研',exp:'经历',intern:'经历',visit:'经历',career:'思考',profile:'思考',admin:'杂事',step:'思考'};
+const SECTIONS=[['research','科研'],['exp','经历'],['admin','杂事'],['think','思考']];
+const secOf=a=>({research:'research',exp:'exp',intern:'exp',visit:'exp',admin:'admin'})[a]||'think';
+const SECNAME=Object.fromEntries(SECTIONS);
+const secItems=sec=>D.items.filter(x=>secOf(x.area)===sec);
 const PRI=[['P0','P0 紧急'],['P1','P1 重要'],['P2','P2 推进'],['P3','P3 有空'],['','— 未设']];
 const PRANK={P0:0,P1:1,P2:2,P3:3,'':4};
 const SETS={
@@ -821,25 +825,25 @@ function renderWeek(){
   const allW=weeklyFor(wk);const openW=allW.filter(x=>!recOn(wk,x.w.id)),doneW=allW.filter(x=>recOn(wk,x.w.id));
   const done=plan.filter(t=>t.done).length+doneW.length,total=plan.length+allW.length;
   const openPlan=plan.filter(t=>!t.done),donePlan=plan.filter(t=>t.done);
-  const byArea={};const slot=(it,iid)=>{const a=it?it.area:'other';const A=byArea[a]=byArea[a]||{};return A[iid]=A[iid]||{w:[],t:[]}};
+  const byArea={};const slot=(it,iid)=>{const a=it?secOf(it.area):'other';const A=byArea[a]=byArea[a]||{};return A[iid]=A[iid]||{w:[],t:[]}};
   for(const x of allW)slot(x.it,x.it.id).w.push(x.w);
   for(const t of plan)slot(itemById(t.item),t.item).t.push(t);
   const AREA_C={research:'research',exp:'exp',admin:'admin'};
-  const planHtml=[...AREAS,'other'].filter(a=>byArea[a]).map(a=>{const groups=Object.entries(byArea[a]);
+  const planHtml=[...SECTIONS.map(x=>x[0]),'other'].filter(a=>byArea[a]).map(a=>{const groups=Object.entries(byArea[a]);
     let tot=0,dn=0;for(const [,g] of groups){tot+=g.w.length+g.t.length;dn+=g.w.filter(w=>recOn(wk,w.id)).length+g.t.filter(t=>t.done).length}
-    return `<section class="box wk-area" data-c="${AREA_C[a]||'think'}"><div class="wk-area-h"><span class="dot" aria-hidden="true"></span><h2>${AREANAME[a]||'其他'}</h2><span class="cnt">${dn}/${tot}</span></div>${
+    return `<section class="box wk-area" data-c="${AREA_C[a]||'think'}"><div class="wk-area-h"><span class="dot" aria-hidden="true"></span><h2>${SECNAME[a]||'其他'}</h2><span class="cnt">${dn}/${tot}</span></div>${
     groups.map(([iid,g])=>{const it=itemById(iid);const [tab,sub]=it?tabFor(it):['week',''];
       return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${it.kind==='proj'?`<span class="proj-id">${esc(it.id)}</span>`:''}<span>${esc(it.title)}</span></button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${[false,true].map(fin=>g.w.filter(w=>recOn(wk,w.id)===fin).map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true,focus:true})).join('')+g.t.filter(t=>!!t.done===fin).map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true,focus:true})).join('')).join('')}</div></div>`}).join('')}</section>`}).join('');
   const prev=addWeeks(wk,-1);const carry=planIds(prev).map(todoById).filter(t=>t&&!t.done&&!t.del&&!inWeek(t.id,wk));
   const open=liveTodos().filter(t=>!t.done&&!inWeek(t.id,wk));
-  const pickList=open.filter(t=>!U.pickArea||itemById(t.item).area===U.pickArea);
+  const pickList=open.filter(t=>!U.pickArea||secOf(itemById(t.item).area)===U.pickArea);
   const pickLine=t=>`<div class="td"><span class="td-t">${md(t.t)}</span>${itemChip(itemById(t.item))}${dueBadge(t)}<button class="btn ghost sm" type="button" data-act="wk-add" data-id="${esc(t.id)}" data-v="${wk}">加入</button></div>`;
   const upcoming=liveTodos().filter(t=>!t.done&&t.ddl&&daysTo(t.ddl)<=14&&!inWeek(t.id,wk)).sort((a,b)=>a.ddl<b.ddl?-1:1);
   const doneThisWeek=[...liveTodos().filter(t=>t.done&&t.doneAt&&t.doneAt>=mon&&t.doneAt<=sun),...doneW.map(x=>({t:x.w.t,doneAt:typeof W.rec[x.w.id]==='string'?W.rec[x.w.id]:mon,item:x.it.id}))];
   const logsThisWeek=D.logs.filter(l=>!l.auto&&l.d>=mon&&l.d<=sun&&itemById(l.item));
   const others=Object.keys(D.weeks).filter(k=>k!==wk).sort().reverse();
   const quick=`<form class="add slim" data-form="wk-quick" data-wk="${wk}">
-      <select class="field" id="wkq-item" name="item" aria-label="属于哪个条目">${AREAS.map(a=>{const its=areaItems(a);return its.length?`<optgroup label="${AREANAME[a]}">${its.map(it=>`<option value="${esc(it.id)}"${it.id===U.lastItem?' selected':''}>${esc(label(it))}</option>`).join('')}</optgroup>`:''}).join('')}</select>
+      <select class="field" id="wkq-item" name="item" aria-label="属于哪个条目">${SECTIONS.map(([a,nm])=>{const its=secItems(a);return its.length?`<optgroup label="${nm}">${its.map(it=>`<option value="${esc(it.id)}"${it.id===U.lastItem?' selected':''}>${esc(label(it))}</option>`).join('')}</optgroup>`:''}).join('')}</select>
       <input type="text" class="field" id="wkq-t" name="t" placeholder="+ 新建 To-Do 放进这周" required aria-label="新 To-Do">
       <input type="date" class="field" id="wkq-d" name="d" aria-label="DDL（可选）">
       <label class="rep-l" title="每周自动出现一次"><input type="checkbox" name="rep" id="wkq-r"> 每周</label>
@@ -869,7 +873,7 @@ function renderWeek(){
 
       ${upcoming.length?`<section class="box"><h2 class="h-sm">接下来两周到期</h2><div class="todos">${upcoming.map(t=>todoLine(t,'up',{chip:true,noDel:true,find:true})).join('')}</div></section>`:''}
       ${doneThisWeek.length+logsThisWeek.length===0?'':group('wk-done','这周完成',`<div class="log">${[...doneThisWeek.map(t=>({d:t.doneAt,t:'✓ '+t.t,it:itemById(t.item)})),...logsThisWeek.map(l=>({d:l.d,t:l.t,it:itemById(l.item)}))].sort((a,b)=>a.d<b.d?1:-1).map(e=>`<div class="log-e"><span class="d">${esc(mdShort(e.d))}</span><span class="t">${md(e.t)}</span><span>${e.it?itemChip(e.it):''}</span></div>`).join('')||'<p class="blank">还没有。</p>'}</div>`,{closed:true,count:doneThisWeek.length+logsThisWeek.length})}
-      ${open.length===0?'':group('wk-pick',`从各分区挑选`,`${filterChips('pick-area',U.pickArea,[['','全部'],...AREAS.map(a=>[a,AREANAME[a]])])}<div class="todos">${pickList.map(pickLine).join('')||'<p class="blank">没有可挑选的 To-Do。</p>'}</div>`,{closed:true,count:open.length})}
+      ${open.length===0?'':group('wk-pick',`从各分区挑选`,`${filterChips('pick-area',U.pickArea,[['','全部'],...SECTIONS])}<div class="todos">${pickList.map(pickLine).join('')||'<p class="blank">没有可挑选的 To-Do。</p>'}</div>`,{closed:true,count:open.length})}
       ${group('wk-review','复盘',`<textarea class="field" id="wk-review" data-wk="${wk}" data-field="review" placeholder="做得好的、没做完的原因、下周要调整的…" rows="4">${esc(W.review||'')}</textarea>`,{closed:!W.review})}
       ${others.length?group('wk-hist','往期周计划',`<div class="hist">${others.map(k=>{const w=week(k);const p=planIds(k).map(todoById).filter(Boolean);const kw=weeklyFor(k);const d=p.filter(t=>t.done).length+kw.filter(x=>recOn(k,x.w.id)).length;const pt=p.length+kw.length;const [m,s]=weekRange(k);
         return `<button type="button" data-act="wk-go" data-v="${k}"><span class="w">${k.slice(5)}<small>${mdShort(m)}–${mdShort(s)}</small></span><span class="g">${esc((w.goals||w.review||'').split('\n')[0]||'—')}</span><span class="s">完成 ${d}/${pt}</span></button>`}).join('')}</div>`,{closed:true,count:others.length}):''}
@@ -1139,7 +1143,7 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('submit',e=>{
   const f=e.target;const kind=f.dataset&&f.dataset.form;if(!kind)return;e.preventDefault();
-  const v=n=>{const el=f.elements[n];return el?(el.type==='checkbox'?el.checked:String(el.value).trim()):''};
+  const v=n=>{const el=f.elements.namedItem(n);return el?(el.type==='checkbox'?el.checked:String(el.value).trim()):''};
   const refocus=id=>{const n=document.getElementById(id);if(n)n.focus()};
   switch(kind){
     case 'connect':{const cfg={owner:v('owner'),repo:v('repo'),path:v('path').replace(/^\/+/,''),branch:v('branch'),token:v('token')};doConnect(cfg);return}
@@ -1278,7 +1282,7 @@ document.addEventListener('keydown',e=>{if(e.key==='/'&&!/^(INPUT|TEXTAREA|SELEC
 
 /* ============================== boot ============================== */
 async function boot(){
-  const h0=(location.hash||'').slice(1);const h=(h0==='intern'||h0==='visit')?'exp':h0;if(U.tab==='intern'||U.tab==='visit')U.tab='exp';if(PANELS[h])U.tab=h;if(!PANELS[U.tab])U.tab='week';U.week='';
+  const h0=(location.hash||'').slice(1);const h=(h0==='intern'||h0==='visit')?'exp':h0;if(U.tab==='intern'||U.tab==='visit')U.tab='exp';if(U.pickArea&&!SECNAME[U.pickArea])U.pickArea='';if(PANELS[h])U.tab=h;if(!PANELS[U.tab])U.tab='week';U.week='';
   document.getElementById('today-line').textContent='今天 '+TODAY_ISO.replace(/-/g,'.')+' · '+CUR_WK;
   applyTheme();
   const cfg=ls.get(CFG_KEY);const seedEl=document.getElementById('seed');
