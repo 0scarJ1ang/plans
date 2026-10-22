@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1022-0908-4c29a2">
+<meta name="app-build" content="1022-1145-a6fdaf">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -17,7 +17,7 @@
    to-dos from every area; each area sheet is trackers (priority, status, to-do/DDL, progress log) then reference notes. */
 :root{
   --bg:#F2F4F6; --surface:#FFFFFF; --sunk:#E8ECF0; --ink:#16202A; --muted:#58646F; --line:#D8DEE4; --hair:#E7EBEF; --grid:rgba(30,90,150,.07);
-  --c-research:#1E5A96; --c-exp:#1D6A56; --c-admin:#6F45A6; --c-think:#7A6236;
+  --c-research:#1E5A96; --c-exp:#1D6A56; --c-dim:#A3375E; --c-admin:#6F45A6; --c-think:#7A6236;
   --accent:#1E5A96; --accent-soft:#E2ECF6; --on-accent:#FFFFFF;
   --p0:#B3321F; --p0-bg:#FAE7E3; --p1:#94590A; --p1-bg:#F8EDD8; --p2:#1D6A56; --p2-bg:#E0F1EA; --p3:#5D6873; --p3-bg:#EAEEF1;
   --ok:#1D7A4C; --warn:#94590A; --bad:#B3321F; --shadow:rgba(16,24,32,.14);
@@ -27,14 +27,14 @@
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0E1318; --surface:#151C23; --sunk:#1C252E; --ink:#E3E8ED; --muted:#93A0AC; --line:#28333E; --hair:#202A34; --grid:rgba(125,176,232,.06);
-  --c-research:#7DB0E8; --c-exp:#6BCBA8; --c-admin:#B79AE6; --c-think:#D4BE92;
+  --c-research:#7DB0E8; --c-exp:#6BCBA8; --c-dim:#EE8FB0; --c-admin:#B79AE6; --c-think:#D4BE92;
   --accent:#7DB0E8; --accent-soft:#1A2B3D; --on-accent:#0E1318;
   --p0:#F08B79; --p0-bg:#3A1E19; --p1:#E6B45E; --p1-bg:#33270F; --p2:#6BCBA8; --p2-bg:#122C24; --p3:#A3AEB9; --p3-bg:#222A33;
   --ok:#62CB93; --warn:#E6B45E; --bad:#F08B79; --shadow:rgba(0,0,0,.5); color-scheme:dark;
 }}
 :root[data-theme="dark"]{
   --bg:#0E1318; --surface:#151C23; --sunk:#1C252E; --ink:#E3E8ED; --muted:#93A0AC; --line:#28333E; --hair:#202A34; --grid:rgba(125,176,232,.06);
-  --c-research:#7DB0E8; --c-exp:#6BCBA8; --c-admin:#B79AE6; --c-think:#D4BE92;
+  --c-research:#7DB0E8; --c-exp:#6BCBA8; --c-dim:#EE8FB0; --c-admin:#B79AE6; --c-think:#D4BE92;
   --accent:#7DB0E8; --accent-soft:#1A2B3D; --on-accent:#0E1318;
   --p0:#F08B79; --p0-bg:#3A1E19; --p1:#E6B45E; --p1-bg:#33270F; --p2:#6BCBA8; --p2-bg:#122C24; --p3:#A3AEB9; --p3-bg:#222A33;
   --ok:#62CB93; --warn:#E6B45E; --bad:#F08B79; --shadow:rgba(0,0,0,.5); color-scheme:dark;
@@ -382,14 +382,14 @@ textarea.goal{font-size:15px;min-height:0}
 .plan{display:grid;gap:14px}
 .plan-sum{display:grid;gap:6px}
 .wk-area{--c:var(--c-think);gap:0;padding:14px 18px 8px}
-.wk-area[data-c="research"]{--c:var(--c-research)} .wk-area[data-c="exp"]{--c:var(--c-exp)} .wk-area[data-c="admin"]{--c:var(--c-admin)}
+.wk-area[data-c="research"]{--c:var(--c-research)} .wk-area[data-c="dim"]{--c:var(--c-dim)} .wk-area[data-c="exp"]{--c:var(--c-exp)} .wk-area[data-c="admin"]{--c:var(--c-admin)}
 .wk-area-h{display:flex;align-items:center;gap:10px;padding-bottom:8px;border-bottom:2px solid var(--c)}
 .wk-area-h h2{font:600 18px/1.2 var(--f-display);margin:0;color:var(--c)}
 .wk-area-h .cnt{margin-left:auto;font:500 12.5px var(--f-mono);color:var(--muted)}
 .dot{width:10px;height:10px;border-radius:3px;background:var(--c);flex:none}
 .quick-box{padding:10px 14px}
 #tab-research[aria-selected="true"]{border-bottom-color:var(--c-research)} #tab-exp[aria-selected="true"]{border-bottom-color:var(--c-exp)}
-#tab-admin[aria-selected="true"]{border-bottom-color:var(--c-admin)} #tab-think[aria-selected="true"]{border-bottom-color:var(--c-think)}
+#tab-dim[aria-selected="true"]{border-bottom-color:var(--c-dim)} #tab-admin[aria-selected="true"]{border-bottom-color:var(--c-admin)} #tab-think[aria-selected="true"]{border-bottom-color:var(--c-think)}
 @media (max-width:560px){.wk-area{padding:12px 12px 6px}.wk-it .todos{padding-left:6px}}
 .tag.rep{color:var(--accent);background:var(--accent-soft)}
 .rep-l{display:flex;gap:4px;align-items:center;font-size:12.5px;color:var(--muted);white-space:nowrap;cursor:pointer}
@@ -438,12 +438,12 @@ form.add select.field{max-width:100%}
 'use strict';
 
 /* ============================== constants ============================== */
-const TABS=[['week','本周'],['research','科研'],['exp','经历'],['admin','杂事'],['think','思考']];
+const TABS=[['week','本周'],['research','科研'],['exp','经历'],['admin','杂事'],['dim','维度'],['think','思考']];
 const TABNAME=Object.fromEntries(TABS);
 const AREAS=['research','exp','admin','career','profile','step'];
-const AREANAME={research:'科研',exp:'经历',intern:'经历',visit:'经历',career:'思考',profile:'思考',admin:'杂事',step:'思考'};
-const SECTIONS=[['research','科研'],['exp','经历'],['admin','杂事'],['think','思考']];
-const secOf=a=>({research:'research',exp:'exp',intern:'exp',visit:'exp',admin:'admin'})[a]||'think';
+const AREANAME={research:'科研',exp:'经历',intern:'经历',visit:'经历',career:'维度',profile:'维度',net:'维度',talk:'维度',service:'维度',admin:'杂事',step:'思考'};
+const SECTIONS=[['research','科研'],['exp','经历'],['admin','杂事'],['dim','维度'],['think','思考']];
+const secOf=a=>({research:'research',exp:'exp',intern:'exp',visit:'exp',admin:'admin',net:'dim',talk:'dim',service:'dim',career:'dim',profile:'dim'})[a]||'think';
 const SECNAME=Object.fromEntries(SECTIONS);
 const secItems=sec=>D.items.filter(x=>secOf(x.area)===sec);
 const PRI=[['P0','P0 紧急'],['P1','P1 重要'],['P2','P2 推进'],['P3','P3 有空'],['','— 未设']];
@@ -456,8 +456,9 @@ const SETS={
   visit:['想法','联系中','申请中','已确定','放弃'],
   app:['关注','准备中','已提交','有结果','放弃'],
   todo:['想法','准备中','进行中','完成'],
+  person:['想认识','联系中','聊过','保持联系'],
 };
-const KIND_SET={proj:'proj',collab:'collab',lead:'lead',intern:'intern',visit:'visit',app:'app',todo:'todo',step:'todo'};
+const KIND_SET={person:'person',proj:'proj',collab:'collab',lead:'lead',intern:'intern',visit:'visit',app:'app',todo:'todo',step:'todo'};
 const TAGS={r:'研究',i:'实习',v:'Visiting',c:'职业',p:'曝光',m:'心态'};
 const TAGCODE={'研究':'r','实习':'i','visiting':'v','访问':'v','职业':'c','曝光':'p','心态':'m'};
 const EMPTY={v:2,items:[],todos:[],logs:[],weeks:{},routines:[],
@@ -660,7 +661,7 @@ function nextProjId(){for(let c=65;c<91;c++){const id=String.fromCharCode(c);if(
 const isHidden=k=>!!(D.hidden&&D.hidden[k]);
 const isOpen=(k,def)=>k in U.exp?!!U.exp[k]:!!def;
 const hasContent=h=>/<(input|textarea|select|button)\b/.test(h)||h.replace(/<[^>]+>/g,'').trim()!=='';
-const AREA_TAB={research:['research',''],exp:['exp',''],intern:['exp',''],visit:['exp',''],admin:['admin',''],career:['think','full'],profile:['think','full'],step:['think','full']};
+const AREA_TAB={research:['research',''],exp:['exp',''],intern:['exp',''],visit:['exp',''],admin:['admin',''],career:['dim',''],profile:['dim',''],net:['dim',''],talk:['dim',''],service:['dim',''],step:['think','full']};
 const plain=s=>String(s||'').replace(/\*\*/g,'');
 function stSel(it){const v=st(it);const opts=SETS[setOf(it)];return `<select class="pill st" data-act="st" data-id="${esc(it.id)}" aria-label="状态：${esc(it.title)}">${(opts.includes(v)?opts:[v,...opts]).map(k=>`<option${k===v?' selected':''}>${esc(k)}</option>`).join('')}</select>`}
 function dueBadge(t){if(t.done||!t.ddl)return '';const n=daysTo(t.ddl);if(n===null)return '';
@@ -732,13 +733,14 @@ function itemView(it,o={}){
   return `<div class="it${exp?' open':''}${proj?' proj':''}" id="it-${id}" data-key="${id}">
     <div class="it-row">
       <button class="it-h" type="button" data-act="exp" data-id="${id}" aria-expanded="${exp}"><span class="car"></span>${proj?`<span class="proj-id">${id}</span>`:''}<span class="it-t" data-find>${esc(it.title)}</span>${proj&&it.target?`<span class="tgt">${esc(it.target)}</span>`:''}</button>
-      <span class="it-meta">${openT.length+wOpen?`<span>${openT.length+wOpen} 项</span>`:''}${next?dueBadge(next):''}</span>
+      <span class="it-meta">${it.kind==='person'?ageBadge(it.last,30,90):''}${openT.length+wOpen?`<span>${openT.length+wOpen} 项</span>`:''}${next?dueBadge(next):''}</span>
       ${o.noEdit?'':`<button class="pen" type="button" data-act="item-edit" data-id="${id}" aria-label="编辑：${esc(it.title)}" title="编辑">✎</button>`}${o.star?`<button class="star${it.sel?' on':''}" type="button" data-act="sel" data-id="${id}" aria-pressed="${!!it.sel}" title="${it.sel?'取消 Selected':'标为 Selected'}">${it.sel?'★':'☆'}</button>`:''}${o.noStatus?'':stSel(it)}
     </div>
     <div class="xb"${exp?'':' hidden'}>
       ${body}
       <div class="todos">${[false,true].map(fin=>wkly.filter(w=>recOn(CUR_WK,w.id)===fin).map(w=>weeklyLine(it,w,it.area)).join('')+todos.filter(t=>!!t.done===fin).map(t=>todoLine(t,it.area,{})).join('')).join('')}</div>
       ${todoAdd(it)}
+      ${it.kind==='person'?`<div class="row-foot"><button class="btn ghost sm" type="button" data-act="met" data-id="${id}">今天联系了</button><span class="small muted">上次联系</span><input type="date" class="ddl" id="last-${id}" data-act="last" data-id="${id}" value="${esc(it.last||'')}" aria-label="上次联系日期"></div>`:''}
       ${logPart(it)}
       ${o.extra||''}
       ${o.noEdit?'':`<div class="row-foot"><button class="linkbtn muted" type="button" data-act="item-edit" data-id="${id}">编辑</button><button class="linkbtn danger" type="button" data-act="item-del" data-id="${id}">删除</button></div>`}
@@ -828,7 +830,7 @@ function renderWeek(){
   const byArea={};const slot=(it,iid)=>{const a=it?secOf(it.area):'other';const A=byArea[a]=byArea[a]||{};return A[iid]=A[iid]||{w:[],t:[]}};
   for(const x of allW)slot(x.it,x.it.id).w.push(x.w);
   for(const t of plan)slot(itemById(t.item),t.item).t.push(t);
-  const AREA_C={research:'research',exp:'exp',admin:'admin'};
+  const AREA_C={research:'research',exp:'exp',dim:'dim',admin:'admin'};
   const planHtml=[...SECTIONS.map(x=>x[0]),'other'].filter(a=>byArea[a]).map(a=>{const groups=Object.entries(byArea[a]);
     let tot=0,dn=0;for(const [,g] of groups){tot+=g.w.length+g.t.length;dn+=g.w.filter(w=>recOn(wk,w.id)).length+g.t.filter(t=>t.done).length}
     return `<section class="box wk-area" data-c="${AREA_C[a]||'think'}"><div class="wk-area-h"><span class="dot" aria-hidden="true"></span><h2>${SECNAME[a]||'其他'}</h2><span class="cnt">${dn}/${tot}</span></div>${
@@ -926,6 +928,24 @@ function renderAdmin(){
   ${itemList(its,'admin','todo','例如：组会 slides、报销')}
   ${group('a-ref','资料',notes(['dim_teaching']),{closed:true})}</div>`}
 
+/* 维度: the long-term assets besides papers — people, talks, visibility, service, funding */
+function renderDim(){
+  const net=areaItems('net'),talk=areaItems('talk'),svc=areaItems('service'),fund=[...areaItems('career'),...areaItems('profile')];
+  const papers=areaItems('research','proj');const pid=papers.some(p=>p.id===U.paper)?U.paper:(papers[0]&&papers[0].id);
+  const tpl=D.launchTpl||[];const keys=tpl.flatMap((g,gi)=>g.items.map((_,ii)=>`launch:${pid}:${gi}:${ii}`));const n=keys.filter(k=>D.checks[k]).length;
+  const letters=isHidden('w:letters')?'':`<div class="box"><div class="box-h"><h3>推荐信 × 3</h3></div>${[0,1,2].map(i=>`<div class="slot"><b>${i+1}</b><input class="field" id="letter-${i}" data-act="letter" data-id="${i}" value="${esc(D.letters[i]||'')}" aria-label="推荐信 ${i+1}"></div>`).join('')}</div>`;
+  return `<div class="narrow stack">
+  ${pageHead('维度')}
+  ${group('d-net','人脉 · 圈子',`${itemList(net,'net','person','例如：某位想认识的老师')}${letters}${notes(['connection'])}`,{count:net.length,aside:addBtn('net','person','+ 添加')})}
+  ${group('d-talk','Talk · Workshop',itemList(talk,'talk','todo','例如：某个 invited talk、某个 workshop')||'<p class="blank">还没有。</p>',{count:talk.length,aside:addBtn('talk','todo','+ 添加')})}
+  ${group('d-expo','曝光',`<div class="box ch-box">${D.channels.map(freshRow).join('')}</div>
+    ${pid?group('e-launch','论文发布清单',`<div class="box">
+      <div class="chips"><label class="k" for="paper-sel">论文</label><select class="pill" id="paper-sel" data-act="paper">${papers.map(p=>`<option value="${esc(p.id)}"${p.id===pid?' selected':''}>${esc(label(p))}</option>`).join('')}</select><span class="small muted">${n}/${keys.length}</span></div>
+      ${tpl.map((g,gi)=>`<div class="grp"><div class="grp-k">${esc(g.g)}</div>${g.items.map((x,ii)=>{const k=`launch:${pid}:${gi}:${ii}`;const on=!!D.checks[k];return `<label class="lc${on?' done':''}"><input type="checkbox" data-act="check" data-id="${k}"${on?' checked':''}><span>${md(x)}</span></label>`}).join('')}</div>`).join('')}</div>`,{closed:true,hide:'w:launch',count:`${n}/${keys.length}`}):''}`,{id:'channels',hide:'w:channels'})}
+  ${group('d-svc','学术服务',itemList(svc,'service','todo','例如：某会议 reviewer')||'<p class="blank">还没有。</p>',{count:svc.length,aside:addBtn('service','todo','+ 添加')})}
+  ${group('d-fund','博后 · 奖项 · Funding',`${itemList(fund,'career','app','例如：某 fellowship')}${notes(['postdoc'])}`,{count:fund.length,aside:addBtn('career','app','+ 添加')})}
+  ${noteGroup('d-ref','各维度说明',['ind_big','ind_small','dim_service','dim_teaching','dim_talk','dim_indep','dim_other'])}
+  </div>`}
 const SUBS=[['half','退半步 · 研究规划'],['full','退一步 · 事业规划'],['notes','笔记']];
 const SUB_LEGACY={career:'full',profile:'full',opp:'full',expo:'full',lib:'full',step:'full'};
 const tabFor=it=>it.area==='step'?['think',it.id==='hb'?'half':'full']:(AREA_TAB[it.area]||['week','']);
@@ -967,25 +987,12 @@ const THINK={
     ${s?stepCard(s):''}
     ${cluster('研究思考',notes(['how','what','taste','watch','ptaste']))}`},
   /* 退一步: career planning */
-  full(){const s=D.steps.find(x=>x.id==='fb');const post=areaItems('career'),prize=areaItems('profile');
-    const papers=areaItems('research','proj');const pid=papers.some(p=>p.id===U.paper)?U.paper:(papers[0]&&papers[0].id);
-    const tpl=D.launchTpl||[];const keys=tpl.flatMap((g,gi)=>g.items.map((_,ii)=>`launch:${pid}:${gi}:${ii}`));const n=keys.filter(k=>D.checks[k]).length;
+  full(){const s=D.steps.find(x=>x.id==='fb');
     const tl=timelineHtml();const rated=D.abilities.filter(a=>D.rate[a.id]).length;
     return `
     ${s?stepCard(s):''}
-    ${cluster('机会',`
-      ${group('o-post','博后 · Funding',itemList(post,'career','app','例如：某博后 funding'),{closed:true,count:post.length,aside:addBtn('career','app','+ 添加')})}
-      ${group('o-prize','奖项 · Fellowship · Workshop',itemList(prize,'profile','app','例如：某奖项'),{closed:true,count:prize.length,aside:addBtn('profile','app','+ 添加')})}
-      ${group('o-letters','推荐信',`<div class="box">${[0,1,2].map(i=>`<div class="slot"><b>${i+1}</b><input class="field" id="letter-${i}" data-act="letter" data-id="${i}" value="${esc(D.letters[i]||'')}" aria-label="推荐信 ${i+1}"></div>`).join('')}</div>`,{closed:true,hide:'w:letters'})}`)}
-    ${cluster('曝光',`
-      ${group('e-ch','渠道',`<div class="box ch-box">${D.channels.map(freshRow).join('')}</div>`,{id:'channels',closed:true,hide:'w:channels'})}
-      ${pid?group('e-launch','论文发布清单',`<div class="box">
-        <div class="chips"><label class="k" for="paper-sel">论文</label><select class="pill" id="paper-sel" data-act="paper">${papers.map(p=>`<option value="${esc(p.id)}"${p.id===pid?' selected':''}>${esc(label(p))}</option>`).join('')}</select><span class="small muted">${n}/${keys.length}</span></div>
-        ${tpl.map((g,gi)=>`<div class="grp"><div class="grp-k">${esc(g.g)}</div>${g.items.map((x,ii)=>{const k=`launch:${pid}:${gi}:${ii}`;const on=!!D.checks[k];return `<label class="lc${on?' done':''}"><input type="checkbox" data-act="check" data-id="${k}"${on?' checked':''}><span>${md(x)}</span></label>`}).join('')}</div>`).join('')}</div>`,{closed:true,hide:'w:launch',count:`${n}/${keys.length}`}):''}`)}
     ${cluster('规划资料',`
-      ${noteGroup('l-career','职业规划',['career_lede','path_academia','path_industry','path_startup','formula','ap_checks'])}
-      ${noteGroup('l-people','人脉与博后',['connection','postdoc','career_other'])}
-      ${noteGroup('l-ind','指标与维度',['ind_big','ind_small','dim_service','dim_teaching','dim_talk','dim_indep','dim_other'])}
+      ${noteGroup('l-career','职业规划',['career_lede','path_academia','path_industry','path_startup','formula','ap_checks','career_other'])}
       ${tl?group('s-tl','时间线'+(D.timeline.version?' '+esc(D.timeline.version):''),`<div class="box">${tl}</div>`,{closed:true,hide:'w:timeline'}):''}
       ${noteGroup('l-old','旧版计划',['old_0813'])}
       ${D.abilities.length?group('s-review','Periodic Review',`<div class="box">${D.abilities.map(a=>`<div class="rate" data-find><span class="rate-t">${esc(a.t)}</span><span class="dots">${[1,2,3,4,5].map(v=>`<button type="button" class="${(D.rate[a.id]||0)>=v?'on':''}" data-act="rate" data-id="${esc(a.id)}" data-v="${v}" aria-label="${v} 分">${v}</button>`).join('')}</span></div>`).join('')}${rated?`<p class="hint">上次自评：${esc(D.rateAt)}</p>`:''}</div>`,{closed:true,hide:'w:review'}):''}`)}`},
@@ -1068,7 +1075,7 @@ async function firstWrite(data){
 }
 
 /* ============================== app shell ============================== */
-const PANELS={week:renderWeek,research:renderResearch,exp:renderExp,admin:renderAdmin,think:renderThink,settings:renderSettings};
+const PANELS={week:renderWeek,research:renderResearch,exp:renderExp,dim:renderDim,admin:renderAdmin,think:renderThink,settings:renderSettings};
 const PANEL_IDS=Object.keys(PANELS);
 function renderTabs(){
   const over=D?liveTodos().filter(t=>!t.done&&t.ddl&&daysTo(t.ddl)<0).length:0;
@@ -1129,6 +1136,7 @@ document.addEventListener('change',async e=>{
     case 'absorb':{const x=D.absorb.find(a=>a.id===id);if(x){x.done=t.checked;commit('待吸收')}return}
     case 'ch-date':{const c=D.channels.find(x=>x.id===id);if(c){c.date=t.value;commit('曝光渠道')}return}
     case 'paper':U.paper=t.value;saveUI();render();return;
+    case 'last':{const it=itemById(id);if(it){it.last=t.value;commit('上次联系')}return}
     case 'stu-add':{const s=(D.students||[]).find(x=>x.id===id);if(s&&t.value){s.projects=[...(s.projects||[]),t.value];commit('学生分配')}return}
     case 'import':{try{T.pendingImport=await readFile(t);T.confirm='import';setTab('settings')}catch(err){toast(err.message)}t.value='';return}
     case 'seed-file':{try{const data=await readFile(t);await firstWrite(data)}catch(err){T.connectErr=err.message;renderConnect()}return}
@@ -1197,6 +1205,7 @@ document.addEventListener('click',async e=>{
     case 'to-weekly':{const td=todoById(id);const it=td&&itemById(td.item);if(!it)return;snapshot();(it.weekly=it.weekly||[]).push({id:'w'+uid(),t:td.t,created:TODAY_ISO});deleteTodo(id);commit('改成每周任务');toast('已改成每周任务',true);return}
     case 'to-once':{const it=itemById(b.dataset.item);const w=it&&(it.weekly||[]).find(x=>x.id===id);if(!w)return;snapshot();it.weekly=it.weekly.filter(x=>x.id!==id);addTodo(it.id,w.t,'',CUR_WK);commit('改成一次性 To-Do');toast('已改成一次性 To-Do，放在本周',true);return}
     case 'focus':{const w=ensureWeek(v);if(w.focus[id])delete w.focus[id];else w.focus[id]=true;commit('这周重点');return}
+    case 'met':{const it=itemById(id);if(!it)return;it.last=TODAY_ISO;addLog(it.id,'联系了一次',{auto:true});commit('联系');toast('已记录：今天联系了');return}
     case 'more':{const row=b.closest('.td');if(row)row.classList.toggle('show-act');return}
     case 'wkly-del':{const it=itemById(b.dataset.item);if(!it)return;snapshot();it.weekly=(it.weekly||[]).filter(x=>x.id!==id);commit('删除每周任务');toast('已删除每周任务',true);return}
     case 'todo-del':snapshot();deleteTodo(id);commit('删除 To-Do');toast('已删除 To-Do',true);return;
