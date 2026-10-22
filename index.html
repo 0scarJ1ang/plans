@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1022-0645-a0d3dd">
+<meta name="app-build" content="1022-0703-7a2801">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -361,6 +361,8 @@ textarea.goal{font-size:15px;min-height:0}
 .stu .row-sub{margin:0}
 .pchips select.pill{max-width:11em}
 @media (hover:hover){.stu-h .act-r{opacity:0}.stu:hover .act-r,.stu:focus-within .act-r{opacity:1}}
+.tag.rep{color:var(--accent);background:var(--accent-soft)}
+.rep-l{display:flex;gap:4px;align-items:center;font-size:12.5px;color:var(--muted);white-space:nowrap;cursor:pointer}
 .tag.restore{display:inline-flex;gap:8px;align-items:center;padding:5px 9px;font-size:12px}
 .filters{display:grid;gap:8px}
 #settings-btn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
@@ -514,8 +516,8 @@ const pri=it=>it.pri||'';
 const st=it=>it.st||SETS[it.set||KIND_SET[it.kind]||'todo'][0];
 const setOf=it=>it.set||KIND_SET[it.kind]||'todo';
 const areaItems=(area,kind)=>D.items.filter(x=>x.area===area&&(!kind||x.kind===kind));
-const week=wk=>D.weeks[wk]||{plan:[],goals:'',review:'',routine:{}};
-function ensureWeek(wk){if(!D.weeks[wk])D.weeks[wk]={plan:[],goals:'',review:'',routine:{}};const w=D.weeks[wk];w.plan=w.plan||[];w.routine=w.routine||{};return w}
+const week=wk=>D.weeks[wk]||{plan:[],goals:'',review:'',routine:{},rec:{}};
+function ensureWeek(wk){if(!D.weeks[wk])D.weeks[wk]={plan:[],goals:'',review:'',routine:{}};const w=D.weeks[wk];w.plan=w.plan||[];w.routine=w.routine||{};w.rec=w.rec||{};return w}
 const inWeek=(id,wk)=>(week(wk).plan||[]).includes(id);
 const block=id=>D.blocks[id]||{title:'',type:'list',text:''};
 const addLog=(item,t,extra)=>D.logs.push(Object.assign({id:uid(),item,d:TODAY_ISO,t},extra||{}));
@@ -627,9 +629,21 @@ function todoLine(t,ctx,o={}){
     ${o.chip&&it?itemChip(it):''}${dueBadge(t)}${inW?wkBtn(t,wk):''}
     <span class="act">${ddl}${o.noWeek||t.del||inW||t.done?'':wkBtn(t,wk)}${o.remove?`<button class="x" type="button" data-act="wk-remove" data-id="${esc(t.id)}" data-v="${o.wk}" aria-label="移出这周计划" title="移出这周">−</button>`:''}${o.noDel||t.del?'':`<button class="x" type="button" data-act="todo-del" data-id="${esc(t.id)}" aria-label="删除 To-Do：${esc(t.t)}">×</button>`}</span>
   </div>`}
+/* weekly tasks: belong to an item, show up every week, done state kept per week */
+const recOn=(wk,id)=>!!(D.weeks[wk]&&D.weeks[wk].rec&&D.weeks[wk].rec[id]);
+const weeklyFor=wk=>{const end=weekRange(wk)[1];return D.items.flatMap(it=>(it.weekly||[]).filter(w=>!w.created||w.created<=end).map(w=>({it,w})))};
+function weeklyLine(it,w,ctx,o={}){const wk=o.wk||CUR_WK;const on=recOn(wk,w.id);const cid=`wr-${ctx}-${w.id}`;
+  return `<div class="td${on?' done':''}"${o.find?' data-find':''}>
+    <input type="checkbox" id="${cid}" data-act="rec" data-id="${esc(w.id)}" data-item="${esc(it.id)}" data-v="${wk}"${on?' checked':''} aria-label="这周完成：${esc(w.t)}">
+    ${T.editTodo===ctx+':'+w.id?`<form class="td-edit" data-form="todo-edit"><input class="field" id="te-${ctx}-${w.id}" name="t" value="${esc(w.t)}" aria-label="修改每周任务" data-edit="wkly" data-key="${ctx}:${esc(w.id)}" data-id="${esc(w.id)}" data-item="${esc(it.id)}" autocomplete="off"></form>`
+      :`<button type="button" class="td-t" data-act="todo-edit" data-id="${esc(w.id)}" data-v="${ctx}" title="点击修改">${md(w.t)}</button>`}
+    ${o.chip?itemChip(it):''}<span class="tag rep" title="每周自动出现">每周</span>
+    ${o.noDel?'':`<span class="act"><button class="x" type="button" data-act="wkly-del" data-id="${esc(w.id)}" data-item="${esc(it.id)}" aria-label="删除每周任务：${esc(w.t)}">×</button></span>`}
+  </div>`}
 function todoAdd(it){return `<form class="add slim" data-form="todo-add" data-item="${esc(it.id)}">
     <input type="text" class="field" id="add-t-${esc(it.id)}" name="t" placeholder="+ 添加 To-Do" aria-label="新 To-Do" required>
     <input type="date" class="field" id="add-d-${esc(it.id)}" name="d" aria-label="DDL（可选）">
+    <label class="rep-l" title="每周自动出现一次，每周单独打勾"><input type="checkbox" name="rep" id="add-r-${esc(it.id)}"> 每周</label>
     <button class="btn sm" type="submit">添加</button></form>`}
 function logPart(it){
   const logs=D.logs.filter(l=>l.item===it.id).sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:0);const k='log:'+it.id;const open=isOpen(k);
@@ -656,7 +670,7 @@ function itemEdit(it){
 function itemView(it,o={}){
   const id=esc(it.id);
   if(T.editItem===it.id)return `<div class="it open" id="it-${id}"><div class="xb">${itemEdit(it)}</div></div>`;
-  const todos=todosOf(it);const openT=todos.filter(t=>!t.done);
+  const todos=todosOf(it);const openT=todos.filter(t=>!t.done);const wkly=it.weekly||[];const wOpen=wkly.filter(w=>!recOn(CUR_WK,w.id)).length;
   const next=openT.filter(t=>t.ddl).sort((a,b)=>a.ddl<b.ddl?-1:1)[0];
   const exp=isOpen(it.id);const proj=it.kind==='proj';
   const stu=studentsOf(it);
@@ -665,12 +679,12 @@ function itemView(it,o={}){
   return `<div class="it${exp?' open':''}${proj?' proj':''}" id="it-${id}" data-key="${id}">
     <div class="it-row">
       <button class="it-h" type="button" data-act="exp" data-id="${id}" aria-expanded="${exp}"><span class="car"></span>${proj?`<span class="proj-id">${id}</span>`:''}<span class="it-t" data-find>${esc(it.title)}</span>${proj&&it.target?`<span class="tgt">${esc(it.target)}</span>`:''}</button>
-      <span class="it-meta">${openT.length?`<span>${openT.length} 项</span>`:''}${next?dueBadge(next):''}</span>
+      <span class="it-meta">${openT.length+wOpen?`<span>${openT.length+wOpen} 项</span>`:''}${next?dueBadge(next):''}</span>
       ${o.noEdit?'':`<button class="pen" type="button" data-act="item-edit" data-id="${id}" aria-label="编辑：${esc(it.title)}" title="编辑">✎</button>`}${o.star?`<button class="star${it.sel?' on':''}" type="button" data-act="sel" data-id="${id}" aria-pressed="${!!it.sel}" title="${it.sel?'取消 Selected':'标为 Selected'}">${it.sel?'★':'☆'}</button>`:''}${o.noStatus?'':stSel(it)}
     </div>
     <div class="xb"${exp?'':' hidden'}>
       ${body}
-      <div class="todos">${[...todos.filter(t=>!t.done),...todos.filter(t=>t.done)].map(t=>todoLine(t,it.area,{})).join('')}</div>
+      <div class="todos">${wkly.map(w=>weeklyLine(it,w,it.area)).join('')}${[...todos.filter(t=>!t.done),...todos.filter(t=>t.done)].map(t=>todoLine(t,it.area,{})).join('')}</div>
       ${todoAdd(it)}
       ${logPart(it)}
       ${o.extra||''}
@@ -754,20 +768,24 @@ const pageHead=(title,aside)=>`<div class="page-h"><h1>${title}</h1>${aside?`<di
 function renderWeek(){
   const wk=U.week||CUR_WK;const W=week(wk);const [mon,sun]=weekRange(wk);
   const isCur=wk===CUR_WK,isPast=wk<CUR_WK;
-  const plan=(W.plan||[]).map(todoById).filter(Boolean);const done=plan.filter(t=>t.done).length;
+  const plan=(W.plan||[]).map(todoById).filter(Boolean);
+  const allW=weeklyFor(wk);const openW=allW.filter(x=>!recOn(wk,x.w.id)),doneW=allW.filter(x=>recOn(wk,x.w.id));
+  const done=plan.filter(t=>t.done).length+doneW.length,total=plan.length+allW.length;
   const openPlan=plan.filter(t=>!t.done),donePlan=plan.filter(t=>t.done);
-  const byArea={};for(const t of openPlan){const it=itemById(t.item);const a=it?it.area:'other';((byArea[a]=byArea[a]||{})[t.item]=byArea[a][t.item]||[]).push(t)}
+  const byArea={};const slot=(it,iid)=>{const a=it?it.area:'other';const A=byArea[a]=byArea[a]||{};return A[iid]=A[iid]||{w:[],t:[]}};
+  for(const x of openW)slot(x.it,x.it.id).w.push(x.w);
+  for(const t of openPlan)slot(itemById(t.item),t.item).t.push(t);
   const planHtml=[...AREAS,'other'].filter(a=>byArea[a]).map(a=>`<div class="grp"><div class="grp-k">${AREANAME[a]||'其他'}</div>${
-    Object.entries(byArea[a]).map(([iid,ts])=>{const it=itemById(iid);const [tab,sub]=it?(AREA_TAB[it.area]||['week','']):['week',''];
-      return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${esc(label(it))}</button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${ts.map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true})).join('')}</div></div>`}).join('')}</div>`).join('')
-    +(donePlan.length?`<div class="sub-x${isOpen('wk-donelist')?' open':''}" data-key="wk-donelist"><div class="it-row"><button class="mini-h" type="button" data-act="exp" data-id="wk-donelist" aria-expanded="${isOpen('wk-donelist')}"><span class="car"></span>已完成 <span class="cnt">${donePlan.length}</span></button></div>
-      <div class="xb"${isOpen('wk-donelist')?'':' hidden'}><div class="todos">${donePlan.map(t=>todoLine(t,'wk',{wk,chip:true,remove:true,noWeek:true,noDel:true,find:true})).join('')}</div></div></div>`:'');
+    Object.entries(byArea[a]).map(([iid,g])=>{const it=itemById(iid);const [tab,sub]=it?(AREA_TAB[it.area]||['week','']):['week',''];
+      return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${esc(label(it))}</button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${g.w.map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true})).join('')}${g.t.map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true})).join('')}</div></div>`}).join('')}</div>`).join('')
+    +(donePlan.length+doneW.length?`<div class="sub-x${isOpen('wk-donelist')?' open':''}" data-key="wk-donelist"><div class="it-row"><button class="mini-h" type="button" data-act="exp" data-id="wk-donelist" aria-expanded="${isOpen('wk-donelist')}"><span class="car"></span>已完成 <span class="cnt">${donePlan.length+doneW.length}</span></button></div>
+      <div class="xb"${isOpen('wk-donelist')?'':' hidden'}><div class="todos">${doneW.map(x=>weeklyLine(x.it,x.w,'wk',{wk,chip:true,noDel:true,find:true})).join('')}${donePlan.map(t=>todoLine(t,'wk',{wk,chip:true,remove:true,noWeek:true,noDel:true,find:true})).join('')}</div></div></div>`:'');
   const prev=addWeeks(wk,-1);const carry=(week(prev).plan||[]).map(todoById).filter(t=>t&&!t.done&&!t.del&&!inWeek(t.id,wk));
   const open=liveTodos().filter(t=>!t.done&&!inWeek(t.id,wk));
   const pickList=open.filter(t=>!U.pickArea||itemById(t.item).area===U.pickArea);
   const pickLine=t=>`<div class="td"><span class="td-t">${md(t.t)}</span>${itemChip(itemById(t.item))}${dueBadge(t)}<button class="btn ghost sm" type="button" data-act="wk-add" data-id="${esc(t.id)}" data-v="${wk}">加入</button></div>`;
   const upcoming=liveTodos().filter(t=>!t.done&&t.ddl&&daysTo(t.ddl)<=14).sort((a,b)=>a.ddl<b.ddl?-1:1);
-  const doneThisWeek=liveTodos().filter(t=>t.done&&t.doneAt&&t.doneAt>=mon&&t.doneAt<=sun);
+  const doneThisWeek=[...liveTodos().filter(t=>t.done&&t.doneAt&&t.doneAt>=mon&&t.doneAt<=sun),...doneW.map(x=>({t:x.w.t,doneAt:typeof W.rec[x.w.id]==='string'?W.rec[x.w.id]:mon,item:x.it.id}))];
   const logsThisWeek=D.logs.filter(l=>!l.auto&&l.d>=mon&&l.d<=sun&&itemById(l.item));
   const rTotal=D.routines.reduce((a,r)=>a+r.items.length,0);
   const others=Object.keys(D.weeks).filter(k=>k!==wk).sort().reverse();
@@ -787,16 +805,16 @@ function renderWeek(){
     <div class="stack">
       <textarea class="field goal" id="wk-goals" data-wk="${wk}" data-field="goals" placeholder="这周最重要的事…" rows="2" aria-label="这周目标">${esc(W.goals||'')}</textarea>
       <section class="plan box">
-        <div class="meter"><span>计划 ${done}/${plan.length}</span><div class="bar"><i style="width:${plan.length?Math.round(done/plan.length*100):0}%"></i></div></div>
+        <div class="meter"><span>计划 ${done}/${total}</span><div class="bar"><i style="width:${total?Math.round(done/total*100):0}%"></i></div></div>
         ${planHtml||'<p class="blank">这周还没有计划。</p>'}
         ${quick}
         ${carry.length?`<button class="linkbtn" type="button" data-act="wk-carry" data-v="${wk}">把上周没完成的 ${carry.length} 项移过来</button>`:''}
       </section>
       ${open.length===0?'':group('wk-pick',`从各分区挑选`,`${filterChips('pick-area',U.pickArea,[['','全部'],...AREAS.map(a=>[a,AREANAME[a]])])}<div class="todos">${pickList.map(pickLine).join('')||'<p class="blank">没有可挑选的 To-Do。</p>'}</div>`,{closed:true,count:open.length})}
       ${group('wk-review','复盘',`<textarea class="field" id="wk-review" data-wk="${wk}" data-field="review" placeholder="做得好的、没做完的原因、下周要调整的…" rows="4">${esc(W.review||'')}</textarea>`,{closed:!W.review})}
-      ${others.length?group('wk-hist','往期周计划',`<div class="hist">${others.map(k=>{const w=week(k);const p=(w.plan||[]).map(todoById).filter(Boolean);const d=p.filter(t=>t.done).length;const [m,s]=weekRange(k);
+      ${others.length?group('wk-hist','往期周计划',`<div class="hist">${others.map(k=>{const w=week(k);const p=(w.plan||[]).map(todoById).filter(Boolean);const kw=weeklyFor(k);const d=p.filter(t=>t.done).length+kw.filter(x=>recOn(k,x.w.id)).length;const pt=p.length+kw.length;const [m,s]=weekRange(k);
         const rd=D.routines.reduce((a,r)=>a+r.items.filter((_,i)=>w.routine&&w.routine[r.id+':'+i]).length,0);
-        return `<button type="button" data-act="wk-go" data-v="${k}"><span class="w">${k.slice(5)}<small>${mdShort(m)}–${mdShort(s)}</small></span><span class="g">${esc((w.goals||w.review||'').split('\n')[0]||'—')}</span><span class="s">${d}/${p.length} · 例行 ${rd}/${rTotal}</span></button>`}).join('')}</div>`,{closed:true,count:others.length}):''}
+        return `<button type="button" data-act="wk-go" data-v="${k}"><span class="w">${k.slice(5)}<small>${mdShort(m)}–${mdShort(s)}</small></span><span class="g">${esc((w.goals||w.review||'').split('\n')[0]||'—')}</span><span class="s">${d}/${pt} · 例行 ${rd}/${rTotal}</span></button>`}).join('')}</div>`,{closed:true,count:others.length}):''}
     </div>
     <aside class="stack">
       ${D.routines.length?`<section class="box"><h2 class="h-sm">每周例行</h2>${D.routines.map(r=>{const n=r.items.filter((_,i)=>W.routine&&W.routine[r.id+':'+i]).length;
@@ -1047,6 +1065,9 @@ document.addEventListener('change',async e=>{
   const t=e.target,act=t.dataset&&t.dataset.act,id=t.dataset&&t.dataset.id;if(!act||!D&&act!=='seed-file')return;
   switch(act){
     case 'st':{const it=itemById(id);if(!it)return;const old=st(it);it.st=t.value;addLog(it.id,`状态：${old} → ${t.value}`,{auto:true});commit('状态');return}
+    case 'rec':{const w=ensureWeek(t.dataset.v);const it=itemById(t.dataset.item);const wt=it&&(it.weekly||[]).find(x=>x.id===id);
+      if(t.checked){snapshot();w.rec[id]=TODAY_ISO;if(wt)addLog(it.id,'每周：'+wt.t,{auto:true,rec:id,wk:t.dataset.v});commit('每周任务');toast('已完成',true)}
+      else{delete w.rec[id];D.logs=D.logs.filter(l=>!(l.rec===id&&l.wk===t.dataset.v));commit('每周任务')}return}
     case 'done':if(t.checked){snapshot();setDone(id,true);commit('完成 To-Do');toast('已完成',true)}else{setDone(id,false);commit('取消完成')}return;
     case 'ddl':{const td=todoById(id);if(td){td.ddl=t.value;delete T.ddlOpen[id];commit('DDL')}return}
     case 'check':D.checks[id]=t.checked;if(!t.checked)delete D.checks[id];commit('勾选');return;
@@ -1074,7 +1095,7 @@ document.addEventListener('submit',e=>{
   switch(kind){
     case 'connect':{const cfg={owner:v('owner'),repo:v('repo'),path:v('path').replace(/^\/+/,''),branch:v('branch'),token:v('token')};doConnect(cfg);return}
     case 'todo-edit':saveTodoEdit(f.elements.t);return;
-    case 'todo-add':{const item=f.dataset.item;if(!v('t'))return;addTodo(item,v('t'),v('d'),'');U.exp[item]=true;commit('新 To-Do');refocus('add-t-'+item);return}
+    case 'todo-add':{const item=f.dataset.item;if(!v('t'))return;if(v('rep')){const it=itemById(item);if(!it)return;(it.weekly=it.weekly||[]).push({id:'w'+uid(),t:v('t'),created:TODAY_ISO});U.exp[item]=true;commit('新每周任务');refocus('add-t-'+item);return}addTodo(item,v('t'),v('d'),'');U.exp[item]=true;commit('新 To-Do');refocus('add-t-'+item);return}
     case 'wk-quick':{if(!v('t'))return;addTodo(v('item'),v('t'),v('d'),f.dataset.wk);U.lastItem=v('item');saveUI();commit('周计划');refocus('wkq-t');return}
     case 'log-add':{if(!v('t'))return;addLog(f.dataset.item,v('t'),{d:v('d')||TODAY_ISO});U.exp['log:'+f.dataset.item]=true;commit('进展记录');refocus('log-t-'+f.dataset.item);return}
     case 'item-add':{const area=f.dataset.area,k=f.dataset.kind;const it={id:k==='proj'?nextProjId():'n'+uid(),area,kind:k,set:KIND_SET[k],title:v('title'),created:TODAY_ISO};
@@ -1121,6 +1142,7 @@ document.addEventListener('click',async e=>{
     case 'item-del':snapshot();D.items=D.items.filter(x=>x.id!==id);for(const t of D.todos)if(t.item===id)t.del=true;T.editItem='';commit('删除条目');toast('已删除条目',true);return;
     case 'add-open':T.adding=v;render();{const n=document.getElementById('na-title-'+v);if(n)n.focus()}return;
     case 'add-cancel':T.adding='';render();return;
+    case 'wkly-del':{const it=itemById(b.dataset.item);if(!it)return;snapshot();it.weekly=(it.weekly||[]).filter(x=>x.id!==id);commit('删除每周任务');toast('已删除每周任务',true);return}
     case 'todo-del':snapshot();deleteTodo(id);commit('删除 To-Do');toast('已删除 To-Do',true);return;
     case 'log-del':snapshot();D.logs=D.logs.filter(l=>l.id!==id);commit('删除进展');toast('已删除进展',true);return;
     case 'wk-toggle':{const w=ensureWeek(v);if(w.plan.includes(id))w.plan=w.plan.filter(x=>x!==id);else w.plan.push(id);commit('周计划');return}
@@ -1166,9 +1188,11 @@ document.getElementById('sync').addEventListener('click',()=>{if(!D)return;if(/e
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')Sync.refresh();else if(Sync.pending&&!Sync.pushing)Sync.push()});
 window.addEventListener('online',()=>{if(Sync.pending)Sync.push()});
 
-function saveTodoEdit(inp){const td=todoById(inp.dataset.id);T.editTodo='';const val=inp.value.trim();if(td&&val&&val!==td.t){td.t=val;commit('修改 To-Do')}else render()}
-document.addEventListener('focusout',e=>{const t=e.target;if(t.dataset&&t.dataset.edit==='todo'&&T.editTodo===t.dataset.key)saveTodoEdit(t)});
-document.addEventListener('keydown',e=>{const t=e.target;if(e.key==='Escape'&&t.dataset&&t.dataset.edit==='todo'){T.editTodo='';render()}});
+function saveTodoEdit(inp){T.editTodo='';const val=inp.value.trim();
+  if(inp.dataset.edit==='wkly'){const it=itemById(inp.dataset.item);const w=it&&(it.weekly||[]).find(x=>x.id===inp.dataset.id);if(w&&val&&val!==w.t){w.t=val;commit('修改每周任务')}else render();return}
+  const td=todoById(inp.dataset.id);if(td&&val&&val!==td.t){td.t=val;commit('修改 To-Do')}else render()}
+document.addEventListener('focusout',e=>{const t=e.target;if(t.dataset&&(t.dataset.edit==='todo'||t.dataset.edit==='wkly')&&T.editTodo===t.dataset.key)saveTodoEdit(t)});
+document.addEventListener('keydown',e=>{const t=e.target;if(e.key==='Escape'&&t.dataset&&(t.dataset.edit==='todo'||t.dataset.edit==='wkly')){T.editTodo='';render()}});
 
 const BUILD=(document.querySelector('meta[name="app-build"]')||{}).content||'dev';
 let lastCheck=0;
