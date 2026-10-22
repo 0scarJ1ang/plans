@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1022-0808-696d8f">
+<meta name="app-build" content="1022-0811-72425e">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -369,6 +369,10 @@ textarea.goal{font-size:15px;min-height:0}
 .tag.foc{color:var(--p1);background:var(--p1-bg)}
 .focus-box{border-color:var(--p1)}
 .focus-box .h-sm{color:var(--p1)}
+.ch-box{padding:4px 16px}
+.ch-box .fr{padding:8px 0}
+.ch-box .fr-t{font-weight:500;font-size:14.5px}
+.ch-box .age{min-width:5.5em;text-align:center}
 .tag.rep{color:var(--accent);background:var(--accent-soft)}
 .rep-l{display:flex;gap:4px;align-items:center;font-size:12.5px;color:var(--muted);white-space:nowrap;cursor:pointer}
 .it-row select.st{border-color:transparent;background-color:transparent}
@@ -627,7 +631,7 @@ function nextProjId(){for(let c=65;c<91;c++){const id=String.fromCharCode(c);if(
 const isHidden=k=>!!(D.hidden&&D.hidden[k]);
 const isOpen=(k,def)=>k in U.exp?!!U.exp[k]:!!def;
 const hasContent=h=>/<(input|textarea|select|button)\b/.test(h)||h.replace(/<[^>]+>/g,'').trim()!=='';
-const AREA_TAB={research:['research',''],exp:['exp',''],intern:['exp',''],visit:['exp',''],admin:['admin',''],career:['think','career'],profile:['think','profile'],step:['think','step']};
+const AREA_TAB={research:['research',''],exp:['exp',''],intern:['exp',''],visit:['exp',''],admin:['admin',''],career:['think','opp'],profile:['think','opp'],step:['think','step']};
 const plain=s=>String(s||'').replace(/\*\*/g,'');
 function stSel(it){const v=st(it);const opts=SETS[setOf(it)];return `<select class="pill st" data-act="st" data-id="${esc(it.id)}" aria-label="状态：${esc(it.title)}">${(opts.includes(v)?opts:[v,...opts]).map(k=>`<option${k===v?' selected':''}>${esc(k)}</option>`).join('')}</select>`}
 function dueBadge(t){if(t.done||!t.ddl)return '';const n=daysTo(t.ddl);if(n===null)return '';
@@ -781,7 +785,7 @@ function ageBadge(date,ok,warn){const n=date?-daysTo(date):null;const cls=n===nu
 function freshRow(c){
   return `<div class="fr" data-find><div class="fr-t">${esc(c.title)}${c.note?`<small>${md(c.note)}</small>`:''}</div>${ageBadge(c.date,30,90)}
     <span class="act"><input type="date" class="ddl" id="ch-${esc(c.id)}" data-act="ch-date" data-id="${esc(c.id)}" value="${esc(c.date||'')}" aria-label="${esc(c.title)} 上次更新日期"></span>
-    <button class="btn ghost sm" type="button" data-act="ch-today" data-id="${esc(c.id)}">今天更新了</button></div>`}
+    <button class="linkbtn" type="button" data-act="ch-today" data-id="${esc(c.id)}">今天更新了</button></div>`}
 const pageHead=(title,aside)=>`<div class="page-h"><h1>${title}</h1>${aside?`<div class="aside">${aside}</div>`:''}</div>`;
 
 /* ============================== panels ============================== */
@@ -889,29 +893,38 @@ function renderAdmin(){
   ${itemList(its,'admin','todo','例如：组会 slides、报销')}
   ${group('a-ref','资料',notes(['dim_teaching']),{closed:true})}</div>`}
 
-const SUBS=[['career','职业'],['profile','曝光'],['step','退一步'],['notes','笔记']];
+const SUBS=[['opp','机会'],['expo','曝光'],['step','退一步'],['notes','笔记'],['lib','资料']];
+const SUB_LEGACY={career:'opp',profile:'expo'};
 function renderThink(){
-  const sub=SUBS.some(s=>s[0]===U.sub)?U.sub:'career';
+  const want=SUB_LEGACY[U.sub]||U.sub;const sub=SUBS.some(s=>s[0]===want)?want:'opp';
   return `<div class="narrow stack">
   ${pageHead('思考')}
   <nav class="subtabs" aria-label="思考分区">${SUBS.map(([k,l])=>`<button type="button" class="chipbtn" data-act="sub" data-v="${k}" aria-pressed="${sub===k}">${l}</button>`).join('')}</nav>
   ${SUBS.map(([k])=>`<div class="stack" data-sub="${k}"${k===sub?'':' hidden'}>${THINK[k]()}</div>`).join('')}
   </div>`}
+const visibleNotes=ids=>ids.filter(id=>D.blocks[id]&&!isHidden('blk:'+id)).length;
+const LIB=[['l-career','职业规划',['career_lede','path_academia','path_industry','path_startup','formula','ap_checks']],
+  ['l-people','人脉与博后',['connection','postdoc','career_other']],
+  ['l-pub','怎么发 & 发什么',['how','what','taste','watch','ptaste']],
+  ['l-ind','指标与维度',['ind_big','ind_small','dim_service','dim_teaching','dim_talk','dim_indep','dim_other']],
+  ['l-old','旧版计划',['old_0813']]];
 const THINK={
-  career(){const its=areaItems('career');return `
-    ${group('c-items','博后 · Funding',itemList(its,'career','app','例如：某 fellowship'),{count:its.length,aside:addBtn('career','app','+ 添加')})}
-    ${group('c-plan','职业规划',notes(['career_lede','path_academia','path_industry','path_startup','formula','ap_checks']))}
-    ${group('c-people','推荐信 · 人脉',`${isHidden('w:letters')?'':`<div class="box"><div class="box-h"><h3>推荐信 × 3</h3><button class="wx" type="button" data-act="hide" data-id="w:letters" data-v="推荐信 × 3" aria-label="删除：推荐信">×</button></div>${[0,1,2].map(i=>`<div class="slot"><b>${i+1}</b><input class="field" id="letter-${i}" data-act="letter" data-id="${i}" value="${esc(D.letters[i]||'')}" aria-label="推荐信 ${i+1}"></div>`).join('')}</div>`}${notes(['connection','postdoc','career_other'])}`)}`},
-  profile(){
-    const its=areaItems('profile');const papers=areaItems('research','proj');const pid=papers.some(p=>p.id===U.paper)?U.paper:(papers[0]&&papers[0].id);
+  /* things to apply for and follow up */
+  opp(){const post=areaItems('career'),prize=areaItems('profile');return `
+    ${group('o-post','博后 · Funding',itemList(post,'career','app','例如：某博后 funding'),{count:post.length,aside:addBtn('career','app','+ 添加')})}
+    ${group('o-prize','奖项 · Fellowship · Workshop',itemList(prize,'profile','app','例如：某奖项'),{count:prize.length,aside:addBtn('profile','app','+ 添加')})}
+    ${group('o-letters','推荐信',`<div class="box">${[0,1,2].map(i=>`<div class="slot"><b>${i+1}</b><input class="field" id="letter-${i}" data-act="letter" data-id="${i}" value="${esc(D.letters[i]||'')}" aria-label="推荐信 ${i+1}"></div>`).join('')}</div>`,{hide:'w:letters'})}`},
+  /* visibility: how long since each channel was updated, and the per-paper launch list */
+  expo(){
+    const papers=areaItems('research','proj');const pid=papers.some(p=>p.id===U.paper)?U.paper:(papers[0]&&papers[0].id);
     const tpl=D.launchTpl||[];const keys=tpl.flatMap((g,gi)=>g.items.map((_,ii)=>`launch:${pid}:${gi}:${ii}`));const n=keys.filter(k=>D.checks[k]).length;
     return `
-    ${group('p-ch','渠道',`<div class="box">${D.channels.map(freshRow).join('')}</div>`,{id:'channels',hide:'w:channels'})}
-    ${group('p-items','奖项 · Fellowship · Workshop',itemList(its,'profile','app','例如：某奖项'),{count:its.length,aside:addBtn('profile','app','+ 添加')})}
-    ${pid?group('p-launch','论文发布清单',`<div class="box">
+    ${group('e-ch','渠道',`<div class="box ch-box">${D.channels.map(freshRow).join('')}</div>`,{id:'channels',hide:'w:channels'})}
+    ${pid?group('e-launch','论文发布清单',`<div class="box">
       <div class="chips"><label class="k" for="paper-sel">论文</label><select class="pill" id="paper-sel" data-act="paper">${papers.map(p=>`<option value="${esc(p.id)}"${p.id===pid?' selected':''}>${esc(label(p))}</option>`).join('')}</select><span class="small muted">${n}/${keys.length}</span></div>
-      ${tpl.map((g,gi)=>`<div class="grp"><div class="grp-k">${esc(g.g)}</div>${g.items.map((s,ii)=>{const k=`launch:${pid}:${gi}:${ii}`;const on=!!D.checks[k];return `<label class="lc${on?' done':''}"><input type="checkbox" data-act="check" data-id="${k}"${on?' checked':''}><span>${md(s)}</span></label>`}).join('')}</div>`).join('')}</div>`,{closed:true,hide:'w:launch'}):''}
-    ${group('p-ref','指标与维度',notes(['ind_big','ind_small','dim_service','dim_teaching','dim_talk','dim_indep','dim_other']),{closed:true})}`},
+      ${tpl.map((g,gi)=>`<div class="grp"><div class="grp-k">${esc(g.g)}</div>${g.items.map((s,ii)=>{const k=`launch:${pid}:${gi}:${ii}`;const on=!!D.checks[k];return `<label class="lc${on?' done':''}"><input type="checkbox" data-act="check" data-id="${k}"${on?' checked':''}><span>${md(s)}</span></label>`}).join('')}</div>`).join('')}</div>`,{closed:true,hide:'w:launch',count:`${n}/${keys.length}`}):''}`},
+  /* reference reading, grouped by topic */
+  lib(){return LIB.map(([key,title,ids])=>group(key,title,notes(ids),{closed:true,count:visibleNotes(ids)||null})).join('')||'<p class="blank">资料都被删掉了，可以在设置里恢复。</p>'},
   step(){
     const card=s=>{if(isHidden('w:step:'+s.id))return '';const it=itemById(s.id);const last=(s.history||[]).slice(-1)[0];
       const nChecked=s.items.filter((_,i)=>s.checks&&s.checks[i]).length;const k='step:'+s.id;const open=isOpen(k);
@@ -937,12 +950,11 @@ const THINK={
     const steps=D.steps.map(card).join('');
     return `
     ${steps?`<div class="list-i">${steps}</div>`:''}
-    ${group('s-half','Half a Step Back',notes(['how','what','taste','watch','ptaste']))}
     ${group('s-absorb','待吸收',`<div class="box">${D.absorb.map(x=>`<div class="td${x.done?' done':''}" data-find><input type="checkbox" id="ab-${esc(x.id)}" data-act="absorb" data-id="${esc(x.id)}"${x.done?' checked':''}><span class="td-t">${md(x.t)}</span><span class="act"><button class="x" type="button" data-act="absorb-del" data-id="${esc(x.id)}" aria-label="删除">×</button></span></div>`).join('')}
       <form class="add slim" data-form="absorb"><input type="text" class="field" id="absorb-t" name="t" placeholder="+ 新的想法" required aria-label="新的想法"><button class="btn sm" type="submit">添加</button></form></div>`,{closed:true,count:D.absorb.filter(x=>!x.done).length,hide:'w:absorb'})}
     ${tl?group('s-tl','时间线'+(D.timeline.version?' '+esc(D.timeline.version):''),`<div class="box">${tl}</div>`,{closed:true,hide:'w:timeline'}):''}
     ${D.abilities.length?group('s-review','Periodic Review',`<div class="box">${D.abilities.map(a=>`<div class="rate" data-find><span class="rate-t">${esc(a.t)}</span><span class="dots">${[1,2,3,4,5].map(v=>`<button type="button" class="${(D.rate[a.id]||0)>=v?'on':''}" data-act="rate" data-id="${esc(a.id)}" data-v="${v}" aria-label="${v} 分">${v}</button>`).join('')}</span></div>`).join('')}${rated?`<p class="hint">上次自评：${esc(D.rateAt)}</p>`:''}</div>`,{closed:true,hide:'w:review'}):''}
-    ${group('s-old','旧版计划',notes(['old_0813']),{closed:true})}`},
+    `},
   notes(){
     const person=c=>c.p||c.who;const whos=[...new Set(D.convs.map(person))];
     const convs=D.convs.map(c=>({c,items:(c.items||[]).filter(x=>!U.cfTag||(x.tags||[]).includes(U.cfTag))})).filter(g=>(g.items.length||T.editConv===g.c.id)&&(!U.cfWho||person(g.c)===U.cfWho));
