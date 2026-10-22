@@ -624,7 +624,7 @@ function logPart(it){
         <input type="date" class="field" name="d" id="log-d-${esc(it.id)}" value="${TODAY_ISO}" aria-label="日期">
         <input type="text" class="field" name="t" id="log-t-${esc(it.id)}" placeholder="推进了什么、卡在哪、下一步" aria-label="进展" required>
         <button class="btn sm" type="submit">记录</button></form>
-      <div class="log">${logs.map(l=>`<div class="log-e${l.auto?' auto':''}" data-find><span class="d">${esc(l.d)}</span><span class="t">${md(l.t)}</span>${l.auto?'<span></span>':`<button class="x" type="button" data-act="log-del" data-id="${esc(l.id)}" aria-label="删除这条进展">×</button>`}</div>`).join('')}</div>
+      <div class="log">${logs.map(l=>`<div class="log-e${l.auto?' auto':''}" data-find><span class="d">${esc(l.d)}</span><span class="t">${md(l.t)}</span><button class="x" type="button" data-act="log-del" data-id="${esc(l.id)}" aria-label="删除这条进展">×</button></div>`).join('')}</div>
     </div></div>`}
 function itemEdit(it){
   return `<form class="edit" data-form="item-edit" data-id="${esc(it.id)}">
