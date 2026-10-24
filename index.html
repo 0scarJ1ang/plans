@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1024-0559-f1cfb4">
+<meta name="app-build" content="1024-0602-ced2b5">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -379,6 +379,7 @@ textarea.goal{font-size:15px;min-height:0}
 .ch-box .age{min-width:5.5em;text-align:center}
 .cluster{display:grid;gap:10px}
 .promo-todos{display:grid;gap:4px;padding-bottom:6px;border-bottom:1px solid var(--hair)}
+.step-pts{font-size:14px;color:var(--ink)}
 .sub-k{font:600 14.5px var(--f-display);padding-top:6px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
 .cluster-k{font:500 11.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:8px;border-top:1px solid var(--line)}
 .plan{display:grid;gap:14px}
@@ -982,21 +983,19 @@ function renderThink(){
 const visibleNotes=ids=>ids.filter(id=>D.blocks[id]&&!isHidden('blk:'+id)).length;
 const noteGroup=(key,title,ids)=>group(key,title,notes(ids),{closed:true,count:visibleNotes(ids)||null});
 const cluster=(label,html)=>hasContent(html)?`<div class="cluster"><div class="cluster-k">${label}</div>${html}</div>`:'';
-function stepCard(s){if(isHidden('w:step:'+s.id))return '';const it=itemById(s.id);const last=(s.history||[]).slice(-1)[0];
-      const nChecked=s.items.filter((_,i)=>s.checks&&s.checks[i]).length;const k='step:'+s.id;const open=isOpen(k,true);
-      return `<div class="it${open?' open':''}" id="it-${esc(s.id)}" data-key="${k}">
-        <div class="it-row"><button class="it-h" type="button" data-act="exp" data-id="${k}" data-def="1" aria-expanded="${open}"><span class="car"></span><span class="it-t" data-find>${esc(s.title)}</span></button>
-          <span class="it-meta">${ageBadge(last,14,45)}</span></div>
-        <div class="xb"${open?'':' hidden'}>
-          ${s.desc?`<p class="row-sub">${md(s.desc)}</p>`:''}
-          ${T.editBlock==='st:'+s.id?`<form class="edit" data-form="step" data-id="${esc(s.id)}"><label>说明<input class="field" name="desc" id="st-desc-${esc(s.id)}" value="${esc(s.desc||'')}"></label>
-            <label>清单（每行一项）<textarea class="field" name="text" id="st-text-${esc(s.id)}" rows="${s.items.length+2}">${esc(s.items.join('\n'))}</textarea></label>
-            <div class="btnrow"><button class="btn" type="submit">保存</button><button class="btn ghost" type="button" data-act="blk-cancel">取消</button></div></form>`
-          :`<div>${s.items.map((x,i)=>{const on=!!(s.checks&&s.checks[i]);return `<label class="lc${on?' done':''}" data-find><input type="checkbox" data-act="step-check" data-id="${esc(s.id)}" data-v="${i}"${on?' checked':''}><span>${md(x)}</span></label>`}).join('')}</div>`}
-          <div class="btnrow"><button class="btn sm" type="button" data-act="step-done" data-id="${esc(s.id)}">完成这一轮（${nChecked}/${s.items.length}）</button>${(s.history||[]).length?`<span class="small muted">做过 ${s.history.length} 轮</span>`:''}</div>
-          ${it?`<div class="todos">${todosOf(it).map(t=>todoLine(t,'step',{})).join('')}</div>${todoAdd(it)}${logPart(it)}`:''}
-          <div class="row-foot"><button class="linkbtn muted" type="button" data-act="step-edit" data-id="${esc(s.id)}">编辑清单</button><button class="linkbtn danger" type="button" data-act="hide" data-id="w:step:${esc(s.id)}" data-v="${esc(s.title)}">删除</button></div>
-        </div></div>`}
+function stepCard(s){if(isHidden('w:step:'+s.id))return '';const it=itemById(s.id);const k='step:'+s.id;const open=isOpen(k,true);
+  const nOpen=it?todosOf(it).filter(t=>!t.done).length+(it.weekly||[]).filter(w=>!recOn(CUR_WK,w.id)).length:0;
+  return `<div class="it${open?' open':''}" id="it-${esc(s.id)}" data-key="${k}">
+    <div class="it-row"><button class="it-h" type="button" data-act="exp" data-id="${k}" data-def="1" aria-expanded="${open}"><span class="car"></span><span class="it-t" data-find>${esc(s.title)}</span></button>
+      <span class="it-meta">${nOpen?`<span>${nOpen} 项</span>`:''}</span></div>
+    <div class="xb"${open?'':' hidden'}>
+      ${T.editBlock==='st:'+s.id?`<form class="edit" data-form="step" data-id="${esc(s.id)}"><label>说明<input class="field" name="desc" id="st-desc-${esc(s.id)}" value="${esc(s.desc||'')}"></label>
+        <label>要点（每行一条）<textarea class="field" name="text" id="st-text-${esc(s.id)}" rows="${s.items.length+2}">${esc(s.items.join('\n'))}</textarea></label>
+        <div class="btnrow"><button class="btn" type="submit">保存</button><button class="btn ghost" type="button" data-act="blk-cancel">取消</button></div></form>`
+      :`${s.desc?`<p class="row-sub">${md(s.desc)}</p>`:''}${s.items.length?`<ul class="list step-pts">${s.items.map(x=>`<li data-find>${md(x)}</li>`).join('')}</ul>`:''}`}
+      ${it?`<div class="todos">${itemTodos(it,'step')}</div>${todoAdd(it)}${logPart(it)}`:''}
+      <div class="row-foot"><button class="linkbtn muted" type="button" data-act="step-edit" data-id="${esc(s.id)}">编辑</button><button class="linkbtn danger" type="button" data-act="hide" data-id="w:step:${esc(s.id)}" data-v="${esc(s.title)}">删除</button></div>
+    </div></div>`}
 function timelineHtml(){
   const P=D.timeline.periods||[];
     const tl=P.map((p,i)=>{const next=P.slice(i+1).find(q=>q.ym>p.ym);const now=p.ym<=TODAY_YM&&(!next||next.ym>TODAY_YM);const past=!now&&p.ym<TODAY_YM;
@@ -1155,7 +1154,6 @@ document.addEventListener('change',async e=>{
     case 'done':if(t.checked){snapshot();setDone(id,true);commit('完成 To-Do');toast('已完成',true)}else{setDone(id,false);commit('取消完成')}return;
     case 'ddl':{const td=todoById(id);if(td){td.ddl=t.value;delete T.ddlOpen[id];commit('DDL')}return}
     case 'check':D.checks[id]=t.checked;if(!t.checked)delete D.checks[id];commit('勾选');return;
-    case 'step-check':{const s=D.steps.find(x=>x.id===id);if(!s)return;s.checks=s.checks||{};if(t.checked)s.checks[t.dataset.v]=true;else delete s.checks[t.dataset.v];commit('退一步清单');return}
     case 'absorb':{const x=D.absorb.find(a=>a.id===id);if(x){x.done=t.checked;commit('待吸收')}return}
     case 'ch-date':{const c=D.channels.find(x=>x.id===id);if(c){c.date=t.value;commit('曝光渠道')}return}
     case 'paper':U.paper=t.value;saveUI();render();return;
@@ -1245,8 +1243,6 @@ document.addEventListener('click',async e=>{
     case 'blk-edit':T.editBlock=id;render();{const n=document.getElementById('blk-text-'+id);if(n)n.focus()}return;
     case 'blk-cancel':T.editBlock='';render();return;
     case 'step-edit':T.editBlock=T.editBlock==='st:'+id?'':'st:'+id;render();return;
-    case 'step-done':{const s=D.steps.find(x=>x.id===id);if(!s)return;s.history=s.history||[];if(s.history.slice(-1)[0]!==TODAY_ISO)s.history.push(TODAY_ISO);
-      const n=s.items.filter((_,i)=>s.checks&&s.checks[i]).length;s.checks={};if(itemById(s.id))addLog(s.id,`完成一轮${s.title}（${n}/${s.items.length}）`,{auto:true});commit(s.title);toast('已记录这一轮');return}
     case 'rate':D.rate[id]=+v;D.rateAt=TODAY_ISO;commit('自评');return;
     case 'absorb-del':snapshot();D.absorb=D.absorb.filter(x=>x.id!==id);commit('待吸收');toast('已删除',true);return;
     case 'inbox-del':snapshot();D.inbox=D.inbox.filter(n=>n.id!==id);commit('随手记');toast('已删除',true);return;
