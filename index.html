@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1024-1639-d6d2cc">
+<meta name="app-build" content="1024-1658-ffe69b">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -474,6 +474,36 @@ select.pill{font-family:var(--f-body)}
 .flash{border-radius:10px}
 .tl-p.now .tl-when::after{border-radius:6px}
 @media (max-width:560px){.page-h h1,.wklabel{font-size:24px}.mast-row{padding-block:12px 6px}}
+/* ---- motion ---- */
+main{overflow-x:clip}
+.tabs{position:relative}
+.tab{position:relative;z-index:1;transition:background-color .15s,color .15s,transform .12s}
+.tab[aria-selected="true"],.tab[aria-selected="true"]:hover{background:transparent}
+.tab-ind{position:absolute;left:0;top:7px;bottom:7px;width:0;border-radius:8px;background:var(--accent-soft);pointer-events:none}
+.btn,.chipbtn,.iconbtn,.pchip,.wkb,.ichip,.sync{transition:background-color .15s,border-color .15s,color .15s,opacity .15s,transform .12s}
+.btn:active,.chipbtn:active,.iconbtn:active,.pchip:active,.tab:active,.sync:active{transform:scale(.96)}
+.it-h,button.td-t,.wk-it-h,.hist button,.results button,.pen,.star,.wx,.x,.grp-btn,.mini-h{transition:background-color .15s,color .15s}
+.car{transition:transform .3s cubic-bezier(.32,.72,0,1)}
+/* task checkboxes: round, fill and tick (Reminders style); option checkboxes: rounded squares */
+.td input[type=checkbox],.lc input[type=checkbox],.rep-l input[type=checkbox]{-webkit-appearance:none;appearance:none;width:18px;height:18px;margin:0;flex:none;display:inline-grid;place-content:center;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--muted) 55%,transparent);background:var(--surface);cursor:pointer;transition:background-color .2s,border-color .2s,transform .15s}
+.rep-l input[type=checkbox]{width:16px;height:16px;border-radius:5px}
+.td input[type=checkbox]::before,.lc input[type=checkbox]::before,.rep-l input[type=checkbox]::before{content:"";width:10px;height:10px;background:var(--on-accent);clip-path:polygon(14% 44%,0 65%,50% 100%,100% 16%,80% 0%,43% 62%);transform:scale(0);transition:transform .24s cubic-bezier(.3,1.6,.5,1)}
+.rep-l input[type=checkbox]::before{width:9px;height:9px}
+.td input[type=checkbox]:checked,.lc input[type=checkbox]:checked,.rep-l input[type=checkbox]:checked{background:var(--accent-hi);border-color:var(--accent-hi)}
+.td input[type=checkbox]:checked::before,.lc input[type=checkbox]:checked::before,.rep-l input[type=checkbox]:checked::before{transform:scale(1)}
+.td input[type=checkbox]:hover,.lc input[type=checkbox]:hover,.rep-l input[type=checkbox]:hover{border-color:var(--accent-hi)}
+.td input[type=checkbox]:active,.lc input[type=checkbox]:active{transform:scale(.86)}
+.td input[type=checkbox]:focus-visible,.lc input[type=checkbox]:focus-visible{border-radius:50%;outline-offset:2px}
+.rep-l input[type=checkbox]:focus-visible{border-radius:5px;outline-offset:2px}
+.lc input[type=checkbox]{margin-top:3px}
+.td-t,.lc span{text-decoration-line:line-through;text-decoration-color:transparent;transition:color .25s,text-decoration-color .25s}
+.td.done .td-t,.lc.done span{text-decoration-color:currentColor}
+@media (forced-colors: active){.td:not(.done) .td-t,.lc:not(.done) span{text-decoration-line:none}}
+.results:not([hidden]){transform-origin:top right;animation:drop .18s cubic-bezier(.32,.72,0,1)}
+.toast:not([hidden]),.update:not([hidden]){animation:rise .32s cubic-bezier(.32,.72,0,1)}
+@keyframes drop{from{opacity:0;transform:translateY(-4px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes rise{from{opacity:0;transform:translate(-50%,12px) scale(.97)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
 </style>
 </head>
 <body>
@@ -712,6 +742,10 @@ function paintSync(){
 
 /* ============================== mutations ============================== */
 function commit(act){reindex();Sync.changed(act);render()}
+/* ticking a box: save now, re-sort a beat later so the check animation is seen before the row slides away
+   (and never while the user is typing somewhere — renderSoft waits for the field to lose focus) */
+let soonT=0;
+function commitSoon(act){reindex();Sync.changed(act);clearTimeout(soonT);soonT=0;if(!Motion.ok()){render();return}soonT=setTimeout(()=>{soonT=0;renderSoft()},420)}
 function setDone(id,on){const t=todoById(id);if(!t)return;t.done=on;
   if(on){t.doneAt=TODAY_ISO;addLog(t.item,'完成：'+t.t,{auto:true,todo:t.id})}
   else{t.doneAt='';D.logs=D.logs.filter(l=>!(l.auto&&l.todo===id))}}
@@ -1183,21 +1217,40 @@ const PANELS={week:renderWeek,tl:renderTimeline,research:renderResearch,exp:rend
 const PANEL_IDS=Object.keys(PANELS);
 function renderTabs(){
   const over=D?liveTodos().filter(t=>!t.done&&t.ddl&&daysTo(t.ddl)<0).length:0;
-  document.getElementById('tabs').innerHTML=TABS.map(([id,zh])=>`<button class="tab" type="button" role="tab" id="tab-${id}" aria-controls="p-${id}" aria-selected="${U.tab===id}" data-act="tab" data-v="${id}">${zh}${id==='week'&&over?`<span class="n" title="已逾期">${over}</span>`:''}</button>`).join('');
+  document.getElementById('tabs').innerHTML=TABS.map(([id,zh])=>`<button class="tab" type="button" role="tab" id="tab-${id}" aria-controls="p-${id}" aria-selected="${U.tab===id}" data-act="tab" data-v="${id}">${zh}${id==='week'&&over?`<span class="n" title="已逾期">${over}</span>`:''}</button>`).join('')+'<span class="tab-ind" aria-hidden="true"></span>';
   document.getElementById('settings-btn').setAttribute('aria-pressed',U.tab==='settings');
+  placeInd();
 }
+/* the selected-tab pill slides between tabs; its last position is kept because the tab row is rebuilt on every render */
+let indAt=null;
+function placeInd(anim){
+  const tabs=document.getElementById('tabs');const ind=tabs&&tabs.querySelector('.tab-ind');if(!ind)return;
+  const a=tabs.querySelector('.tab[aria-selected="true"]');
+  if(!a){ind.style.opacity='0';indAt=null;return}
+  const to={x:a.offsetLeft,w:a.offsetWidth},from=indAt;indAt=to;
+  ind.style.width=to.w+'px';ind.style.transform=`translateX(${to.x}px)`;
+  if(anim===false||!Motion.ok())return;
+  if(!from)ind.animate([{opacity:0},{opacity:1}],{duration:200,easing:'ease-out'});
+  else if(from.x!==to.x||from.w!==to.w){
+    ind.animate([{transform:`translateX(${from.x}px)`,width:from.w+'px'},{transform:`translateX(${to.x}px)`,width:to.w+'px'}],{duration:380,easing:Motion.EASE});
+    if(tabs.scrollWidth>tabs.clientWidth+1)tabs.scrollTo({left:Math.max(0,to.x-(tabs.clientWidth-to.w)/2),behavior:'smooth'})}
+}
+addEventListener('resize',()=>placeInd(false),{passive:true});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>placeInd(false));
 function ensurePanels(){const host=document.getElementById('panels');if(host.dataset.ready)return;
   host.innerHTML=PANEL_IDS.map(id=>`<div class="panel" data-panel="${id}" id="p-${id}" role="tabpanel" hidden></div>`).join('');host.dataset.ready='1'}
 function renderPanel(id){document.getElementById('p-'+id).innerHTML=PANELS[id]();T.stale[id]=false}
 function render(){
   if(!D)return;ensurePanels();document.querySelector('.search').hidden=false;
   if(!PANELS[U.tab])U.tab='week';
+  const sig=[U.tab,U.tab==='week'?(U.week||CUR_WK):'',U.tab==='think'?U.sub:''].join('|'),snap=Motion.before(sig);
   const a=document.activeElement;const aid=a&&a.id;const key=a&&a.dataset&&a.dataset.act?[a.dataset.act,a.dataset.id||'',a.dataset.v||'']:null;
   renderTabs();
   for(const id of PANEL_IDS){const el=document.getElementById('p-'+id);el.hidden=U.tab!==id;if(id===U.tab)renderPanel(id);else T.stale[id]=true}
   let el=aid&&document.getElementById(aid);
   if(!el&&key){const sel=`[data-act="${key[0]}"]`+(key[1]?`[data-id="${CSS.escape(key[1])}"]`:'')+(key[2]?`[data-v="${CSS.escape(key[2])}"]`:'');el=document.getElementById('p-'+U.tab).querySelector(sel)}
   if(el&&el!==document.body)el.focus({preventScroll:true});
+  Motion.after(sig,snap);
 }
 function renderAllPanels(){for(const id of PANEL_IDS)if(T.stale[id]!==false)renderPanel(id)}
 let softPending=false;
@@ -1220,7 +1273,92 @@ function reveal(el){
 function goto(tab,target,sub){setTab(tab,sub);requestAnimationFrame(()=>{const el=document.getElementById(target);if(el){reveal(el);flash(el)}else window.scrollTo({top:0})})}
 function flash(el){el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),1700)}
 let toastT,undoSnap=null;const snapshot=()=>{undoSnap=clone(D)};
-function toast(msg,undo){const t=document.getElementById('toast');t.innerHTML=esc(msg)+(undo?' <button type="button" class="linkbtn" data-act="undo" style="color:inherit;text-decoration:underline;margin-left:8px">撤销</button>':'');t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true},undo?6000:2400)}
+function toast(msg,undo){const t=document.getElementById('toast');t.innerHTML=esc(msg)+(undo?' <button type="button" class="linkbtn" data-act="undo" style="color:inherit;text-decoration:underline;margin-left:8px">撤销</button>':'');Motion.show(t);clearTimeout(toastT);toastT=setTimeout(()=>Motion.hide(t),undo?6000:2400)}
+
+/* ============================== motion ============================== */
+/* A render replaces the whole panel, so motion is layered on afterwards: rows and cards that survive slide from where
+   they were (FLIP), new ones fade in, removed ones fade out as detached ghosts, a new tab or week slides in.
+   Opening a section animates its height. All of it is skipped when the system asks for reduced motion. */
+const Motion=(()=>{
+  const EASE='cubic-bezier(.32,.72,0,1)';
+  const SEL='.td,.lc,.it,.grp-s,.sub-x,.wk-area,.wk-it,.log-e,.tl-p,.fr,.stu,.inbox-i,.row-foot,.sub-k,.cluster-k,.ch-box,form';
+  const rm=matchMedia('(prefers-reduced-motion: reduce)');
+  const ok=()=>!rm.matches&&typeof Element.prototype.animate==='function';
+  let lastSig='';
+  const key=el=>{
+    if(el.tagName==='FORM')return 'f:'+el.dataset.form+':'+(el.dataset.id||el.dataset.item||'');
+    if(el.id)return '#'+el.id;
+    if(el.dataset.key)return 'k:'+el.dataset.key;
+    const c=el.classList;
+    if(c.contains('wk-area'))return 'wa:'+el.dataset.c;
+    if(c.contains('wk-it')){const h=el.querySelector('.wk-it-h');return h?'wi:'+(h.dataset.target||h.textContent):''}
+    if(c.contains('tl-p')){const w=el.querySelector('.tl-when');return w?'tl:'+w.textContent:''}
+    const cb=el.querySelector('input[type=checkbox]');if(cb)return 'cb:'+(cb.id||cb.dataset.act+':'+cb.dataset.id);
+    const d=el.querySelector('[data-id]');return d?c[0]+':'+d.dataset.act+':'+d.dataset.id:c[0]+':'+el.textContent.trim().slice(0,40)};
+  function collect(panel){const m=new Map(),n={};
+    for(const el of panel.querySelectorAll(SEL)){let k=key(el);if(!k)continue;n[k]=(n[k]||0)+1;if(n[k]>1)k+='#'+n[k];m.set(k,el)}
+    return m}
+  const shown=r=>r.width>0||r.height>0;
+  function before(sig){
+    const panel=document.getElementById('p-'+U.tab);
+    if(!ok()||sig!==lastSig||!panel)return null;
+    const els=collect(panel),rects=new Map();
+    for(const [k,el] of els){const r=el.getBoundingClientRect();if(shown(r))rects.set(k,r)}
+    return {els,rects,bars:[...panel.querySelectorAll('.bar i')].map(b=>b.style.width)}}
+  function after(sig,snap){
+    const panel=document.getElementById('p-'+U.tab);const prev=lastSig;lastSig=sig;
+    if(!ok()||!panel)return;
+    if(!snap){if(prev&&prev!==sig)enter(panel,prev,sig);return}
+    const now=collect(panel),vh=innerHeight,vis=r=>r.bottom>-80&&r.top<vh+80;
+    const up=el=>{const p=el.parentElement&&el.parentElement.closest(SEL);return p&&panel.contains(p)?p:null};
+    const moved=new Map(),fresh=new Map();
+    for(const [k,el] of now){const r=el.getBoundingClientRect();if(!shown(r))continue;const o=snap.rects.get(k);
+      if(o)moved.set(el,{dx:o.left-r.left,dy:o.top-r.top,show:vis(o)||vis(r)});else if(!snap.els.has(k))fresh.set(el,r)}
+    for(const [el,m] of moved){
+      const p=up(el),pm=p&&moved.get(p);const x=m.dx-(pm?pm.dx:0),y=m.dy-(pm?pm.dy:0);
+      if(m.show&&(Math.abs(x)>=1||Math.abs(y)>=1))el.animate([{transform:`translate(${x}px,${y}px)`},{transform:'none'}],{duration:360,easing:EASE})}
+    for(const [el,r] of fresh){const p=up(el);if(p&&fresh.has(p)||!vis(r))continue;
+      el.animate([{opacity:0,transform:'translateY(-6px) scale(.985)'},{opacity:1,transform:'none'}],{duration:280,easing:EASE})}
+    const okey=new Map([...snap.els].map(([k,el])=>[el,k]));let n=0;
+    for(const [k,el] of snap.els){
+      if(now.has(k))continue;const r=snap.rects.get(k);if(!r||!vis(r)||r.height>700)continue;
+      const p=el.parentElement&&el.parentElement.closest(SEL),pk=p&&okey.get(p);if(pk&&!now.has(pk))continue;
+      if(++n>16)break;ghost(el,r)}
+    panel.querySelectorAll('.bar i').forEach((b,i)=>{const w=snap.bars[i];if(w!=null&&w!==b.style.width)b.animate([{width:w},{width:b.style.width}],{duration:520,easing:EASE})})}
+  /* a removed row lingers for a moment where it was, then fades */
+  function ghost(el,r){
+    el.removeAttribute('id');el.querySelectorAll('[id]').forEach(x=>x.removeAttribute('id'));
+    el.inert=true;el.setAttribute('aria-hidden','true');
+    Object.assign(el.style,{position:'fixed',left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',margin:'0',zIndex:'25',pointerEvents:'none'});
+    document.body.appendChild(el);
+    const a=el.animate([{opacity:1,transform:'none'},{opacity:0,transform:'scale(.97)'}],{duration:220,easing:'ease-out',fill:'forwards'});
+    a.onfinish=()=>el.remove()}
+  function enter(panel,prev,sig){
+    const [pt,pw]=prev.split('|'),[t,w]=sig.split('|');
+    const from=pt===t&&t==='week'&&pw!==w?{opacity:0,transform:`translateX(${w>pw?32:-32}px)`}:{opacity:0,transform:'translateY(10px)'};
+    panel.animate([from,{opacity:1,transform:'none'}],{duration:340,easing:EASE})}
+  /* open / close a section body by animating its height (and padding, and the parent's gap) */
+  function slide(body,open){
+    const box=body.parentElement;
+    const cur=()=>{const c=getComputedStyle(body);return {h:body.getBoundingClientRect().height,pt:parseFloat(c.paddingTop)||0,pb:parseFloat(c.paddingBottom)||0,bt:parseFloat(c.borderTopWidth)||0,mt:parseFloat(c.marginTop)||0,o:+c.opacity}};
+    const from=body.hidden?null:cur();
+    if(body._slide){body._slide.cancel();body._slide=null}
+    body.hidden=false;delete body.dataset.closing;body.style.overflow='';
+    if(!ok()){body.hidden=!open;return}
+    const nat=cur(),pc=box&&getComputedStyle(box),gap=pc&&/grid|flex/.test(pc.display)&&body.previousElementSibling?parseFloat(pc.rowGap)||0:0;
+    const zero={h:0,pt:0,pb:0,bt:0,mt:nat.mt-gap,o:0};
+    const a0=from||zero,a1=open?nat:zero;
+    const f=v=>({height:v.h+'px',paddingTop:v.pt+'px',paddingBottom:v.pb+'px',borderTopWidth:v.bt+'px',marginTop:v.mt+'px',opacity:v.o});
+    body.style.overflow='hidden';if(!open)body.dataset.closing='1';
+    const a=body.animate([f(a0),f(a1)],{duration:Math.min(440,Math.max(240,200+Math.abs(a1.h-a0.h)*.18)),easing:EASE,fill:open?'none':'forwards'});
+    body._slide=a;
+    a.onfinish=()=>{body._slide=null;body.style.overflow='';if(!open){delete body.dataset.closing;if(!(box&&box.classList.contains('open')))body.hidden=true;a.cancel()}}}
+  function show(el){if(el._hide){el._hide.cancel();el._hide=null}el.hidden=false}
+  function hide(el){if(el.hidden||el._hide)return;if(!ok()){el.hidden=true;return}
+    const a=el.animate([{opacity:1,transform:'translate(-50%,0) scale(1)'},{opacity:0,transform:'translate(-50%,6px) scale(.98)'}],{duration:200,easing:'ease-in',fill:'forwards'});
+    el._hide=a;a.onfinish=()=>{el._hide=null;el.hidden=true;a.cancel()}}
+  return {EASE,ok,before,after,slide,show,hide}
+})();
 function applyTheme(){const r=document.documentElement;if(U.theme==='system')r.removeAttribute('data-theme');else r.setAttribute('data-theme',U.theme)}
 function download(){const blob=new Blob([JSON.stringify(D,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='phd-plans-'+TODAY_ISO+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 function readFile(input){return new Promise((res,rej)=>{const f=input.files&&input.files[0];if(!f)return rej(new Error('没有选择文件'));const r=new FileReader();r.onload=()=>{try{res(JSON.parse(r.result))}catch(e){rej(new Error('不是有效的 JSON 文件'))}};r.onerror=()=>rej(new Error('读取文件失败'));r.readAsText(f)})}
@@ -1228,15 +1366,16 @@ function readFile(input){return new Promise((res,rej)=>{const f=input.files&&inp
 /* ============================== events ============================== */
 document.addEventListener('change',async e=>{
   const t=e.target,act=t.dataset&&t.dataset.act,id=t.dataset&&t.dataset.id;if(!act||!D&&act!=='seed-file')return;
+  if(t.type==='checkbox'&&/^(done|rec|check|absorb)$/.test(act)){const row=t.closest('.td,.lc');if(row)row.classList.toggle('done',t.checked)}
   switch(act){
     case 'st':{const it=itemById(id);if(!it)return;const old=st(it);it.st=t.value;addLog(it.id,`状态：${old} → ${t.value}`,{auto:true});commit('状态');return}
     case 'rec':{const w=ensureWeek(t.dataset.v);const it=itemById(t.dataset.item);const wt=it&&(it.weekly||[]).find(x=>x.id===id);
-      if(t.checked){snapshot();w.rec[id]=TODAY_ISO;if(wt)addLog(it.id,'每周：'+wt.t,{auto:true,rec:id,wk:t.dataset.v});commit('每周任务');toast('已完成',true)}
-      else{delete w.rec[id];D.logs=D.logs.filter(l=>!(l.rec===id&&l.wk===t.dataset.v));commit('每周任务')}return}
-    case 'done':if(t.checked){snapshot();setDone(id,true);commit('完成 To-Do');toast('已完成',true)}else{setDone(id,false);commit('取消完成')}return;
+      if(t.checked){snapshot();w.rec[id]=TODAY_ISO;if(wt)addLog(it.id,'每周：'+wt.t,{auto:true,rec:id,wk:t.dataset.v});commitSoon('每周任务');toast('已完成',true)}
+      else{delete w.rec[id];D.logs=D.logs.filter(l=>!(l.rec===id&&l.wk===t.dataset.v));commitSoon('每周任务')}return}
+    case 'done':if(t.checked){snapshot();setDone(id,true);commitSoon('完成 To-Do');toast('已完成',true)}else{setDone(id,false);commitSoon('取消完成')}return;
     case 'ddl':{const td=todoById(id);if(td){td.ddl=t.value;delete T.ddlOpen[id];commit('DDL')}return}
-    case 'check':D.checks[id]=t.checked;if(!t.checked)delete D.checks[id];commit('勾选');return;
-    case 'absorb':{const x=D.absorb.find(a=>a.id===id);if(x){x.done=t.checked;commit('待吸收')}return}
+    case 'check':D.checks[id]=t.checked;if(!t.checked)delete D.checks[id];commitSoon('勾选');return;
+    case 'absorb':{const x=D.absorb.find(a=>a.id===id);if(x){x.done=t.checked;commitSoon('待吸收')}return}
     case 'ch-date':{const c=D.channels.find(x=>x.id===id);if(c){c.date=t.value;commit('曝光渠道')}return}
     case 'paper':U.paper=t.value;saveUI();render();return;
     case 'last':{const it=itemById(id);if(it){it.last=t.value;commit('上次联系')}return}
@@ -1295,7 +1434,7 @@ document.addEventListener('click',async e=>{
     case 'sub':setTab('think',v);return;
     case 'goto':goto(b.dataset.tab,b.dataset.target,b.dataset.sub);return;
     case 'exp':{const box=b.closest('[data-key]');const body=box&&box.querySelector(':scope > .xb');if(!body)return;
-      const open=body.hidden;body.hidden=!open;box.classList.toggle('open',open);b.setAttribute('aria-expanded',open);U.exp[box.dataset.key]=open;saveUI();return}
+      const open=body.hidden||body.dataset.closing==='1';box.classList.toggle('open',open);b.setAttribute('aria-expanded',open);U.exp[box.dataset.key]=open;saveUI();Motion.slide(body,open);return}
     case 'sel':{const it=itemById(id);if(!it)return;it.sel=!it.sel;commit(it.sel?'标为 Selected':'取消 Selected');return}
     case 'theme':U.theme=v;saveUI();applyTheme();render();return;
     case 'tl-sec':U.tlSec=v;break;
