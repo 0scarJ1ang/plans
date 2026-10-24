@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1024-0541-ed9ed7">
+<meta name="app-build" content="1024-0551-698e3a">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -378,6 +378,7 @@ textarea.goal{font-size:15px;min-height:0}
 .ch-box .fr-t{font-weight:500;font-size:14.5px}
 .ch-box .age{min-width:5.5em;text-align:center}
 .cluster{display:grid;gap:10px}
+.sub-k{font:600 14.5px var(--f-display);padding-top:6px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
 .cluster-k{font:500 11.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:8px;border-top:1px solid var(--line)}
 .plan{display:grid;gap:14px}
 .plan-sum{display:grid;gap:6px}
@@ -929,20 +930,28 @@ function renderAdmin(){
   ${group('a-ref','资料',notes(['dim_teaching']),{closed:true})}</div>`}
 
 /* 维度: the long-term assets besides papers — people, talks, visibility, service, funding */
+const PROMO_ST=['Maintaining','Submitting','In submission'];
+/* per-paper promotion checklist: only for papers that are out (Maintaining) or under review (Submitting) */
+function promoCard(p){
+  const tpl=D.launchTpl||[];const keys=tpl.flatMap((g,gi)=>g.items.map((_,ii)=>`launch:${p.id}:${gi}:${ii}`));const n=keys.filter(k=>D.checks[k]).length;
+  const k='promo:'+p.id;const open=isOpen(k);
+  return `<div class="it${open?' open':''}" id="promo-${esc(p.id)}" data-key="${k}">
+    <div class="it-row"><button class="it-h" type="button" data-act="exp" data-id="${k}" aria-expanded="${open}"><span class="car"></span><span class="proj-id">${esc(p.id)}</span><span class="it-t" data-find>${esc(p.title)}</span><span class="tgt">${esc(st(p))}</span></button>
+      <span class="it-meta"><span>${n}/${keys.length}</span></span></div>
+    <div class="xb"${open?'':' hidden'}>${tpl.map((g,gi)=>`<div class="grp"><div class="grp-k">${esc(g.g)}</div>${g.items.map((x,ii)=>{const ck=`launch:${p.id}:${gi}:${ii}`;const on=!!D.checks[ck];return `<label class="lc${on?' done':''}"><input type="checkbox" data-act="check" data-id="${ck}"${on?' checked':''}><span>${md(x)}</span></label>`}).join('')}</div>`).join('')}</div>
+  </div>`}
+/* 维度: the long-term assets besides papers — people, talks & reviewing, visibility, funding */
 function renderDim(){
-  const net=areaItems('net'),talk=areaItems('talk'),svc=areaItems('service'),fund=[...areaItems('career'),...areaItems('profile')];
-  const papers=areaItems('research','proj');const pid=papers.some(p=>p.id===U.paper)?U.paper:(papers[0]&&papers[0].id);
-  const tpl=D.launchTpl||[];const keys=tpl.flatMap((g,gi)=>g.items.map((_,ii)=>`launch:${pid}:${gi}:${ii}`));const n=keys.filter(k=>D.checks[k]).length;
+  const net=areaItems('net'),talk=[...areaItems('talk'),...areaItems('service')],fund=[...areaItems('career'),...areaItems('profile')];
+  const promo=areaItems('research','proj').filter(p=>PROMO_ST.includes(st(p)));
   const letters=isHidden('w:letters')?'':`<div class="box"><div class="box-h"><h3>推荐信 × 3</h3></div>${[0,1,2].map(i=>`<div class="slot"><b>${i+1}</b><input class="field" id="letter-${i}" data-act="letter" data-id="${i}" value="${esc(D.letters[i]||'')}" aria-label="推荐信 ${i+1}"></div>`).join('')}</div>`;
   return `<div class="narrow stack">
   ${pageHead('维度')}
   ${group('d-net','人脉 · 圈子',`${itemList(net,'net','person','例如：某位想认识的老师')}${letters}${notes(['connection'])}`,{count:net.length,aside:addBtn('net','person','+ 添加')})}
-  ${group('d-talk','Talk · Workshop',itemList(talk,'talk','todo','例如：某个 invited talk、某个 workshop')||'<p class="blank">还没有。</p>',{count:talk.length,aside:addBtn('talk','todo','+ 添加')})}
+  ${group('d-talk','Talk · Workshop · Reviewer',itemList(talk,'talk','todo','例如：某个 invited talk、workshop、审稿')||'<p class="blank">还没有。</p>',{count:talk.length,aside:addBtn('talk','todo','+ 添加')})}
   ${group('d-expo','曝光',`<div class="box ch-box">${D.channels.map(freshRow).join('')}</div>
-    ${pid?group('e-launch','论文发布清单',`<div class="box">
-      <div class="chips"><label class="k" for="paper-sel">论文</label><select class="pill" id="paper-sel" data-act="paper">${papers.map(p=>`<option value="${esc(p.id)}"${p.id===pid?' selected':''}>${esc(label(p))}</option>`).join('')}</select><span class="small muted">${n}/${keys.length}</span></div>
-      ${tpl.map((g,gi)=>`<div class="grp"><div class="grp-k">${esc(g.g)}</div>${g.items.map((x,ii)=>{const k=`launch:${pid}:${gi}:${ii}`;const on=!!D.checks[k];return `<label class="lc${on?' done':''}"><input type="checkbox" data-act="check" data-id="${k}"${on?' checked':''}><span>${md(x)}</span></label>`}).join('')}</div>`).join('')}</div>`,{closed:true,hide:'w:launch',count:`${n}/${keys.length}`}):''}`,{id:'channels',hide:'w:channels'})}
-  ${group('d-svc','学术服务',itemList(svc,'service','todo','例如：某会议 reviewer')||'<p class="blank">还没有。</p>',{count:svc.length,aside:addBtn('service','todo','+ 添加')})}
+    <div class="sub-k">论文宣传 <span class="muted small">只列 Maintaining 和 Submitting 的论文</span></div>
+    ${promo.length?`<div class="list-i">${promo.map(promoCard).join('')}</div>`:'<p class="blank">目前没有 Maintaining 或 Submitting 的论文。</p>'}`,{id:'channels',hide:'w:channels'})}
   ${group('d-fund','博后 · 奖项 · Funding',`${itemList(fund,'career','app','例如：某 fellowship')}${notes(['postdoc'])}`,{count:fund.length,aside:addBtn('career','app','+ 添加')})}
   ${noteGroup('d-ref','各维度说明',['ind_big','ind_small','dim_service','dim_teaching','dim_talk','dim_indep','dim_other'])}
   </div>`}
