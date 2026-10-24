@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1024-0623-4d8336">
+<meta name="app-build" content="1024-0633-eb396e">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -968,7 +968,7 @@ function renderDim(){
   ${group('d-expo','曝光',`<div class="box ch-box">${D.channels.map(freshRow).join('')}</div>
     ${itemList(ops,'expo','todo','例如：公众号运营')}
     <div class="sub-k">论文宣传 <span class="muted small">只列 Maintaining 和 Submitting 的论文</span></div>
-    ${promo.length?`<div class="list-i">${promo.map(promoCard).join('')}</div>`:'<p class="blank">目前没有 Maintaining 或 Submitting 的论文。</p>'}`,{id:'channels',hide:'w:channels',aside:addBtn('expo','todo','+ 运营条目')})}
+    ${promo.length?`<div class="list-i">${promo.map(promoCard).join('')}</div>`:'<p class="blank">目前没有 Maintaining 或 Submitting 的论文。</p>'}`,{id:'channels',count:ops.length+promo.length,aside:addBtn('expo','todo','+ 运营条目')})}
   ${group('d-talk','Talk · Workshop · Reviewer',itemList(talk,'talk','todo','例如：某个 invited talk、workshop、审稿')||'<p class="blank">还没有。</p>',{count:talk.length,aside:addBtn('talk','todo','+ 添加')})}
   ${noteGroup('d-ref','各维度说明',['ind_big','ind_small','dim_service','dim_teaching','dim_talk','dim_indep','dim_other'])}
   </div>`}
@@ -1055,6 +1055,7 @@ const THINK={
 function renderSettings(){
   const c=GH.cfg;const dis=T.confirm==='disconnect';const imp=T.confirm==='import';
   const hidden=Object.entries(D.hidden||{});
+  const hiddenLabel=(k,t)=>{if(t&&t!==k)return t;const b=k.startsWith('blk:')&&D.blocks[k.slice(4)];return b?(b.title||plain(String(b.text||'')).split('\n')[0].slice(0,24)||'笔记'):t};
   return `<div class="narrow stack">
   ${pageHead('设置')}
   <section class="box"><h2 class="h-sm">同步</h2>
@@ -1070,7 +1071,7 @@ function renderSettings(){
   <section class="box"><h2 class="h-sm">外观</h2>${filterChips('theme',U.theme,[['system','跟随系统'],['light','浅色'],['dark','深色']])}</section>
   <p class="hint">版本 ${esc(BUILD)}</p>
   <section class="box" id="settings-hidden"><h2 class="h-sm">已删除的窗口</h2>
-    ${hidden.length?`<div class="chips">${hidden.map(([k,t])=>`<span class="tag restore">${esc(t)}<button class="linkbtn" type="button" data-act="unhide" data-id="${esc(k)}">恢复</button></span>`).join('')}</div>`:'<p class="blank">没有。</p>'}</section>
+    ${hidden.length?`<div class="chips">${hidden.map(([k,t])=>`<span class="tag restore">${esc(hiddenLabel(k,t))}<button class="linkbtn" type="button" data-act="unhide" data-id="${esc(k)}">恢复</button></span>`).join('')}</div>`:'<p class="blank">没有。</p>'}</section>
   </div>`}
 
 /* ============================== connect screen ============================== */
