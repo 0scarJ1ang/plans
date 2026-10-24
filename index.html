@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1022-1145-a6fdaf">
+<meta name="app-build" content="1024-0541-ed9ed7">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -569,7 +569,7 @@ function planIds(wk){if(PLAN_CACHE[wk])return PLAN_CACHE[wk];
   const ids=[...(W.plan||[]).filter(id=>!skip[id]),...auto];return PLAN_CACHE[wk]=[...new Set(ids)]}
 const inWeek=(id,wk)=>planIds(wk).includes(id);
 function weekAdd(wk,id){const w=ensureWeek(wk);w.skip=w.skip||{};delete w.skip[id];if(!w.plan.includes(id))w.plan.push(id)}
-function weekRemove(wk,id){const w=ensureWeek(wk);w.plan=w.plan.filter(x=>x!==id);const t=todoById(id);if(t&&t.ddl){w.skip=w.skip||{};w.skip[id]=true}}
+function weekRemove(wk,id){const w=ensureWeek(wk);w.plan=w.plan.filter(x=>x!==id);delete w.focus[id];const t=todoById(id);if(t&&t.ddl){w.skip=w.skip||{};w.skip[id]=true}}
 const block=id=>D.blocks[id]||{title:'',type:'list',text:''};
 const addLog=(item,t,extra)=>D.logs.push(Object.assign({id:uid(),item,d:TODAY_ISO,t},extra||{}));
 
@@ -681,7 +681,7 @@ function todoLine(t,ctx,o={}){
     <span class="act">${o.focus&&!foc&&!t.done?focBtn(t.id,wk,false):''}${ddl}${o.noWeek||t.del||inW||t.done?'':wkBtn(t,wk)}${o.remove?`<button class="x" type="button" data-act="wk-remove" data-id="${esc(t.id)}" data-v="${o.wk}" aria-label="移出这周计划" title="移出这周">−</button>`:''}${t.done||t.del?'':`<button type="button" class="wkb" data-act="to-weekly" data-id="${esc(t.id)}" title="改成每周任务">↻每周</button>`}${o.noDel||t.del?'':`<button class="x" type="button" data-act="todo-del" data-id="${esc(t.id)}" aria-label="删除 To-Do：${esc(t.t)}">×</button>`}</span><button class="more" type="button" data-act="more" aria-label="更多操作">⋯</button>
   </div>`}
 /* weekly tasks: belong to an item, show up every week, done state kept per week */
-const isFocus=(wk,id)=>!!(D.weeks[wk]&&D.weeks[wk].focus&&D.weeks[wk].focus[id]);
+const isFocus=(wk,id)=>!!(D.weeks[wk]&&D.weeks[wk].focus&&D.weeks[wk].focus[id])&&(!todoById(id)||inWeek(id,wk));
 const focBtn=(id,wk,on)=>`<button type="button" class="wkb foc${on?' on':''}" data-act="focus" data-id="${esc(id)}" data-v="${wk}" aria-pressed="${on}" title="${on?'取消这周重点':'设为这周重点'}">${on?'重点':'设为重点'}</button>`;
 const focTag=id=>isFocus(CUR_WK,id)?'<span class="tag foc">本周重点</span>':'';
 const recOn=(wk,id)=>!!(D.weeks[wk]&&D.weeks[wk].rec&&D.weeks[wk].rec[id]);
