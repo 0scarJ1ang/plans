@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1024-0602-ced2b5">
+<meta name="app-build" content="1024-0618-df70f6">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -229,6 +229,7 @@ form.add select.field{flex:0 1 230px;width:auto}
 .tl-p.now .tl-when{color:var(--accent)}
 .tl-p.now .tl-when::after{content:"现在";display:block;width:max-content;font-size:10.5px;letter-spacing:.06em;margin-top:4px;padding:2px 6px;border-radius:4px;background:var(--accent-soft)}
 .tl-p.past{opacity:.62}
+.tl-p.over .tl-when{color:var(--bad)}
 
 /* freshness */
 .fr{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;padding:9px 0;border-top:1px solid var(--line)}
@@ -441,7 +442,7 @@ form.add select.field{max-width:100%}
 'use strict';
 
 /* ============================== constants ============================== */
-const TABS=[['week','本周'],['research','科研'],['exp','经历'],['admin','杂事'],['dim','维度'],['think','思考']];
+const TABS=[['week','本周'],['tl','时间线'],['research','科研'],['exp','经历'],['admin','杂事'],['dim','维度'],['think','思考']];
 const TABNAME=Object.fromEntries(TABS);
 const AREAS=['research','exp','admin','career','profile','step'];
 const AREANAME={research:'科研',exp:'经历',intern:'经历',visit:'经历',career:'维度',profile:'维度',expo:'维度',net:'维度',talk:'维度',service:'维度',admin:'杂事',step:'思考'};
@@ -687,6 +688,7 @@ function todoLine(t,ctx,o={}){
 const isFocus=(wk,id)=>!!(D.weeks[wk]&&D.weeks[wk].focus&&D.weeks[wk].focus[id])&&(!todoById(id)||inWeek(id,wk));
 const focBtn=(id,wk,on)=>`<button type="button" class="wkb foc${on?' on':''}" data-act="focus" data-id="${esc(id)}" data-v="${wk}" aria-pressed="${on}" title="${on?'取消这周重点':'设为这周重点'}">${on?'重点':'设为重点'}</button>`;
 const focTag=id=>isFocus(CUR_WK,id)?'<span class="tag foc">本周重点</span>':'';
+const byDdl=(a,b)=>{const x=a.ddl||'9999',y=b.ddl||'9999';return x<y?-1:x>y?1:0};
 const recOn=(wk,id)=>!!(D.weeks[wk]&&D.weeks[wk].rec&&D.weeks[wk].rec[id]);
 const weeklyFor=wk=>{const end=weekRange(wk)[1];return D.items.flatMap(it=>(it.weekly||[]).filter(w=>!w.created||w.created<=end).map(w=>({it,w})))};
 function weeklyLine(it,w,ctx,o={}){const wk=o.wk||CUR_WK;const on=recOn(wk,w.id);const cid=`wr-${ctx}-${w.id}`;const foc=o.focus&&isFocus(wk,w.id);
@@ -741,7 +743,7 @@ function itemView(it,o={}){
     </div>
     <div class="xb"${exp?'':' hidden'}>
       ${body}
-      <div class="todos">${[false,true].map(fin=>wkly.filter(w=>recOn(CUR_WK,w.id)===fin).map(w=>weeklyLine(it,w,it.area)).join('')+todos.filter(t=>!!t.done===fin).map(t=>todoLine(t,it.area,{})).join('')).join('')}</div>
+      <div class="todos">${[false,true].map(fin=>wkly.filter(w=>recOn(CUR_WK,w.id)===fin).map(w=>weeklyLine(it,w,it.area)).join('')+todos.filter(t=>!!t.done===fin).sort(byDdl).map(t=>todoLine(t,it.area,{})).join('')).join('')}</div>
       ${todoAdd(it)}
       ${it.kind==='person'?`<div class="row-foot"><button class="btn ghost sm" type="button" data-act="met" data-id="${id}">今天联系了</button><span class="small muted">上次联系</span><input type="date" class="ddl" id="last-${id}" data-act="last" data-id="${id}" value="${esc(it.last||'')}" aria-label="上次联系日期"></div>`:''}
       ${logPart(it)}
@@ -838,7 +840,7 @@ function renderWeek(){
     let tot=0,dn=0;for(const [,g] of groups){tot+=g.w.length+g.t.length;dn+=g.w.filter(w=>recOn(wk,w.id)).length+g.t.filter(t=>t.done).length}
     return `<section class="box wk-area" data-c="${AREA_C[a]||'think'}"><div class="wk-area-h"><span class="dot" aria-hidden="true"></span><h2>${SECNAME[a]||'其他'}</h2><span class="cnt">${dn}/${tot}</span></div>${
     groups.map(([iid,g])=>{const it=itemById(iid);const [tab,sub]=it?tabFor(it):['week',''];
-      return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${it.kind==='proj'?`<span class="proj-id">${esc(it.id)}</span>`:''}<span>${esc(it.kind==='promo'?label(it):it.title)}</span></button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${[false,true].map(fin=>g.w.filter(w=>recOn(wk,w.id)===fin).map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true,focus:true})).join('')+g.t.filter(t=>!!t.done===fin).map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true,focus:true})).join('')).join('')}</div></div>`}).join('')}</section>`}).join('');
+      return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${it.kind==='proj'?`<span class="proj-id">${esc(it.id)}</span>`:''}<span>${esc(it.kind==='promo'?label(it):it.title)}</span></button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${[false,true].map(fin=>g.w.filter(w=>recOn(wk,w.id)===fin).map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true,focus:true})).join('')+g.t.filter(t=>!!t.done===fin).sort(byDdl).map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true,focus:true})).join('')).join('')}</div></div>`}).join('')}</section>`}).join('');
   const prev=addWeeks(wk,-1);const carry=planIds(prev).map(todoById).filter(t=>t&&!t.done&&!t.del&&!inWeek(t.id,wk));
   const open=liveTodos().filter(t=>!t.done&&!inWeek(t.id,wk));
   const pickList=open.filter(t=>!U.pickArea||secOf(itemById(t.item).area)===U.pickArea);
@@ -922,7 +924,7 @@ function renderResearch(){
 function renderExp(){const its=areaItems('exp');return `<div class="narrow stack">
   ${pageHead('经历',addBtn('exp','intern','+ 添加'))}
   ${itemList(its,'exp','intern','例如：某公司实习、某组访问')}
-  ${group('e-ref','资料',notes(['intern_intro','visit_intro']),{closed:true})}</div>`}
+  ${group('e-ref','资料',notes(['intern_intro','visit_intro','postdoc']),{closed:true})}</div>`}
 function renderAdmin(){
   const its=areaItems('admin');
 
@@ -935,7 +937,7 @@ function renderAdmin(){
 const PROMO_ST=['Maintaining','Submitting','In submission'];
 /* per-paper promotion checklist: only for papers that are out (Maintaining) or under review (Submitting) */
 function itemTodos(it,ctx,wk){wk=wk||CUR_WK;const wkly=it.weekly||[],todos=todosOf(it);
-  return [false,true].map(fin=>wkly.filter(w=>recOn(wk,w.id)===fin).map(w=>weeklyLine(it,w,ctx)).join('')+todos.filter(t=>!!t.done===fin).map(t=>todoLine(t,ctx,{})).join('')).join('')}
+  return [false,true].map(fin=>wkly.filter(w=>recOn(wk,w.id)===fin).map(w=>weeklyLine(it,w,ctx)).join('')+todos.filter(t=>!!t.done===fin).sort(byDdl).map(t=>todoLine(t,ctx,{})).join('')).join('')}
 function promoCard(p){
   const tpl=D.launchTpl||[];const keys=tpl.flatMap((g,gi)=>g.items.map((_,ii)=>`launch:${p.id}:${gi}:${ii}`));const n=keys.filter(k=>D.checks[k]).length;
   const k='promo:'+p.id;const open=isOpen(k);const pi=itemById('pr-'+p.id);
@@ -955,14 +957,14 @@ function promoCard(p){
   </div>`}
 /* 维度: the long-term assets besides papers — people, talks & reviewing, visibility, funding */
 function renderDim(){
-  const net=areaItems('net'),talk=[...areaItems('talk'),...areaItems('service')],fund=[...areaItems('career'),...areaItems('profile')];
+  const net=areaItems('net'),talk=[...areaItems('talk'),...areaItems('service')],fund=[...areaItems('profile'),...areaItems('career')];
   const promo=areaItems('research','proj').filter(p=>PROMO_ST.includes(st(p)));
   const letters=isHidden('w:letters')?'':`<div class="box"><div class="box-h"><h3>推荐信 × 3</h3></div>${[0,1,2].map(i=>`<div class="slot"><b>${i+1}</b><input class="field" id="letter-${i}" data-act="letter" data-id="${i}" value="${esc(D.letters[i]||'')}" aria-label="推荐信 ${i+1}"></div>`).join('')}</div>`;
   const ops=areaItems('expo').filter(x=>x.kind!=='promo');
   return `<div class="narrow stack">
   ${pageHead('维度')}
   ${group('d-net','人脉 · 圈子',`${letters}${itemList(net,'net','person','例如：某位想认识的老师')}${notes(['connection'])}`,{count:net.length,aside:addBtn('net','person','+ 添加')})}
-  ${group('d-fund','博后 · 奖项 · Funding',`${itemList(fund,'career','app','例如：某 fellowship')}${notes(['postdoc'])}`,{count:fund.length,aside:addBtn('career','app','+ 添加')})}
+  ${group('d-fund','奖项 · Fellowship',itemList(fund,'profile','app','例如：某 fellowship')||'<p class="blank">还没有。</p>',{count:fund.length,aside:addBtn('profile','app','+ 添加')})}
   ${group('d-expo','曝光',`<div class="box ch-box">${D.channels.map(freshRow).join('')}</div>
     ${itemList(ops,'expo','todo','例如：公众号运营')}
     <div class="sub-k">论文宣传 <span class="muted small">只列 Maintaining 和 Submitting 的论文</span></div>
@@ -996,6 +998,23 @@ function stepCard(s){if(isHidden('w:step:'+s.id))return '';const it=itemById(s.i
       ${it?`<div class="todos">${itemTodos(it,'step')}</div>${todoAdd(it)}${logPart(it)}`:''}
       <div class="row-foot"><button class="linkbtn muted" type="button" data-act="step-edit" data-id="${esc(s.id)}">编辑</button><button class="linkbtn danger" type="button" data-act="hide" data-id="w:step:${esc(s.id)}" data-v="${esc(s.title)}">删除</button></div>
     </div></div>`}
+function autoTimeline(sec){
+  const open=liveTodos().filter(t=>!t.done&&t.ddl&&(!sec||secOf(itemById(t.item).area)===sec)).sort((a,b)=>a.ddl<b.ddl?-1:a.ddl>b.ddl?1:0);
+  const over=open.filter(t=>t.ddl<TODAY_ISO),fut=open.filter(t=>t.ddl>=TODAY_ISO);
+  const byYm={};for(const t of fut)(byYm[t.ddl.slice(0,7)]=byYm[t.ddl.slice(0,7)]||[]).push(t);
+  const thisY=TODAY_ISO.slice(0,4);
+  const row=(cls,lbl,ts)=>`<div class="tl-p${cls}"><div class="tl-when">${lbl}</div><div class="todos">${ts.map(t=>todoLine(t,'atl',{chip:true,noDel:true,find:true})).join('')}</div></div>`;
+  return (over.length?row(' over','已逾期',over):'')+Object.keys(byYm).sort().map(ym=>{const [y,m]=ym.split('-');
+    return row(ym===TODAY_YM?' now':'',(y===thisY?'':y+' 年 ')+(+m)+' 月',byYm[ym])}).join('')}
+function renderTimeline(){
+  const sec=SECNAME[U.tlSec]?U.tlSec:'';const body=autoTimeline(sec);
+  const n=liveTodos().filter(t=>!t.done&&t.ddl&&(!sec||secOf(itemById(t.item).area)===sec)).length;
+  return `<div class="narrow stack">
+  ${pageHead('时间线','<span class="small muted">所有还没完成、带 DDL 的待办</span>')}
+  ${filterChips('tl-sec',sec,[['','全部'],...SECTIONS])}
+  ${body?`<div class="box">${body}</div>`:'<p class="blank">这里还没有带 DDL 的待办。</p>'}
+  <p class="hint">共 ${n} 项。没有 DDL 的待办不在这里，给它设个日期就会出现。</p>
+  </div>`}
 function timelineHtml(){
   const P=D.timeline.periods||[];
     const tl=P.map((p,i)=>{const next=P.slice(i+1).find(q=>q.ym>p.ym);const now=p.ym<=TODAY_YM&&(!next||next.ym>TODAY_YM);const past=!now&&p.ym<TODAY_YM;
@@ -1015,8 +1034,7 @@ const THINK={
     ${s?stepCard(s):''}
     ${cluster('规划资料',`
       ${noteGroup('l-career','职业规划',['career_lede','path_academia','path_industry','path_startup','formula','ap_checks','career_other'])}
-      ${tl?group('s-tl','时间线'+(D.timeline.version?' '+esc(D.timeline.version):''),`<div class="box">${tl}</div>`,{closed:true,hide:'w:timeline'}):''}
-      ${noteGroup('l-old','旧版计划',['old_0813'])}
+      ${group('l-old','旧版计划',`${notes(['old_0813'])}${tl?`<div class="box"><div class="box-h"><h3>时间线${D.timeline.version?' '+esc(D.timeline.version):''}（旧）</h3></div>${tl}</div>`:''}`,{closed:true})}
       ${D.abilities.length?group('s-review','Periodic Review',`<div class="box">${D.abilities.map(a=>`<div class="rate" data-find><span class="rate-t">${esc(a.t)}</span><span class="dots">${[1,2,3,4,5].map(v=>`<button type="button" class="${(D.rate[a.id]||0)>=v?'on':''}" data-act="rate" data-id="${esc(a.id)}" data-v="${v}" aria-label="${v} 分">${v}</button>`).join('')}</span></div>`).join('')}${rated?`<p class="hint">上次自评：${esc(D.rateAt)}</p>`:''}</div>`,{closed:true,hide:'w:review'}):''}`)}`},
   notes(){
     const person=c=>c.p||c.who;const whos=[...new Set(D.convs.map(person))];
@@ -1097,7 +1115,7 @@ async function firstWrite(data){
 }
 
 /* ============================== app shell ============================== */
-const PANELS={week:renderWeek,research:renderResearch,exp:renderExp,dim:renderDim,admin:renderAdmin,think:renderThink,settings:renderSettings};
+const PANELS={week:renderWeek,tl:renderTimeline,research:renderResearch,exp:renderExp,dim:renderDim,admin:renderAdmin,think:renderThink,settings:renderSettings};
 const PANEL_IDS=Object.keys(PANELS);
 function renderTabs(){
   const over=D?liveTodos().filter(t=>!t.done&&t.ddl&&daysTo(t.ddl)<0).length:0;
@@ -1216,6 +1234,7 @@ document.addEventListener('click',async e=>{
       const open=body.hidden;body.hidden=!open;box.classList.toggle('open',open);b.setAttribute('aria-expanded',open);U.exp[box.dataset.key]=open;saveUI();return}
     case 'sel':{const it=itemById(id);if(!it)return;it.sel=!it.sel;commit(it.sel?'标为 Selected':'取消 Selected');return}
     case 'theme':U.theme=v;saveUI();applyTheme();render();return;
+    case 'tl-sec':U.tlSec=v;break;
     case 'cf-who':U.cfWho=v;break; case 'cf-tag':U.cfTag=v;break; case 'pick-area':U.pickArea=v;break;
     case 'todo-edit':{T.editTodo=v+':'+id;render();const n=document.getElementById('te-'+v+'-'+id);if(n){n.focus();n.select()}return}
     case 'ddl-open':{T.ddlOpen[id]=true;render();const n=document.getElementById('dd-'+v+'-'+id);if(n){n.focus();try{n.showPicker()}catch(err){}}return}
