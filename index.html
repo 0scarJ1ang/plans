@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1024-0551-698e3a">
+<meta name="app-build" content="1024-0559-f1cfb4">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -378,6 +378,7 @@ textarea.goal{font-size:15px;min-height:0}
 .ch-box .fr-t{font-weight:500;font-size:14.5px}
 .ch-box .age{min-width:5.5em;text-align:center}
 .cluster{display:grid;gap:10px}
+.promo-todos{display:grid;gap:4px;padding-bottom:6px;border-bottom:1px solid var(--hair)}
 .sub-k{font:600 14.5px var(--f-display);padding-top:6px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
 .cluster-k{font:500 11.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:8px;border-top:1px solid var(--line)}
 .plan{display:grid;gap:14px}
@@ -442,9 +443,9 @@ form.add select.field{max-width:100%}
 const TABS=[['week','本周'],['research','科研'],['exp','经历'],['admin','杂事'],['dim','维度'],['think','思考']];
 const TABNAME=Object.fromEntries(TABS);
 const AREAS=['research','exp','admin','career','profile','step'];
-const AREANAME={research:'科研',exp:'经历',intern:'经历',visit:'经历',career:'维度',profile:'维度',net:'维度',talk:'维度',service:'维度',admin:'杂事',step:'思考'};
+const AREANAME={research:'科研',exp:'经历',intern:'经历',visit:'经历',career:'维度',profile:'维度',expo:'维度',net:'维度',talk:'维度',service:'维度',admin:'杂事',step:'思考'};
 const SECTIONS=[['research','科研'],['exp','经历'],['admin','杂事'],['dim','维度'],['think','思考']];
-const secOf=a=>({research:'research',exp:'exp',intern:'exp',visit:'exp',admin:'admin',net:'dim',talk:'dim',service:'dim',career:'dim',profile:'dim'})[a]||'think';
+const secOf=a=>({research:'research',exp:'exp',intern:'exp',visit:'exp',admin:'admin',net:'dim',talk:'dim',service:'dim',career:'dim',profile:'dim',expo:'dim'})[a]||'think';
 const SECNAME=Object.fromEntries(SECTIONS);
 const secItems=sec=>D.items.filter(x=>secOf(x.area)===sec);
 const PRI=[['P0','P0 紧急'],['P1','P1 重要'],['P2','P2 推进'],['P3','P3 有空'],['','— 未设']];
@@ -459,7 +460,7 @@ const SETS={
   todo:['想法','准备中','进行中','完成'],
   person:['想认识','联系中','聊过','保持联系'],
 };
-const KIND_SET={person:'person',proj:'proj',collab:'collab',lead:'lead',intern:'intern',visit:'visit',app:'app',todo:'todo',step:'todo'};
+const KIND_SET={promo:'todo',person:'person',proj:'proj',collab:'collab',lead:'lead',intern:'intern',visit:'visit',app:'app',todo:'todo',step:'todo'};
 const TAGS={r:'研究',i:'实习',v:'Visiting',c:'职业',p:'曝光',m:'心态'};
 const TAGCODE={'研究':'r','实习':'i','visiting':'v','访问':'v','职业':'c','曝光':'p','心态':'m'};
 const EMPTY={v:2,items:[],todos:[],logs:[],weeks:{},routines:[],
@@ -556,7 +557,7 @@ const itemById=id=>IX.items.get(id);
 const todoById=id=>IX.todos.get(id);
 const todosOf=it=>IX.byItem.get(it.id)||[];
 const liveTodos=()=>D.todos.filter(t=>!t.del&&IX.items.has(t.item));
-const label=it=>it.kind==='proj'?it.id+' · '+it.title:it.title;
+const label=it=>it.kind==='proj'?it.id+' · '+it.title:it.kind==='promo'?((itemById(it.paper)||{}).title||it.title)+' · 宣传':it.title;
 const pri=it=>it.pri||'';
 const st=it=>it.st||SETS[it.set||KIND_SET[it.kind]||'todo'][0];
 const setOf=it=>it.set||KIND_SET[it.kind]||'todo';
@@ -662,7 +663,7 @@ function nextProjId(){for(let c=65;c<91;c++){const id=String.fromCharCode(c);if(
 const isHidden=k=>!!(D.hidden&&D.hidden[k]);
 const isOpen=(k,def)=>k in U.exp?!!U.exp[k]:!!def;
 const hasContent=h=>/<(input|textarea|select|button)\b/.test(h)||h.replace(/<[^>]+>/g,'').trim()!=='';
-const AREA_TAB={research:['research',''],exp:['exp',''],intern:['exp',''],visit:['exp',''],admin:['admin',''],career:['dim',''],profile:['dim',''],net:['dim',''],talk:['dim',''],service:['dim',''],step:['think','full']};
+const AREA_TAB={research:['research',''],exp:['exp',''],intern:['exp',''],visit:['exp',''],admin:['admin',''],career:['dim',''],profile:['dim',''],expo:['dim',''],net:['dim',''],talk:['dim',''],service:['dim',''],step:['think','full']};
 const plain=s=>String(s||'').replace(/\*\*/g,'');
 function stSel(it){const v=st(it);const opts=SETS[setOf(it)];return `<select class="pill st" data-act="st" data-id="${esc(it.id)}" aria-label="状态：${esc(it.title)}">${(opts.includes(v)?opts:[v,...opts]).map(k=>`<option${k===v?' selected':''}>${esc(k)}</option>`).join('')}</select>`}
 function dueBadge(t){if(t.done||!t.ddl)return '';const n=daysTo(t.ddl);if(n===null)return '';
@@ -836,7 +837,7 @@ function renderWeek(){
     let tot=0,dn=0;for(const [,g] of groups){tot+=g.w.length+g.t.length;dn+=g.w.filter(w=>recOn(wk,w.id)).length+g.t.filter(t=>t.done).length}
     return `<section class="box wk-area" data-c="${AREA_C[a]||'think'}"><div class="wk-area-h"><span class="dot" aria-hidden="true"></span><h2>${SECNAME[a]||'其他'}</h2><span class="cnt">${dn}/${tot}</span></div>${
     groups.map(([iid,g])=>{const it=itemById(iid);const [tab,sub]=it?tabFor(it):['week',''];
-      return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${it.kind==='proj'?`<span class="proj-id">${esc(it.id)}</span>`:''}<span>${esc(it.title)}</span></button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${[false,true].map(fin=>g.w.filter(w=>recOn(wk,w.id)===fin).map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true,focus:true})).join('')+g.t.filter(t=>!!t.done===fin).map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true,focus:true})).join('')).join('')}</div></div>`}).join('')}</section>`}).join('');
+      return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${it.kind==='proj'?`<span class="proj-id">${esc(it.id)}</span>`:''}<span>${esc(it.kind==='promo'?label(it):it.title)}</span></button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${[false,true].map(fin=>g.w.filter(w=>recOn(wk,w.id)===fin).map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true,focus:true})).join('')+g.t.filter(t=>!!t.done===fin).map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true,focus:true})).join('')).join('')}</div></div>`}).join('')}</section>`}).join('');
   const prev=addWeeks(wk,-1);const carry=planIds(prev).map(todoById).filter(t=>t&&!t.done&&!t.del&&!inWeek(t.id,wk));
   const open=liveTodos().filter(t=>!t.done&&!inWeek(t.id,wk));
   const pickList=open.filter(t=>!U.pickArea||secOf(itemById(t.item).area)===U.pickArea);
@@ -932,27 +933,40 @@ function renderAdmin(){
 /* 维度: the long-term assets besides papers — people, talks, visibility, service, funding */
 const PROMO_ST=['Maintaining','Submitting','In submission'];
 /* per-paper promotion checklist: only for papers that are out (Maintaining) or under review (Submitting) */
+function itemTodos(it,ctx,wk){wk=wk||CUR_WK;const wkly=it.weekly||[],todos=todosOf(it);
+  return [false,true].map(fin=>wkly.filter(w=>recOn(wk,w.id)===fin).map(w=>weeklyLine(it,w,ctx)).join('')+todos.filter(t=>!!t.done===fin).map(t=>todoLine(t,ctx,{})).join('')).join('')}
 function promoCard(p){
   const tpl=D.launchTpl||[];const keys=tpl.flatMap((g,gi)=>g.items.map((_,ii)=>`launch:${p.id}:${gi}:${ii}`));const n=keys.filter(k=>D.checks[k]).length;
-  const k='promo:'+p.id;const open=isOpen(k);
+  const k='promo:'+p.id;const open=isOpen(k);const pi=itemById('pr-'+p.id);
+  const nOpen=pi?todosOf(pi).filter(t=>!t.done).length+(pi.weekly||[]).filter(w=>!recOn(CUR_WK,w.id)).length:0;
+  const addForm=pi?todoAdd(pi):`<form class="add slim" data-form="promo-add" data-paper="${esc(p.id)}">
+    <input type="text" class="field" id="add-t-pr-${esc(p.id)}" name="t" placeholder="+ 添加宣传 To-Do" aria-label="新的宣传 To-Do" required>
+    <input type="date" class="field" id="add-d-pr-${esc(p.id)}" name="d" aria-label="DDL（可选）">
+    <label class="rep-l"><input type="checkbox" name="rep" id="add-r-pr-${esc(p.id)}"> 每周</label>
+    <button class="btn sm" type="submit">添加</button></form>`;
   return `<div class="it${open?' open':''}" id="promo-${esc(p.id)}" data-key="${k}">
     <div class="it-row"><button class="it-h" type="button" data-act="exp" data-id="${k}" aria-expanded="${open}"><span class="car"></span><span class="proj-id">${esc(p.id)}</span><span class="it-t" data-find>${esc(p.title)}</span><span class="tgt">${esc(st(p))}</span></button>
-      <span class="it-meta"><span>${n}/${keys.length}</span></span></div>
-    <div class="xb"${open?'':' hidden'}>${tpl.map((g,gi)=>`<div class="grp"><div class="grp-k">${esc(g.g)}</div>${g.items.map((x,ii)=>{const ck=`launch:${p.id}:${gi}:${ii}`;const on=!!D.checks[ck];return `<label class="lc${on?' done':''}"><input type="checkbox" data-act="check" data-id="${ck}"${on?' checked':''}><span>${md(x)}</span></label>`}).join('')}</div>`).join('')}</div>
+      <span class="it-meta">${nOpen?`<span>${nOpen} 项</span>`:''}<span>清单 ${n}/${keys.length}</span></span></div>
+    <div class="xb"${open?'':' hidden'}>
+      <div class="promo-todos"${pi?` id="it-${esc(pi.id)}"`:''}><div class="k">宣传 To-Do</div><div class="todos">${pi?itemTodos(pi,'expo'):''}</div>${addForm}</div>
+      ${tpl.map((g,gi)=>`<div class="grp"><div class="grp-k">${esc(g.g)}</div>${g.items.map((x,ii)=>{const ck=`launch:${p.id}:${gi}:${ii}`;const on=!!D.checks[ck];return `<label class="lc${on?' done':''}"><input type="checkbox" data-act="check" data-id="${ck}"${on?' checked':''}><span>${md(x)}</span></label>`}).join('')}</div>`).join('')}
+    </div>
   </div>`}
 /* 维度: the long-term assets besides papers — people, talks & reviewing, visibility, funding */
 function renderDim(){
   const net=areaItems('net'),talk=[...areaItems('talk'),...areaItems('service')],fund=[...areaItems('career'),...areaItems('profile')];
   const promo=areaItems('research','proj').filter(p=>PROMO_ST.includes(st(p)));
   const letters=isHidden('w:letters')?'':`<div class="box"><div class="box-h"><h3>推荐信 × 3</h3></div>${[0,1,2].map(i=>`<div class="slot"><b>${i+1}</b><input class="field" id="letter-${i}" data-act="letter" data-id="${i}" value="${esc(D.letters[i]||'')}" aria-label="推荐信 ${i+1}"></div>`).join('')}</div>`;
+  const ops=areaItems('expo').filter(x=>x.kind!=='promo');
   return `<div class="narrow stack">
   ${pageHead('维度')}
-  ${group('d-net','人脉 · 圈子',`${itemList(net,'net','person','例如：某位想认识的老师')}${letters}${notes(['connection'])}`,{count:net.length,aside:addBtn('net','person','+ 添加')})}
-  ${group('d-talk','Talk · Workshop · Reviewer',itemList(talk,'talk','todo','例如：某个 invited talk、workshop、审稿')||'<p class="blank">还没有。</p>',{count:talk.length,aside:addBtn('talk','todo','+ 添加')})}
-  ${group('d-expo','曝光',`<div class="box ch-box">${D.channels.map(freshRow).join('')}</div>
-    <div class="sub-k">论文宣传 <span class="muted small">只列 Maintaining 和 Submitting 的论文</span></div>
-    ${promo.length?`<div class="list-i">${promo.map(promoCard).join('')}</div>`:'<p class="blank">目前没有 Maintaining 或 Submitting 的论文。</p>'}`,{id:'channels',hide:'w:channels'})}
+  ${group('d-net','人脉 · 圈子',`${letters}${itemList(net,'net','person','例如：某位想认识的老师')}${notes(['connection'])}`,{count:net.length,aside:addBtn('net','person','+ 添加')})}
   ${group('d-fund','博后 · 奖项 · Funding',`${itemList(fund,'career','app','例如：某 fellowship')}${notes(['postdoc'])}`,{count:fund.length,aside:addBtn('career','app','+ 添加')})}
+  ${group('d-expo','曝光',`<div class="box ch-box">${D.channels.map(freshRow).join('')}</div>
+    ${itemList(ops,'expo','todo','例如：公众号运营')}
+    <div class="sub-k">论文宣传 <span class="muted small">只列 Maintaining 和 Submitting 的论文</span></div>
+    ${promo.length?`<div class="list-i">${promo.map(promoCard).join('')}</div>`:'<p class="blank">目前没有 Maintaining 或 Submitting 的论文。</p>'}`,{id:'channels',hide:'w:channels',aside:addBtn('expo','todo','+ 运营条目')})}
+  ${group('d-talk','Talk · Workshop · Reviewer',itemList(talk,'talk','todo','例如：某个 invited talk、workshop、审稿')||'<p class="blank">还没有。</p>',{count:talk.length,aside:addBtn('talk','todo','+ 添加')})}
   ${noteGroup('d-ref','各维度说明',['ind_big','ind_small','dim_service','dim_teaching','dim_talk','dim_indep','dim_other'])}
   </div>`}
 const SUBS=[['half','退半步 · 研究规划'],['full','退一步 · 事业规划'],['notes','笔记']];
@@ -1177,6 +1191,10 @@ document.addEventListener('submit',e=>{
       T.editItem='';commit('编辑条目');return}
     case 'blk':{const id=f.dataset.id;const b=D.blocks[id]=Object.assign({type:'list'},D.blocks[id]||{});b.title=v('title');b.text=f.elements.text.value.replace(/\s+$/,'');T.editBlock='';U.exp['blk:'+id]=true;commit('编辑：'+(b.title||id));return}
     case 'step':{const s=D.steps.find(x=>x.id===f.dataset.id);if(!s)return;s.desc=v('desc');s.items=f.elements.text.value.split('\n').map(x=>x.trim()).filter(Boolean);s.checks={};T.editBlock='';commit('退一步清单');return}
+    case 'promo-add':{const pid=f.dataset.paper;const p=itemById(pid);if(!p||!v('t'))return;let pi=itemById('pr-'+pid);
+      if(!pi){pi={id:'pr-'+pid,area:'expo',kind:'promo',set:'todo',title:p.title+' · 宣传',sub:'',st:'进行中',paper:pid,created:TODAY_ISO};D.items.push(pi)}
+      if(v('rep'))(pi.weekly=pi.weekly||[]).push({id:'w'+uid(),t:v('t'),created:TODAY_ISO});else addTodo(pi.id,v('t'),v('d'),'');
+      U.exp['promo:'+pid]=true;commit('论文宣传 To-Do');refocus('add-t-pr-'+pid);return}
     case 'student-new':{if(!v('name'))return;(D.students=D.students||[]).push({id:'st'+uid(),name:v('name'),projects:[],note:''});T.addingStudent=false;commit('学生');return}
     case 'student':{const s=(D.students||[]).find(x=>x.id===f.dataset.id);if(!s)return;s.name=v('name')||s.name;s.note=v('note');T.editStudent='';commit('学生');return}
     case 'conv':{const id=f.dataset.id;const items=textToConvItems(f.elements.text.value);
