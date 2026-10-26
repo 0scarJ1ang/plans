@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1024-1658-ffe69b">
+<meta name="app-build" content="1026-0631-e3a7a9">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -542,7 +542,9 @@ const AREANAME={research:'科研',exp:'经历',intern:'经历',visit:'经历',ca
 const SECTIONS=[['research','科研'],['exp','经历'],['admin','杂事'],['dim','维度'],['think','思考']];
 const secOf=a=>({research:'research',exp:'exp',intern:'exp',visit:'exp',admin:'admin',net:'dim',talk:'dim',service:'dim',career:'dim',profile:'dim',expo:'dim'})[a]||'think';
 const SECNAME=Object.fromEntries(SECTIONS);
-const secItems=sec=>D.items.filter(x=>secOf(x.area)===sec);
+/* Lead projects always read A, B, C… and come before everything else in their section; other items keep their order */
+const byProj=(a,b)=>{const p=a.kind==='proj',q=b.kind==='proj';return p!==q?(p?-1:1):p?a.id.length-b.id.length||(a.id<b.id?-1:a.id>b.id?1:0):0};
+const secItems=sec=>D.items.filter(x=>secOf(x.area)===sec).sort(byProj);
 const PRI=[['P0','P0 紧急'],['P1','P1 重要'],['P2','P2 推进'],['P3','P3 有空'],['','— 未设']];
 const PRANK={P0:0,P1:1,P2:2,P3:3,'':4};
 const SETS={
@@ -656,7 +658,7 @@ const label=it=>it.kind==='proj'?it.id+' · '+it.title:it.kind==='promo'?((itemB
 const pri=it=>it.pri||'';
 const st=it=>it.st||SETS[it.set||KIND_SET[it.kind]||'todo'][0];
 const setOf=it=>it.set||KIND_SET[it.kind]||'todo';
-const areaItems=(area,kind)=>D.items.filter(x=>x.area===area&&(!kind||x.kind===kind));
+const areaItems=(area,kind)=>D.items.filter(x=>x.area===area&&(!kind||x.kind===kind)).sort(byProj);
 const week=wk=>D.weeks[wk]||{plan:[],goals:'',review:'',rec:{},focus:{}};
 function ensureWeek(wk){if(!D.weeks[wk])D.weeks[wk]={plan:[],goals:'',review:'',rec:{},focus:{}};const w=D.weeks[wk];w.plan=w.plan||[];w.rec=w.rec||{};w.focus=w.focus||{};PLAN_CACHE={};return w}
 let PLAN_CACHE={};
@@ -933,7 +935,7 @@ function renderWeek(){
   for(const x of allW)slot(x.it,x.it.id).w.push(x.w);
   for(const t of plan)slot(itemById(t.item),t.item).t.push(t);
   const AREA_C={research:'research',exp:'exp',dim:'dim',admin:'admin'};
-  const planHtml=[...SECTIONS.map(x=>x[0]),'other'].filter(a=>byArea[a]).map(a=>{const groups=Object.entries(byArea[a]);
+  const planHtml=[...SECTIONS.map(x=>x[0]),'other'].filter(a=>byArea[a]).map(a=>{const groups=Object.entries(byArea[a]).sort(([x],[y])=>byProj(itemById(x)||{},itemById(y)||{}));
     let tot=0,dn=0;for(const [,g] of groups){tot+=g.w.length+g.t.length;dn+=g.w.filter(w=>recOn(wk,w.id)).length+g.t.filter(t=>t.done).length}
     return `<section class="box wk-area" data-c="${AREA_C[a]||'think'}"><div class="wk-area-h"><span class="dot" aria-hidden="true"></span><h2>${SECNAME[a]||'其他'}</h2><span class="cnt">${dn}/${tot}</span></div>${
     groups.map(([iid,g])=>{const it=itemById(iid);const [tab,sub]=it?tabFor(it):['week',''];
