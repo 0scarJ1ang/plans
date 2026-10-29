@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1026-0631-e3a7a9">
+<meta name="app-build" content="1029-0423-e1f034">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -474,6 +474,10 @@ select.pill{font-family:var(--f-body)}
 .flash{border-radius:10px}
 .tl-p.now .tl-when::after{border-radius:6px}
 @media (max-width:560px){.page-h h1,.wklabel{font-size:24px}.mast-row{padding-block:12px 6px}}
+.td.skipped .td-t{color:var(--muted)}
+.td.skipped input[type=checkbox]{opacity:.35;cursor:default}
+.tag.skip{color:var(--muted);background:var(--sunk)}
+.skip-l{gap:6px}
 /* ---- motion ---- */
 main{overflow-x:clip}
 .tabs{position:relative}
@@ -789,14 +793,16 @@ const focBtn=(id,wk,on)=>`<button type="button" class="wkb foc${on?' on':''}" da
 const focTag=id=>isFocus(CUR_WK,id)?'<span class="tag foc">本周重点</span>':'';
 const byDdl=(a,b)=>{const x=a.ddl||'9999',y=b.ddl||'9999';return x<y?-1:x>y?1:0};
 const recOn=(wk,id)=>!!(D.weeks[wk]&&D.weeks[wk].rec&&D.weeks[wk].rec[id]);
-const weeklyFor=wk=>{const end=weekRange(wk)[1];return D.items.flatMap(it=>(it.weekly||[]).filter(w=>!w.created||w.created<=end).map(w=>({it,w})))};
-function weeklyLine(it,w,ctx,o={}){const wk=o.wk||CUR_WK;const on=recOn(wk,w.id);const cid=`wr-${ctx}-${w.id}`;const foc=o.focus&&isFocus(wk,w.id);
-  return `<div class="td${on?' done':''}${foc?' focus':''}"${o.find?' data-find':''}>
-    <input type="checkbox" id="${cid}" data-act="rec" data-id="${esc(w.id)}" data-item="${esc(it.id)}" data-v="${wk}"${on?' checked':''} aria-label="这周完成：${esc(w.t)}">
+/* a weekly task can be skipped for one week (weeks[wk].skip[id]) without touching the series before or after */
+const skipOn=(wk,id)=>!!(D.weeks[wk]&&D.weeks[wk].skip&&D.weeks[wk].skip[id]);
+const weeklyFor=(wk,all)=>{const end=weekRange(wk)[1];return D.items.flatMap(it=>(it.weekly||[]).filter(w=>(!w.created||w.created<=end)&&(all||!skipOn(wk,w.id))).map(w=>({it,w})))};
+function weeklyLine(it,w,ctx,o={}){const wk=o.wk||CUR_WK;const on=recOn(wk,w.id);const sk=!on&&skipOn(wk,w.id);const cid=`wr-${ctx}-${w.id}`;const foc=o.focus&&isFocus(wk,w.id);
+  return `<div class="td${on?' done':''}${sk?' skipped':''}${foc?' focus':''}"${o.find?' data-find':''}>
+    <input type="checkbox" id="${cid}" data-act="rec" data-id="${esc(w.id)}" data-item="${esc(it.id)}" data-v="${wk}"${on?' checked':''}${sk?' disabled':''} aria-label="这周完成：${esc(w.t)}">
     ${T.editTodo===ctx+':'+w.id?`<form class="td-edit" data-form="todo-edit"><input class="field" id="te-${ctx}-${w.id}" name="t" value="${esc(w.t)}" aria-label="修改每周任务" data-edit="wkly" data-key="${ctx}:${esc(w.id)}" data-id="${esc(w.id)}" data-item="${esc(it.id)}" autocomplete="off"></form>`
       :`<button type="button" class="td-t" data-act="todo-edit" data-id="${esc(w.id)}" data-v="${ctx}" title="点击修改">${md(w.t)}</button>`}
-    ${o.chip?itemChip(it):''}<span class="tag rep" title="每周自动出现">每周</span>${foc?focBtn(w.id,wk,true):''}${o.focus?'':focTag(w.id)}
-    <span class="act">${o.focus&&!foc&&!on?focBtn(w.id,wk,false):''}<button type="button" class="wkb" data-act="to-once" data-id="${esc(w.id)}" data-item="${esc(it.id)}" title="改成一次性 To-Do（放进本周）">改为一次</button>${o.noDel?'':`<button class="x" type="button" data-act="wkly-del" data-id="${esc(w.id)}" data-item="${esc(it.id)}" aria-label="删除每周任务：${esc(w.t)}">×</button>`}</span><button class="more" type="button" data-act="more" aria-label="更多操作">⋯</button>
+    ${o.chip?itemChip(it):''}<span class="tag rep" title="每周自动出现">每周</span>${sk?`<span class="tag skip">这周跳过</span><button type="button" class="wkb" data-act="wkly-unskip" data-id="${esc(w.id)}" data-v="${wk}" title="这周还是要做">恢复这周</button>`:''}${foc?focBtn(w.id,wk,true):''}${o.focus?'':focTag(w.id)}
+    <span class="act">${o.focus&&!foc&&!on?focBtn(w.id,wk,false):''}${on||sk?'':`<button type="button" class="wkb" data-act="wkly-skip" data-id="${esc(w.id)}" data-v="${wk}" title="只是这周不做，之前和之后的周照常出现">这周跳过</button>`}<button type="button" class="wkb" data-act="to-once" data-id="${esc(w.id)}" data-item="${esc(it.id)}" title="改成一次性 To-Do（放进本周）">改为一次</button>${o.noDel?'':`<button class="x" type="button" data-act="wkly-del" data-id="${esc(w.id)}" data-item="${esc(it.id)}" aria-label="删除每周任务：${esc(w.t)}">×</button>`}</span><button class="more" type="button" data-act="more" aria-label="更多操作">⋯</button>
   </div>`}
 function todoAdd(it){return `<form class="add slim" data-form="todo-add" data-item="${esc(it.id)}">
     <input type="text" class="field" id="add-t-${esc(it.id)}" name="t" placeholder="+ 添加 To-Do" aria-label="新 To-Do" required>
@@ -828,7 +834,7 @@ function itemEdit(it){
 function itemView(it,o={}){
   const id=esc(it.id);
   if(T.editItem===it.id)return `<div class="it open" id="it-${id}"><div class="xb">${itemEdit(it)}</div></div>`;
-  const todos=todosOf(it);const openT=todos.filter(t=>!t.done);const wkly=it.weekly||[];const wOpen=wkly.filter(w=>!recOn(CUR_WK,w.id)).length;
+  const todos=todosOf(it);const openT=todos.filter(t=>!t.done);const wkly=it.weekly||[];const wOpen=wkly.filter(w=>!recOn(CUR_WK,w.id)&&!skipOn(CUR_WK,w.id)).length;
   const next=openT.filter(t=>t.ddl).sort((a,b)=>a.ddl<b.ddl?-1:1)[0];
   const exp=isOpen(it.id);const proj=it.kind==='proj';
   const stu=studentsOf(it);
@@ -929,6 +935,7 @@ function renderWeek(){
   const isCur=wk===CUR_WK,isPast=wk<CUR_WK;
   const plan=planIds(wk).map(todoById).filter(Boolean);
   const allW=weeklyFor(wk);const openW=allW.filter(x=>!recOn(wk,x.w.id)),doneW=allW.filter(x=>recOn(wk,x.w.id));
+  const skippedW=weeklyFor(wk,true).filter(x=>skipOn(wk,x.w.id));
   const done=plan.filter(t=>t.done).length+doneW.length,total=plan.length+allW.length;
   const openPlan=plan.filter(t=>!t.done),donePlan=plan.filter(t=>t.done);
   const byArea={};const slot=(it,iid)=>{const a=it?secOf(it.area):'other';const A=byArea[a]=byArea[a]||{};return A[iid]=A[iid]||{w:[],t:[]}};
@@ -969,6 +976,7 @@ function renderWeek(){
         ${carry.length?`<button class="linkbtn" type="button" data-act="wk-carry" data-v="${wk}" title="只挪普通待办（还是同一条，不会新建）；每周任务本来就会自动出现">把上周没完成的 ${carry.length} 项移过来</button>`:''}
       </div>
       <div class="plan">${planHtml||'<p class="blank">这周还没有计划。</p>'}</div>
+      ${skippedW.length?`<div class="chips skip-l"><span class="hint">这周跳过的每周任务：</span>${skippedW.map(x=>`<span class="tag restore">${esc(x.w.t)}<button class="linkbtn" type="button" data-act="wkly-unskip" data-id="${esc(x.w.id)}" data-v="${wk}">恢复</button></span>`).join('')}</div>`:''}
 
 
 
@@ -1445,6 +1453,8 @@ document.addEventListener('click',async e=>{
     case 'ddl-open':{T.ddlOpen[id]=true;render();const n=document.getElementById('dd-'+v+'-'+id);if(n){n.focus();try{n.showPicker()}catch(err){}}return}
     case 'undo':if(undoSnap){D=adopt(undoSnap);undoSnap=null;document.getElementById('toast').hidden=true;commit('撤销');toast('已撤销')}return;
     case 'hide':snapshot();D.hidden=D.hidden||{};D.hidden[id]=v||id;commit('删除窗口');toast('已删除，可在设置里恢复',true);return;
+    case 'wkly-skip':{snapshot();const w=ensureWeek(v);w.skip=w.skip||{};w.skip[id]=true;delete w.focus[id];commit('这周跳过');toast('这周跳过了，其他周照常',true);return}
+    case 'wkly-unskip':{const w=ensureWeek(v);if(w.skip)delete w.skip[id];commit('恢复这周');toast('已恢复');return}
     case 'unhide':if(D.hidden){delete D.hidden[id];commit('恢复窗口');toast('已恢复')}return;
     case 'item-edit':T.editItem=id;render();return;
     case 'item-edit-cancel':T.editItem='';render();return;
