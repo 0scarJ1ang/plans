@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1029-0423-e1f034">
+<meta name="app-build" content="1031-0517-2cd53e">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -398,6 +398,8 @@ textarea.goal{font-size:15px;min-height:0}
 #tab-research[aria-selected="true"]{border-bottom-color:var(--c-research)} #tab-exp[aria-selected="true"]{border-bottom-color:var(--c-exp)}
 #tab-dim[aria-selected="true"]{border-bottom-color:var(--c-dim)} #tab-admin[aria-selected="true"]{border-bottom-color:var(--c-admin)} #tab-think[aria-selected="true"]{border-bottom-color:var(--c-think)}
 @media (max-width:560px){.wk-area{padding:12px 12px 6px}.wk-it .todos{padding-left:6px}}
+/* phone: in the merged participate group the project tag drops under the task text instead of squeezing it */
+@media (max-width:560px){.wk-part .td-t{flex-basis:calc(100% - 30px)}.wk-part .td>.ichip{margin-left:26px;max-width:calc(100% - 90px)}.wk-part .td>.more{margin-left:auto}}
 .tag.rep{color:var(--accent);background:var(--accent-soft)}
 .rep-l{display:flex;gap:4px;align-items:center;font-size:12.5px;color:var(--muted);white-space:nowrap;cursor:pointer}
 .it-row select.st{border-color:transparent;background-color:transparent}
@@ -942,11 +944,15 @@ function renderWeek(){
   for(const x of allW)slot(x.it,x.it.id).w.push(x.w);
   for(const t of plan)slot(itemById(t.item),t.item).t.push(t);
   const AREA_C={research:'research',exp:'exp',dim:'dim',admin:'admin'};
+  const lines=(it,g,fin,chip)=>g.w.filter(w=>recOn(wk,w.id)===fin).map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true,focus:true,chip})).join('')+g.t.filter(t=>!!t.done===fin).sort(byDdl).map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true,focus:true,chip})).join('');
   const planHtml=[...SECTIONS.map(x=>x[0]),'other'].filter(a=>byArea[a]).map(a=>{const groups=Object.entries(byArea[a]).sort(([x],[y])=>byProj(itemById(x)||{},itemById(y)||{}));
     let tot=0,dn=0;for(const [,g] of groups){tot+=g.w.length+g.t.length;dn+=g.w.filter(w=>recOn(wk,w.id)).length+g.t.filter(t=>t.done).length}
+    /* in 科研 every lead project keeps its own group; the participate projects share one, each line tagged with its project */
+    const part=a==='research'?groups.filter(([iid])=>{const it=itemById(iid);return it&&it.kind!=='proj'}):[];
     return `<section class="box wk-area" data-c="${AREA_C[a]||'think'}"><div class="wk-area-h"><span class="dot" aria-hidden="true"></span><h2>${SECNAME[a]||'其他'}</h2><span class="cnt">${dn}/${tot}</span></div>${
-    groups.map(([iid,g])=>{const it=itemById(iid);const [tab,sub]=it?tabFor(it):['week',''];
-      return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${it.kind==='proj'?`<span class="proj-id">${esc(it.id)}</span>`:''}<span>${esc(it.kind==='promo'?label(it):it.title)}</span></button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${[false,true].map(fin=>g.w.filter(w=>recOn(wk,w.id)===fin).map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true,focus:true})).join('')+g.t.filter(t=>!!t.done===fin).sort(byDdl).map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true,focus:true})).join('')).join('')}</div></div>`}).join('')}</section>`}).join('');
+    groups.filter(x=>!part.includes(x)).map(([iid,g])=>{const it=itemById(iid);const [tab,sub]=it?tabFor(it):['week',''];
+      return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${it.kind==='proj'?`<span class="proj-id">${esc(it.id)}</span>`:''}<span>${esc(it.kind==='promo'?label(it):it.title)}</span></button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${[false,true].map(fin=>lines(it,g,fin)).join('')}</div></div>`}).join('')}${
+    part.length?`<div class="wk-it wk-part"><button class="wk-it-h" type="button" data-act="goto" data-tab="research" data-sub="" data-target="r-collab"><span>Participate Project</span></button><div class="todos">${[false,true].map(fin=>part.map(([iid,g])=>lines(itemById(iid),g,fin,true)).join('')).join('')}</div></div>`:''}</section>`}).join('');
   const prev=addWeeks(wk,-1);const carry=planIds(prev).map(todoById).filter(t=>t&&!t.done&&!t.del&&!inWeek(t.id,wk));
   const open=liveTodos().filter(t=>!t.done&&!inWeek(t.id,wk));
   const pickList=open.filter(t=>!U.pickArea||secOf(itemById(t.item).area)===U.pickArea);
@@ -1024,7 +1030,7 @@ function renderResearch(){
   return `<div class="narrow stack">
   ${pageHead('科研')}
   ${group('r-proj','Lead Project',L.body||'<p class="blank">还没有。</p>',{count:projs.length,aside:L.switch+addBtn('research','proj','+ 添加')})}
-  ${group('r-collab','Participate Project',P.body||'<p class="blank">还没有。</p>',{count:cols.length,aside:P.switch+addBtn('research','collab','+ 添加')})}
+  ${group('r-collab','Participate Project',P.body||'<p class="blank">还没有。</p>',{id:'r-collab',count:cols.length,aside:P.switch+addBtn('research','collab','+ 添加')})}
   ${studentsSection()}
   ${group('r-ref','资料',notes(['hero','students','bottomline','authorship']),{closed:true})}
   </div>`}
