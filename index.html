@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1031-0706-ec82a4">
+<meta name="app-build" content="1107-0339-d60f5e">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -796,16 +796,27 @@ const focBtn=(id,wk,on)=>`<button type="button" class="wkb foc${on?' on':''}" da
 const focTag=id=>isFocus(CUR_WK,id)?'<span class="tag foc">本周重点</span>':'';
 const byDdl=(a,b)=>{const x=a.ddl||'9999',y=b.ddl||'9999';return x<y?-1:x>y?1:0};
 const recOn=(wk,id)=>!!(D.weeks[wk]&&D.weeks[wk].rec&&D.weeks[wk].rec[id]);
+/* a ticked week is a record of its own, weeks[wk].rec[id] = {d, t, item}: editing, deleting or converting the series later never changes it.
+   Older ticks are only a date; they get their copy of the text the first time the series changes. */
+const recOf=(wk,id)=>{const r=D.weeks[wk]&&D.weeks[wk].rec&&D.weeks[wk].rec[id];return !r?null:isObj(r)?r:{d:typeof r==='string'?r:''}};
+function freezeRec(wk,id,t,item){const W=D.weeks[wk];const r=W&&W.rec&&W.rec[id];if(r&&!(isObj(r)&&r.t))W.rec[id]={d:typeof r==='string'?r:(isObj(r)&&r.d)||'',t,item}}
+const freezeSeries=(it,w)=>{for(const wk of Object.keys(D.weeks))freezeRec(wk,w.id,w.t,it.id)};
 /* a weekly task can be skipped for one week (weeks[wk].skip[id]) without touching the series before or after */
 const skipOn=(wk,id)=>!!(D.weeks[wk]&&D.weeks[wk].skip&&D.weeks[wk].skip[id]);
-const weeklyFor=(wk,all)=>{const end=weekRange(wk)[1];return D.items.flatMap(it=>(it.weekly||[]).filter(w=>(!w.created||w.created<=end)&&(all||!skipOn(wk,w.id))).map(w=>({it,w})))};
-function weeklyLine(it,w,ctx,o={}){const wk=o.wk||CUR_WK;const on=recOn(wk,w.id);const sk=!on&&skipOn(wk,w.id);const cid=`wr-${ctx}-${w.id}`;const foc=o.focus&&isFocus(wk,w.id);
+/* the weekly lines of one week: each live series (a ticked week shows its own copy of the text), plus ticked weeks of series deleted since */
+const weeklyFor=(wk,all)=>{const end=weekRange(wk)[1];const seen=new Set();
+  const out=D.items.flatMap(it=>(it.weekly||[]).filter(w=>recOn(wk,w.id)||(!w.created||w.created<=end)&&(all||!skipOn(wk,w.id))).map(w=>{seen.add(w.id);const r=recOf(wk,w.id);return {it,iid:it.id,w:r&&r.t?Object.assign({},w,{t:r.t}):w}}));
+  for(const id of Object.keys((D.weeks[wk]&&D.weeks[wk].rec)||{})){const r=recOf(wk,id);if(!seen.has(id)&&r.t)out.push({it:itemById(r.item),iid:r.item||'',w:{id,t:r.t,gone:true}})}
+  return out};
+function weeklyLine(it,w,ctx,o={}){const wk=o.wk||CUR_WK;const on=recOn(wk,w.id);const sk=!on&&skipOn(wk,w.id);const cid=`wr-${ctx}-${w.id}`;const foc=o.focus&&isFocus(wk,w.id);const iid=it?it.id:'';
+  const rec=!!o.wk&&on;  // a ticked line in the week plan is that week's record: editing it changes only that week
+  const acts=`${o.focus&&!foc&&!on?focBtn(w.id,wk,false):''}${on||sk?'':`<button type="button" class="wkb" data-act="wkly-skip" data-id="${esc(w.id)}" data-v="${wk}" title="只是这周不做，之前和之后的周照常出现">这周跳过</button>`}${w.gone?'':`<button type="button" class="wkb" data-act="to-once" data-id="${esc(w.id)}" data-item="${esc(iid)}" title="改成一次性 To-Do（放进本周）">改为一次</button>`}${o.noDel||w.gone?'':`<button class="x" type="button" data-act="wkly-del" data-id="${esc(w.id)}" data-item="${esc(iid)}" aria-label="删除每周任务：${esc(w.t)}">×</button>`}`;
   return `<div class="td${on?' done':''}${sk?' skipped':''}${foc?' focus':''}"${o.find?' data-find':''}>
-    <input type="checkbox" id="${cid}" data-act="rec" data-id="${esc(w.id)}" data-item="${esc(it.id)}" data-v="${wk}"${on?' checked':''}${sk?' disabled':''} aria-label="这周完成：${esc(w.t)}">
-    ${T.editTodo===ctx+':'+w.id?`<form class="td-edit" data-form="todo-edit"><input class="field" id="te-${ctx}-${w.id}" name="t" value="${esc(w.t)}" aria-label="修改每周任务" data-edit="wkly" data-key="${ctx}:${esc(w.id)}" data-id="${esc(w.id)}" data-item="${esc(it.id)}" autocomplete="off"></form>`
-      :`<button type="button" class="td-t" data-act="todo-edit" data-id="${esc(w.id)}" data-v="${ctx}" title="点击修改">${md(w.t)}</button>`}
-    ${o.chip?itemChip(it):''}<span class="tag rep" title="每周自动出现">每周</span>${sk?`<span class="tag skip">这周跳过</span><button type="button" class="wkb" data-act="wkly-unskip" data-id="${esc(w.id)}" data-v="${wk}" title="这周还是要做">恢复这周</button>`:''}${foc?focBtn(w.id,wk,true):''}${o.focus?'':focTag(w.id)}
-    <span class="act">${o.focus&&!foc&&!on?focBtn(w.id,wk,false):''}${on||sk?'':`<button type="button" class="wkb" data-act="wkly-skip" data-id="${esc(w.id)}" data-v="${wk}" title="只是这周不做，之前和之后的周照常出现">这周跳过</button>`}<button type="button" class="wkb" data-act="to-once" data-id="${esc(w.id)}" data-item="${esc(it.id)}" title="改成一次性 To-Do（放进本周）">改为一次</button>${o.noDel?'':`<button class="x" type="button" data-act="wkly-del" data-id="${esc(w.id)}" data-item="${esc(it.id)}" aria-label="删除每周任务：${esc(w.t)}">×</button>`}</span><button class="more" type="button" data-act="more" aria-label="更多操作">⋯</button>
+    <input type="checkbox" id="${cid}" data-act="rec" data-id="${esc(w.id)}" data-item="${esc(iid)}" data-v="${wk}"${on?' checked':''}${sk?' disabled':''} aria-label="这周完成：${esc(w.t)}">
+    ${T.editTodo===ctx+':'+w.id?`<form class="td-edit" data-form="todo-edit"><input class="field" id="te-${ctx}-${w.id}" name="t" value="${esc(w.t)}" aria-label="${rec?'修改这周的记录':'修改每周任务'}" data-edit="wkly" data-key="${ctx}:${esc(w.id)}" data-id="${esc(w.id)}" data-item="${esc(iid)}"${rec?` data-rec="${wk}"`:''} autocomplete="off"></form>`
+      :`<button type="button" class="td-t" data-act="todo-edit" data-id="${esc(w.id)}" data-v="${ctx}" title="${rec?'点击修改，只改这一周':'点击修改，完成过的周不变'}">${md(w.t)}</button>`}
+    ${o.chip&&it?itemChip(it):''}<span class="tag rep" title="${w.gone?'这个每周任务已删除，这周的完成记录保留':'每周自动出现'}">每周</span>${sk?`<span class="tag skip">这周跳过</span><button type="button" class="wkb" data-act="wkly-unskip" data-id="${esc(w.id)}" data-v="${wk}" title="这周还是要做">恢复这周</button>`:''}${foc?focBtn(w.id,wk,true):''}${o.focus?'':focTag(w.id)}
+    ${acts?`<span class="act">${acts}</span><button class="more" type="button" data-act="more" aria-label="更多操作">⋯</button>`:''}
   </div>`}
 function todoAdd(it){return `<form class="add slim" data-form="todo-add" data-item="${esc(it.id)}">
     <input type="text" class="field" id="add-t-${esc(it.id)}" name="t" placeholder="+ 添加 To-Do" aria-label="新 To-Do" required>
@@ -942,7 +953,7 @@ function renderWeek(){
   const done=plan.filter(t=>t.done).length+doneW.length,total=plan.length+allW.length;
   const openPlan=plan.filter(t=>!t.done),donePlan=plan.filter(t=>t.done);
   const byArea={};const slot=(it,iid)=>{const a=it?secOf(it.area):'other';const A=byArea[a]=byArea[a]||{};return A[iid]=A[iid]||{w:[],t:[]}};
-  for(const x of allW)slot(x.it,x.it.id).w.push(x.w);
+  for(const x of allW)slot(x.it,x.iid).w.push(x.w);
   for(const t of plan)slot(itemById(t.item),t.item).t.push(t);
   const AREA_C={research:'research',exp:'exp',dim:'dim',admin:'admin'};
   const lines=(it,g,fin,chip)=>g.w.filter(w=>recOn(wk,w.id)===fin).map(w=>weeklyLine(it,w,'wk',{wk,noDel:true,find:true,focus:true,chip})).join('')+g.t.filter(t=>!!t.done===fin).sort(byDdl).map(t=>todoLine(t,'wk',{wk,remove:true,noWeek:true,noDel:true,find:true,focus:true,chip})).join('');
@@ -959,7 +970,7 @@ function renderWeek(){
   const pickList=open.filter(t=>!U.pickArea||secOf(itemById(t.item).area)===U.pickArea);
   const pickLine=t=>`<div class="td"><span class="td-t">${md(t.t)}</span>${itemChip(itemById(t.item))}${dueBadge(t)}<button class="btn ghost sm" type="button" data-act="wk-add" data-id="${esc(t.id)}" data-v="${wk}">加入</button></div>`;
   const upcoming=liveTodos().filter(t=>!t.done&&t.ddl&&daysTo(t.ddl)<=14&&!inWeek(t.id,wk)).sort((a,b)=>a.ddl<b.ddl?-1:1);
-  const doneThisWeek=[...liveTodos().filter(t=>t.done&&t.doneAt&&t.doneAt>=mon&&t.doneAt<=sun),...doneW.map(x=>({t:x.w.t,doneAt:typeof W.rec[x.w.id]==='string'?W.rec[x.w.id]:mon,item:x.it.id}))];
+  const doneThisWeek=[...liveTodos().filter(t=>t.done&&t.doneAt&&t.doneAt>=mon&&t.doneAt<=sun),...doneW.map(x=>({t:x.w.t,doneAt:recOf(wk,x.w.id).d||mon,item:x.iid}))];
   const logsThisWeek=D.logs.filter(l=>!l.auto&&l.d>=mon&&l.d<=sun&&itemById(l.item));
   const others=Object.keys(D.weeks).filter(k=>k!==wk).sort().reverse();
   const quick=`<form class="add slim" data-form="wk-quick" data-wk="${wk}">
@@ -1387,8 +1398,8 @@ document.addEventListener('change',async e=>{
   switch(act){
     case 'st':{const it=itemById(id);if(!it)return;const old=st(it);it.st=t.value;addLog(it.id,`状态：${old} → ${t.value}`,{auto:true});commit('状态');return}
     case 'rec':{const w=ensureWeek(t.dataset.v);const it=itemById(t.dataset.item);const wt=it&&(it.weekly||[]).find(x=>x.id===id);
-      if(t.checked){snapshot();w.rec[id]=TODAY_ISO;if(wt)addLog(it.id,'每周：'+wt.t,{auto:true,rec:id,wk:t.dataset.v});commitSoon('每周任务');toast('已完成',true)}
-      else{delete w.rec[id];D.logs=D.logs.filter(l=>!(l.rec===id&&l.wk===t.dataset.v));commitSoon('每周任务')}return}
+      if(t.checked){snapshot();w.rec[id]=wt?{d:TODAY_ISO,t:wt.t,item:it.id}:TODAY_ISO;if(wt)addLog(it.id,'每周：'+wt.t,{auto:true,rec:id,wk:t.dataset.v});commitSoon('每周任务');toast('已完成',true)}
+      else{if(!wt)snapshot();delete w.rec[id];D.logs=D.logs.filter(l=>!(l.rec===id&&l.wk===t.dataset.v));commitSoon('每周任务');if(!wt)toast('这个每周任务已删除，这条完成记录也移除了',true)}return}
     case 'done':if(t.checked){snapshot();setDone(id,true);commitSoon('完成 To-Do');toast('已完成',true)}else{setDone(id,false);commitSoon('取消完成')}return;
     case 'ddl':{const td=todoById(id);if(td){td.ddl=t.value;delete T.ddlOpen[id];commit('DDL')}return}
     case 'check':D.checks[id]=t.checked;if(!t.checked)delete D.checks[id];commitSoon('勾选');return;
@@ -1465,15 +1476,15 @@ document.addEventListener('click',async e=>{
     case 'unhide':if(D.hidden){delete D.hidden[id];commit('恢复窗口');toast('已恢复')}return;
     case 'item-edit':T.editItem=id;render();return;
     case 'item-edit-cancel':T.editItem='';render();return;
-    case 'item-del':snapshot();D.items=D.items.filter(x=>x.id!==id);for(const t of D.todos)if(t.item===id)t.del=true;T.editItem='';commit('删除条目');toast('已删除条目',true);return;
+    case 'item-del':snapshot();{const it=itemById(id);if(it)for(const w of it.weekly||[])freezeSeries(it,w)}D.items=D.items.filter(x=>x.id!==id);for(const t of D.todos)if(t.item===id)t.del=true;T.editItem='';commit('删除条目');toast('已删除条目',true);return;
     case 'add-open':T.adding=v;render();{const n=document.getElementById('na-title-'+v);if(n)n.focus()}return;
     case 'add-cancel':T.adding='';render();return;
     case 'to-weekly':{const td=todoById(id);const it=td&&itemById(td.item);if(!it)return;snapshot();(it.weekly=it.weekly||[]).push({id:'w'+uid(),t:td.t,created:TODAY_ISO});deleteTodo(id);commit('改成每周任务');toast('已改成每周任务',true);return}
-    case 'to-once':{const it=itemById(b.dataset.item);const w=it&&(it.weekly||[]).find(x=>x.id===id);if(!w)return;snapshot();it.weekly=it.weekly.filter(x=>x.id!==id);addTodo(it.id,w.t,'',CUR_WK);commit('改成一次性 To-Do');toast('已改成一次性 To-Do，放在本周',true);return}
+    case 'to-once':{const it=itemById(b.dataset.item);const w=it&&(it.weekly||[]).find(x=>x.id===id);if(!w)return;snapshot();freezeSeries(it,w);it.weekly=it.weekly.filter(x=>x.id!==id);addTodo(it.id,w.t,'',CUR_WK);commit('改成一次性 To-Do');toast('已改成一次性 To-Do，放在本周',true);return}
     case 'focus':{const w=ensureWeek(v);if(w.focus[id])delete w.focus[id];else w.focus[id]=true;commit('这周重点');return}
     case 'met':{const it=itemById(id);if(!it)return;it.last=TODAY_ISO;addLog(it.id,'联系了一次',{auto:true});commit('联系');toast('已记录：今天联系了');return}
     case 'more':{const row=b.closest('.td');if(row)row.classList.toggle('show-act');return}
-    case 'wkly-del':{const it=itemById(b.dataset.item);if(!it)return;snapshot();it.weekly=(it.weekly||[]).filter(x=>x.id!==id);commit('删除每周任务');toast('已删除每周任务',true);return}
+    case 'wkly-del':{const it=itemById(b.dataset.item);if(!it)return;snapshot();const w=(it.weekly||[]).find(x=>x.id===id);if(w)freezeSeries(it,w);it.weekly=(it.weekly||[]).filter(x=>x.id!==id);commit('删除每周任务');toast('已删除每周任务，完成过的周保留',true);return}
     case 'todo-del':snapshot();deleteTodo(id);commit('删除 To-Do');toast('已删除 To-Do',true);return;
     case 'log-del':snapshot();D.logs=D.logs.filter(l=>l.id!==id);commit('删除进展');toast('已删除进展',true);return;
     case 'wk-toggle':{if(inWeek(id,v))weekRemove(v,id);else weekAdd(v,id);commit('周计划');return}
@@ -1515,7 +1526,10 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 window.addEventListener('online',()=>{if(Sync.pending)Sync.push()});
 
 function saveTodoEdit(inp){T.editTodo='';const val=inp.value.trim();
-  if(inp.dataset.edit==='wkly'){const it=itemById(inp.dataset.item);const w=it&&(it.weekly||[]).find(x=>x.id===inp.dataset.id);if(w&&val&&val!==w.t){w.t=val;commit('修改每周任务')}else render();return}
+  if(inp.dataset.edit==='wkly'){const id=inp.dataset.id,it=itemById(inp.dataset.item);const w=it&&(it.weekly||[]).find(x=>x.id===id);
+    /* a ticked line in the week plan: change only that week's record (and its progress-log line) */
+    const rw=inp.dataset.rec;if(rw){const r=recOf(rw,id);if(r&&val&&val!==(r.t||(w&&w.t))){D.weeks[rw].rec[id]=Object.assign({},r,{t:val,item:r.item||(it?it.id:'')});for(const l of D.logs)if(l.rec===id&&l.wk===rw)l.t='每周：'+val;commit('修改这周的记录')}else render();return}
+    if(w&&val&&val!==w.t){freezeSeries(it,w);w.t=val;commit('修改每周任务')}else render();return}
   const td=todoById(inp.dataset.id);if(td&&val&&val!==td.t){td.t=val;commit('修改 To-Do')}else render()}
 document.addEventListener('focusout',e=>{const t=e.target;if(t.dataset&&(t.dataset.edit==='todo'||t.dataset.edit==='wkly')&&T.editTodo===t.dataset.key)saveTodoEdit(t)});
 document.addEventListener('keydown',e=>{const t=e.target;if(e.key==='Escape'&&t.dataset&&(t.dataset.edit==='todo'||t.dataset.edit==='wkly')){T.editTodo='';render()}});
