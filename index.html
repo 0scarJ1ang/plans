@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1108-0921-51ac13">
+<meta name="app-build" content="1108-0933-a9687d">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -17,12 +17,12 @@
    white rounded cards on a soft grey canvas, a frosted sticky tab bar, one spring curve for motion. Layout: sticky masthead with sync chip + tab rail;
    the week sheet pulls to-dos from every area; each area sheet is trackers (status, to-do/DDL, progress log) then reference notes. */
 :root{
-  --bg:#F4F5F8; --surface:#FFFFFF; --sunk:#F1F3F7; --ink:#1E293B; --muted:#64748B; --line:#E3E7EE; --hair:#EDF0F4; --grid:transparent;
+  --bg:#FBFBFD; --surface:#FFFFFF; --sunk:#F3F5F8; --ink:#1E293B; --muted:#64748B; --line:#E2E8F0; --hair:#EEF1F5; --grid:transparent;
   --c-research:#3A6EA5; --c-exp:#3D7F63; --c-dim:#B0506E; --c-admin:#7556A8; --c-think:#8E6A2E;
   --accent:#8E6A2E; --accent-hi:#D4A562; --accent-soft:#FAF4EA; --on-accent:#FFFFFF; --btn:#1E293B; --on-btn:#FFFFFF;
   --p0:#C62E3A; --p0-bg:#FDEEEF; --p1:#A15C07; --p1-bg:#FBF3E4; --p2:#2F7D57; --p2-bg:#E9F6EF; --p3:#64748B; --p3-bg:#F1F5F9;
-  --ok:#2F7D57; --warn:#A15C07; --bad:#C62E3A; --shadow:rgba(15,23,42,.12); --card-shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px -12px rgba(15,23,42,.12);
-  --glass:rgba(244,245,248,.72); --card-line:rgba(15,23,42,.06); --lift:0 1px 2px rgba(15,23,42,.06),0 3px 10px -3px rgba(15,23,42,.12);
+  --ok:#2F7D57; --warn:#A15C07; --bad:#C62E3A; --shadow:rgba(15,23,42,.12); --card-shadow:0 1px 2px rgba(15,23,42,.04),0 6px 20px -12px rgba(15,23,42,.10);
+  --glass:rgba(251,251,253,.78); --card-line:#E7EBF0; --lift:0 1px 2px rgba(15,23,42,.06),0 3px 10px -3px rgba(15,23,42,.12);
   --f-display:Georgia,"Noto Serif SC","Songti SC","Source Han Serif SC",STSong,serif;
   --f-body:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
   --f-mono:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
@@ -497,26 +497,23 @@ select.pill{font-family:var(--f-body)}
 .tag.skip{color:var(--muted);background:var(--sunk)}
 .skip-l{gap:6px}
 /* ---- modern surfaces (2026-11-08) ----
-   White cards float on a soft grey canvas: bigger corners, a hairline edge and a soft shadow instead of a drawn border.
+   White cards on the white page: bigger corners, a hairline edge and a soft shadow (a grey canvas was tried and dropped).
    Chips and tags are pills, fields inside cards are filled, row separators start where the text starts.
    The colours, the gold accent and the serif titles stay as they were. */
 .box,.it,.rows,.proj,.hero{border-color:var(--card-line);border-radius:18px;box-shadow:var(--card-shadow)}
 .empty-card{border-radius:18px}
 .it-h{border-radius:12px}
 .results,.update{border-color:var(--card-line);border-radius:16px}
-/* things that sit straight on the canvas are white and lifted, like the cards */
-.search input{background:var(--surface);box-shadow:var(--lift)}
-.iconbtn,.sync:not([data-s="error"]):not([data-s="auth"]):not([data-s="offline"]),.btn.ghost,.chipbtn:not([aria-pressed="true"]){border-color:transparent;box-shadow:var(--lift)}
-textarea.goal{background:var(--surface);border-color:transparent;box-shadow:var(--card-shadow);border-radius:16px;padding:12px 14px}
-.skip-l .tag.restore{background:var(--surface);box-shadow:var(--lift)}
+/* the goal box is a card like the others */
+textarea.goal{background:var(--surface);border-color:var(--card-line);box-shadow:var(--card-shadow);border-radius:16px;padding:12px 14px}
 /* fields inside cards are filled and turn white with a ring while typing */
 .box .field,.it .field,.rows .field{background:var(--sunk);border-color:transparent}
 .box .field:focus,.it .field:focus,.rows .field:focus{background:var(--surface);border-color:var(--accent-hi)}
 form.edit{background:var(--sunk);border-color:transparent;border-radius:16px}
 form.edit .field{background:var(--surface)}
-/* tabs: the selected one is a small white pill lifted off the frosted bar */
+/* tabs: the selected one sits in a light grey pill on the frosted bar */
 .tabbar{-webkit-backdrop-filter:saturate(1.8) blur(20px);backdrop-filter:saturate(1.8) blur(20px)}
-.tabs>.tab-ind{background:var(--surface);box-shadow:var(--lift)}
+.tabs>.tab-ind{background:var(--sunk)}
 /* chips, tags and badges are pills; a project letter is a tinted tile */
 .tag,.ichip,.rank,.pdot{border-radius:999px}
 .tag{padding:3px 8px}
