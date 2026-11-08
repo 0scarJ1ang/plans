@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1107-0339-d60f5e">
+<meta name="app-build" content="1108-0849-2bcfa9">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -417,6 +417,21 @@ form.add select.field{max-width:100%}
 #settings-btn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
 @media (max-width:860px){.wkgrid{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:560px){.it>.xb{padding:10px 12px 12px 14px}.page-h h1,.wklabel{font-size:21px}}
+/* ---- long text never widens the layout ----
+   One-column stacks get an explicit shrinkable column. With the implicit auto column, one wide child (a long skipped weekly
+   task in a chip that did not wrap) widened the whole week column past the phone screen, and main's horizontal clip then cut
+   the right side off every week card (2026-11-08). tests/phone_longtext_check.py fills every text field with long text. */
+.panel,.sec,.stack,.plan,.plan-sum,.grp,.grp-s,.list-i,.todos,.wk-it,.cluster,.stu,.rows,.row,.proj,.hist,.log,.convs,.connect,.filters,.promo-todos,.hero,.fx,form.edit,form.edit label,ul.list,.connect ol{grid-template-columns:minmax(0,1fr)}
+body{overflow-wrap:break-word}
+/* user text in chips, tags and headings wraps inside its box */
+.tag.restore{white-space:normal;max-width:100%;text-align:left;line-height:1.35}
+.tag.restore>span{min-width:0;overflow-wrap:anywhere}
+.tag.restore .linkbtn{flex:none;white-space:nowrap}
+.wk-it-h{max-width:100%}
+.wk-it-h>span:last-child{min-width:0;overflow-wrap:anywhere}
+.it-h>.tgt,.it-h>.rank{flex:none;max-width:50%;white-space:normal;overflow-wrap:anywhere;text-align:right}
+.stu-n{min-width:min(7.5em,100%);overflow-wrap:anywhere}
+.lc span,.grp-k,.sub-k,.fr-t,.rate-t,.row-title,.row-sub,.chain span,.log-e .t,.h-sm,.who{min-width:0;overflow-wrap:anywhere}
 /* ---- homepage look (type, nav, cards, controls) ---- */
 body{font-size:15px;line-height:1.6;font-variant-numeric:tabular-nums;letter-spacing:-.003em}
 :focus-visible{outline:2px solid var(--accent-hi)}
@@ -994,7 +1009,7 @@ function renderWeek(){
         ${carry.length?`<button class="linkbtn" type="button" data-act="wk-carry" data-v="${wk}" title="只挪普通待办（还是同一条，不会新建）；每周任务本来就会自动出现">把上周没完成的 ${carry.length} 项移过来</button>`:''}
       </div>
       <div class="plan">${planHtml||'<p class="blank">这周还没有计划。</p>'}</div>
-      ${skippedW.length?`<div class="chips skip-l"><span class="hint">这周跳过的每周任务：</span>${skippedW.map(x=>`<span class="tag restore">${esc(x.w.t)}<button class="linkbtn" type="button" data-act="wkly-unskip" data-id="${esc(x.w.id)}" data-v="${wk}">恢复</button></span>`).join('')}</div>`:''}
+      ${skippedW.length?`<div class="chips skip-l"><span class="hint">这周跳过的每周任务：</span>${skippedW.map(x=>`<span class="tag restore"><span>${esc(x.w.t)}</span><button class="linkbtn" type="button" data-act="wkly-unskip" data-id="${esc(x.w.id)}" data-v="${wk}">恢复</button></span>`).join('')}</div>`:''}
 
 
 
@@ -1196,7 +1211,7 @@ function renderSettings(){
   <section class="box"><h2 class="h-sm">外观</h2>${filterChips('theme',U.theme,[['system','跟随系统'],['light','浅色'],['dark','深色']])}</section>
   <p class="hint">版本 ${esc(BUILD)}</p>
   <section class="box" id="settings-hidden"><h2 class="h-sm">已删除的窗口</h2>
-    ${hidden.length?`<div class="chips">${hidden.map(([k,t])=>`<span class="tag restore">${esc(hiddenLabel(k,t))}<button class="linkbtn" type="button" data-act="unhide" data-id="${esc(k)}">恢复</button></span>`).join('')}</div>`:'<p class="blank">没有。</p>'}</section>
+    ${hidden.length?`<div class="chips">${hidden.map(([k,t])=>`<span class="tag restore"><span>${esc(hiddenLabel(k,t))}</span><button class="linkbtn" type="button" data-act="unhide" data-id="${esc(k)}">恢复</button></span>`).join('')}</div>`:'<p class="blank">没有。</p>'}</section>
   </div>`}
 
 /* ============================== connect screen ============================== */
