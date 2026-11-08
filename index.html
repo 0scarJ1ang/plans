@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1108-0849-2bcfa9">
+<meta name="app-build" content="1108-0921-51ac13">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -13,34 +13,34 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap">
 <style>
-/* Look: follows the personal homepage — white paper, slate ink, serif titles (Georgia / Noto Serif SC), warm gold accent,
-   thin-bordered rounded cards, pill navigation and a frosted sticky tab bar. Layout: sticky masthead with sync chip + tab rail;
+/* Look: follows the personal homepage — slate ink, serif titles (Georgia / Noto Serif SC), warm gold accent, pill navigation;
+   white rounded cards on a soft grey canvas, a frosted sticky tab bar, one spring curve for motion. Layout: sticky masthead with sync chip + tab rail;
    the week sheet pulls to-dos from every area; each area sheet is trackers (status, to-do/DDL, progress log) then reference notes. */
 :root{
-  --bg:#FBFBFD; --surface:#FFFFFF; --sunk:#F3F5F8; --ink:#1E293B; --muted:#64748B; --line:#E2E8F0; --hair:#EEF1F5; --grid:transparent;
+  --bg:#F4F5F8; --surface:#FFFFFF; --sunk:#F1F3F7; --ink:#1E293B; --muted:#64748B; --line:#E3E7EE; --hair:#EDF0F4; --grid:transparent;
   --c-research:#3A6EA5; --c-exp:#3D7F63; --c-dim:#B0506E; --c-admin:#7556A8; --c-think:#8E6A2E;
   --accent:#8E6A2E; --accent-hi:#D4A562; --accent-soft:#FAF4EA; --on-accent:#FFFFFF; --btn:#1E293B; --on-btn:#FFFFFF;
   --p0:#C62E3A; --p0-bg:#FDEEEF; --p1:#A15C07; --p1-bg:#FBF3E4; --p2:#2F7D57; --p2-bg:#E9F6EF; --p3:#64748B; --p3-bg:#F1F5F9;
-  --ok:#2F7D57; --warn:#A15C07; --bad:#C62E3A; --shadow:rgba(15,23,42,.12); --card-shadow:0 1px 2px rgba(15,23,42,.04),0 1px 3px rgba(15,23,42,.03);
-  --glass:rgba(251,251,253,.78);
+  --ok:#2F7D57; --warn:#A15C07; --bad:#C62E3A; --shadow:rgba(15,23,42,.12); --card-shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px -12px rgba(15,23,42,.12);
+  --glass:rgba(244,245,248,.72); --card-line:rgba(15,23,42,.06); --lift:0 1px 2px rgba(15,23,42,.06),0 3px 10px -3px rgba(15,23,42,.12);
   --f-display:Georgia,"Noto Serif SC","Songti SC","Source Han Serif SC",STSong,serif;
   --f-body:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
   --f-mono:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
   --f-code:ui-monospace,SFMono-Regular,Menlo,Consolas,"PingFang SC","Noto Sans SC",monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0F172A; --surface:#1A2335; --sunk:#243049; --ink:#F1F5F9; --muted:#94A3B8; --line:#2C3850; --hair:#243047; --grid:transparent;
+  --bg:#0B1220; --surface:#151D2E; --sunk:#1F2A3D; --ink:#F1F5F9; --muted:#94A3B8; --line:#2A364C; --hair:#222D41; --grid:transparent;
   --c-research:#8AB4E8; --c-exp:#7CCBA6; --c-dim:#EE9BB5; --c-admin:#BBA3E8; --c-think:#E4B976;
   --accent:#E4B976; --accent-hi:#E4B976; --accent-soft:rgba(228,185,118,.13); --on-accent:#0F172A; --btn:#F1F5F9; --on-btn:#0F172A;
   --p0:#F2848B; --p0-bg:rgba(242,132,139,.14); --p1:#E9B872; --p1-bg:rgba(228,185,118,.14); --p2:#74D0A1; --p2-bg:rgba(116,208,161,.13); --p3:#A3AEBD; --p3-bg:rgba(148,163,184,.14);
-  --ok:#74D0A1; --warn:#E9B872; --bad:#F2848B; --shadow:rgba(0,0,0,.5); --card-shadow:none; --glass:rgba(15,23,42,.78); color-scheme:dark;
+  --ok:#74D0A1; --warn:#E9B872; --bad:#F2848B; --shadow:rgba(0,0,0,.5); --card-shadow:0 8px 24px -14px rgba(0,0,0,.6); --glass:rgba(11,18,32,.72); --card-line:rgba(255,255,255,.06); --lift:0 1px 2px rgba(0,0,0,.4),0 3px 10px -3px rgba(0,0,0,.5); color-scheme:dark;
 }}
 :root[data-theme="dark"]{
-  --bg:#0F172A; --surface:#1A2335; --sunk:#243049; --ink:#F1F5F9; --muted:#94A3B8; --line:#2C3850; --hair:#243047; --grid:transparent;
+  --bg:#0B1220; --surface:#151D2E; --sunk:#1F2A3D; --ink:#F1F5F9; --muted:#94A3B8; --line:#2A364C; --hair:#222D41; --grid:transparent;
   --c-research:#8AB4E8; --c-exp:#7CCBA6; --c-dim:#EE9BB5; --c-admin:#BBA3E8; --c-think:#E4B976;
   --accent:#E4B976; --accent-hi:#E4B976; --accent-soft:rgba(228,185,118,.13); --on-accent:#0F172A; --btn:#F1F5F9; --on-btn:#0F172A;
   --p0:#F2848B; --p0-bg:rgba(242,132,139,.14); --p1:#E9B872; --p1-bg:rgba(228,185,118,.14); --p2:#74D0A1; --p2-bg:rgba(116,208,161,.13); --p3:#A3AEBD; --p3-bg:rgba(148,163,184,.14);
-  --ok:#74D0A1; --warn:#E9B872; --bad:#F2848B; --shadow:rgba(0,0,0,.5); --card-shadow:none; --glass:rgba(15,23,42,.78); color-scheme:dark;
+  --ok:#74D0A1; --warn:#E9B872; --bad:#F2848B; --shadow:rgba(0,0,0,.5); --card-shadow:0 8px 24px -14px rgba(0,0,0,.6); --glass:rgba(11,18,32,.72); --card-line:rgba(255,255,255,.06); --lift:0 1px 2px rgba(0,0,0,.4),0 3px 10px -3px rgba(0,0,0,.5); color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{scroll-padding-top:64px;-webkit-text-size-adjust:100%;text-size-adjust:100%}  /* no iOS font boosting */
@@ -170,7 +170,7 @@ form.edit label{display:grid;gap:3px;font-size:12.5px;color:var(--muted)}
 .todos > .td:first-child{border-top:0}
 .td input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;margin:0;flex:none}
 .td-t{flex:1 1 180px;min-width:0;font-size:14px;cursor:pointer;overflow-wrap:anywhere}
-.td.done .td-t{text-decoration:line-through;color:var(--muted)}
+.td.done .td-t{color:var(--muted)}
 button.td-t{border:0;background:none;padding:2px 4px;margin-left:-4px;text-align:left;color:inherit;font:inherit;font-size:14px;cursor:text;border-radius:5px}
 button.td-t:hover{background:var(--sunk)}
 .td-edit{flex:1 1 220px;min-width:0;display:flex}
@@ -266,7 +266,7 @@ form.add select.field{flex:0 1 230px;width:auto}
 .chain i{font-style:normal;color:var(--muted)}
 .lc{display:flex;gap:8px;align-items:flex-start;font-size:14px;padding:3px 0;cursor:pointer}
 .lc input{accent-color:var(--accent);margin-top:4px;flex:none}
-.lc.done span{color:var(--muted);text-decoration:line-through}
+.lc.done span{color:var(--muted)}
 
 /* rating, steps */
 .rate{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:7px 0;border-top:1px solid var(--line)}
@@ -496,7 +496,58 @@ select.pill{font-family:var(--f-body)}
 .td.skipped input[type=checkbox]{opacity:.35;cursor:default}
 .tag.skip{color:var(--muted);background:var(--sunk)}
 .skip-l{gap:6px}
+/* ---- modern surfaces (2026-11-08) ----
+   White cards float on a soft grey canvas: bigger corners, a hairline edge and a soft shadow instead of a drawn border.
+   Chips and tags are pills, fields inside cards are filled, row separators start where the text starts.
+   The colours, the gold accent and the serif titles stay as they were. */
+.box,.it,.rows,.proj,.hero{border-color:var(--card-line);border-radius:18px;box-shadow:var(--card-shadow)}
+.empty-card{border-radius:18px}
+.it-h{border-radius:12px}
+.results,.update{border-color:var(--card-line);border-radius:16px}
+/* things that sit straight on the canvas are white and lifted, like the cards */
+.search input{background:var(--surface);box-shadow:var(--lift)}
+.iconbtn,.sync:not([data-s="error"]):not([data-s="auth"]):not([data-s="offline"]),.btn.ghost,.chipbtn:not([aria-pressed="true"]){border-color:transparent;box-shadow:var(--lift)}
+textarea.goal{background:var(--surface);border-color:transparent;box-shadow:var(--card-shadow);border-radius:16px;padding:12px 14px}
+.skip-l .tag.restore{background:var(--surface);box-shadow:var(--lift)}
+/* fields inside cards are filled and turn white with a ring while typing */
+.box .field,.it .field,.rows .field{background:var(--sunk);border-color:transparent}
+.box .field:focus,.it .field:focus,.rows .field:focus{background:var(--surface);border-color:var(--accent-hi)}
+form.edit{background:var(--sunk);border-color:transparent;border-radius:16px}
+form.edit .field{background:var(--surface)}
+/* tabs: the selected one is a small white pill lifted off the frosted bar */
+.tabbar{-webkit-backdrop-filter:saturate(1.8) blur(20px);backdrop-filter:saturate(1.8) blur(20px)}
+.tabs>.tab-ind{background:var(--surface);box-shadow:var(--lift)}
+/* chips, tags and badges are pills; a project letter is a tinted tile */
+.tag,.ichip,.rank,.pdot{border-radius:999px}
+.tag{padding:3px 8px}
+.ichip{padding:3px 9px}
+.tag.restore{border-radius:12px}
+.proj-id{border-color:transparent;background:var(--accent-soft)}
+/* week area cards: a haloed dot, a tinted count and a thin progress line in the area colour (it replaces the rule) */
+.wk-area-h{border-bottom:0;padding-bottom:10px}
+.dot{width:8px;height:8px;border-radius:50%;margin:0 4px 0 3px;box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 18%,transparent)}
+.wk-area-h .cnt{color:var(--c);background:color-mix(in srgb,var(--c) 11%,transparent);padding:3px 10px;border-radius:999px;font-weight:600}
+.wk-prog{height:3px;border-radius:3px;background:var(--hair);overflow:hidden;margin-bottom:4px}
+.wk-prog i{display:block;height:100%;border-radius:3px;background:var(--c)}
+.wk-it+.wk-it{border-top-color:var(--hair)}
+/* rows: a little more air; separators start at the text, as in iOS lists */
+.td{padding:7px 0}
+.todos>.td{border-top:0}
+.todos>.td+.td{background-image:linear-gradient(var(--hair),var(--hair));background-repeat:no-repeat;background-position:right top;background-size:100% 1px}
+.todos>.td+.td:has(>input[type=checkbox]){background-size:calc(100% - 26px) 1px}
+.todos>.td.focus,.todos>.td.focus+.td{background-image:none}
+.td.focus{border-radius:12px}
+.bar{height:7px}
+.plan-sum .bar{background:var(--line)}
+textarea.goal{resize:none}
+/* an item's status reads as a small pill you can tap */
+.it-row select.st,.it-row:hover select.st{background-color:var(--sunk);border-color:transparent;border-radius:999px;padding:4px 24px 4px 11px}
+.it-row select.st:focus-visible{border-color:var(--accent-hi)}
+.td .more{color:color-mix(in srgb,var(--muted) 75%,transparent)}
 /* ---- motion ---- */
+/* one spring for everything that moves (lands softly, about 0.5% past the target); a plain deceleration for fades */
+:root{--spring:cubic-bezier(.32,.72,0,1);--out:cubic-bezier(.22,1,.36,1)}
+@supports (transition-timing-function:linear(0, 1)){:root{--spring:linear(0, 0.017, 0.0608, 0.1224, 0.1947, 0.2723, 0.3512, 0.4286, 0.5023, 0.571, 0.634, 0.6908, 0.7414, 0.7858, 0.8246, 0.8579, 0.8863, 0.9103, 0.9303, 0.9469, 0.9604, 0.9714, 0.9802, 0.9871, 0.9924, 0.9965, 0.9995, 1.0017, 1.0032, 1.0042, 1.0047, 1.005, 1.005, 1.0049, 1.0046, 1.0043, 1.0039, 1.0035, 1.0031, 1.0027, 1)}}
 main{overflow-x:clip}
 .tabs{position:relative}
 .tab{position:relative;z-index:1;transition:background-color .15s,color .15s,transform .12s}
@@ -505,7 +556,7 @@ main{overflow-x:clip}
 .btn,.chipbtn,.iconbtn,.pchip,.wkb,.ichip,.sync{transition:background-color .15s,border-color .15s,color .15s,opacity .15s,transform .12s}
 .btn:active,.chipbtn:active,.iconbtn:active,.pchip:active,.tab:active,.sync:active{transform:scale(.96)}
 .it-h,button.td-t,.wk-it-h,.hist button,.results button,.pen,.star,.wx,.x,.grp-btn,.mini-h{transition:background-color .15s,color .15s}
-.car{transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.car{transition:transform .42s var(--spring)}
 /* task checkboxes: round, fill and tick (Reminders style); option checkboxes: rounded squares */
 .td input[type=checkbox],.lc input[type=checkbox],.rep-l input[type=checkbox]{-webkit-appearance:none;appearance:none;width:18px;height:18px;margin:0;flex:none;display:inline-grid;place-content:center;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--muted) 55%,transparent);background:var(--surface);cursor:pointer;transition:background-color .2s,border-color .2s,transform .15s}
 .rep-l input[type=checkbox]{width:16px;height:16px;border-radius:5px}
@@ -518,11 +569,27 @@ main{overflow-x:clip}
 .td input[type=checkbox]:focus-visible,.lc input[type=checkbox]:focus-visible{border-radius:50%;outline-offset:2px}
 .rep-l input[type=checkbox]:focus-visible{border-radius:5px;outline-offset:2px}
 .lc input[type=checkbox]{margin-top:3px}
-.td-t,.lc span{text-decoration-line:line-through;text-decoration-color:transparent;transition:color .25s,text-decoration-color .25s}
-.td.done .td-t,.lc.done span{text-decoration-color:currentColor}
-@media (forced-colors: active){.td:not(.done) .td-t,.lc:not(.done) span{text-decoration-line:none}}
-.results:not([hidden]){transform-origin:top right;animation:drop .18s cubic-bezier(.32,.72,0,1)}
-.toast:not([hidden]),.update:not([hidden]){animation:rise .32s cubic-bezier(.32,.72,0,1)}
+/* done: a line draws across the text (every wrapped line at once) and slides back when unticked */
+.td-t>.tx,.lc>span{-webkit-box-decoration-break:clone;box-decoration-break:clone;background:linear-gradient(currentColor,currentColor) no-repeat 0 58%/0 max(1px,.075em);transition:background-size .45s var(--out)}
+.td.done .td-t>.tx,.lc.done>span{background-size:100% max(1px,.075em)}
+.td .td-t,.lc>span{transition:background-color .15s,color .35s var(--out)}
+@media (forced-colors: active){.td.done .td-t,.lc.done>span{text-decoration:line-through}}
+/* a tick: the circle gives a little, springs back, and a soft ring spreads out */
+.td input[type=checkbox].pop,.lc input[type=checkbox].pop{animation:pop .5s var(--out)}
+@keyframes pop{0%{transform:scale(.86);box-shadow:0 0 0 0 color-mix(in srgb,var(--accent-hi) 50%,transparent)}40%{transform:scale(1.06)}100%{transform:scale(1);box-shadow:0 0 0 10px color-mix(in srgb,var(--accent-hi) 0%,transparent)}}
+/* touch: no grey tap flash; a press shows at once (iOS needs a touchstart listener for :active) and lets go softly */
+html{-webkit-tap-highlight-color:transparent}
+.more,.linkbtn,.pen,.star,.td .x,.log-e .x,.inbox-i .x,a{transition:opacity .3s var(--out),background-color .15s,color .15s}
+@media (hover:none){
+  .it-h:active,button.td-t:active,.wk-it-h:active,.grp-btn:active,.mini-h:active,.hist button:active,.results button:active,.wx:active{background:var(--sunk);transition:background-color .1s ease-out .04s}
+  .more:active,.linkbtn:active,.pen:active,.star:active,.td .x:active,.log-e .x:active,.inbox-i .x:active,a:active,.wkb:active,.ichip:active{opacity:.45;transition:opacity .06s}
+  textarea.field{resize:none}
+}
+/* once the page scrolls under it, the tab bar lifts off with a soft shadow */
+.tabbar{transition:box-shadow .35s var(--out),border-color .35s var(--out)}
+.scrolled .tabbar{box-shadow:0 12px 28px -20px var(--shadow);border-bottom-color:transparent}
+.results:not([hidden]){transform-origin:top right;animation:drop .26s var(--out)}
+.toast:not([hidden]),.update:not([hidden]){animation:rise .5s var(--spring)}
 @keyframes drop{from{opacity:0;transform:translateY(-4px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes rise{from{opacity:0;transform:translate(-50%,12px) scale(.97)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
@@ -801,7 +868,7 @@ function todoLine(t,ctx,o={}){
   return `<div class="td${t.done?' done':''}${foc?' focus':''}"${o.find?' data-find':''}>
     <input type="checkbox" id="${cid}" data-act="done" data-id="${esc(t.id)}"${t.done?' checked':''} aria-label="完成：${esc(t.t)}">
     ${T.editTodo===ctx+':'+t.id?`<form class="td-edit" data-form="todo-edit"><input class="field" id="te-${ctx}-${t.id}" name="t" value="${esc(t.t)}" aria-label="修改 To-Do" data-edit="todo" data-key="${ctx}:${esc(t.id)}" data-id="${esc(t.id)}" autocomplete="off"></form>`
-      :`<button type="button" class="td-t" data-act="todo-edit" data-id="${esc(t.id)}" data-v="${ctx}" title="点击修改">${md(t.t)}${t.del?' <span class="tag">已删除</span>':''}</button>`}
+      :`<button type="button" class="td-t" data-act="todo-edit" data-id="${esc(t.id)}" data-v="${ctx}" title="点击修改"><span class="tx">${md(t.t)}</span>${t.del?' <span class="tag">已删除</span>':''}</button>`}
     ${o.chip&&it?itemChip(it):''}${dueBadge(t)}${inW?wkBtn(t,wk):''}${foc?focBtn(t.id,wk,true):''}${o.focus?'':focTag(t.id)}
     <span class="act">${o.focus&&!foc&&!t.done?focBtn(t.id,wk,false):''}${ddl}${o.noWeek||t.del||inW||t.done?'':wkBtn(t,wk)}${o.remove?`<button class="x" type="button" data-act="wk-remove" data-id="${esc(t.id)}" data-v="${o.wk}" aria-label="移出这周计划" title="移出这周">−</button>`:''}${t.done||t.del?'':`<button type="button" class="wkb" data-act="to-weekly" data-id="${esc(t.id)}" title="改成每周任务">↻每周</button>`}${o.noDel||t.del?'':`<button class="x" type="button" data-act="todo-del" data-id="${esc(t.id)}" aria-label="删除 To-Do：${esc(t.t)}">×</button>`}</span><button class="more" type="button" data-act="more" aria-label="更多操作">⋯</button>
   </div>`}
@@ -829,7 +896,7 @@ function weeklyLine(it,w,ctx,o={}){const wk=o.wk||CUR_WK;const on=recOn(wk,w.id)
   return `<div class="td${on?' done':''}${sk?' skipped':''}${foc?' focus':''}"${o.find?' data-find':''}>
     <input type="checkbox" id="${cid}" data-act="rec" data-id="${esc(w.id)}" data-item="${esc(iid)}" data-v="${wk}"${on?' checked':''}${sk?' disabled':''} aria-label="这周完成：${esc(w.t)}">
     ${T.editTodo===ctx+':'+w.id?`<form class="td-edit" data-form="todo-edit"><input class="field" id="te-${ctx}-${w.id}" name="t" value="${esc(w.t)}" aria-label="${rec?'修改这周的记录':'修改每周任务'}" data-edit="wkly" data-key="${ctx}:${esc(w.id)}" data-id="${esc(w.id)}" data-item="${esc(iid)}"${rec?` data-rec="${wk}"`:''} autocomplete="off"></form>`
-      :`<button type="button" class="td-t" data-act="todo-edit" data-id="${esc(w.id)}" data-v="${ctx}" title="${rec?'点击修改，只改这一周':'点击修改，完成过的周不变'}">${md(w.t)}</button>`}
+      :`<button type="button" class="td-t" data-act="todo-edit" data-id="${esc(w.id)}" data-v="${ctx}" title="${rec?'点击修改，只改这一周':'点击修改，完成过的周不变'}"><span class="tx">${md(w.t)}</span></button>`}
     ${o.chip&&it?itemChip(it):''}<span class="tag rep" title="${w.gone?'这个每周任务已删除，这周的完成记录保留':'每周自动出现'}">每周</span>${sk?`<span class="tag skip">这周跳过</span><button type="button" class="wkb" data-act="wkly-unskip" data-id="${esc(w.id)}" data-v="${wk}" title="这周还是要做">恢复这周</button>`:''}${foc?focBtn(w.id,wk,true):''}${o.focus?'':focTag(w.id)}
     ${acts?`<span class="act">${acts}</span><button class="more" type="button" data-act="more" aria-label="更多操作">⋯</button>`:''}
   </div>`}
@@ -976,7 +1043,7 @@ function renderWeek(){
     let tot=0,dn=0;for(const [,g] of groups){tot+=g.w.length+g.t.length;dn+=g.w.filter(w=>recOn(wk,w.id)).length+g.t.filter(t=>t.done).length}
     /* in 科研 every lead project keeps its own group; the participate projects share one, each line tagged with its project */
     const part=a==='research'?groups.filter(([iid])=>{const it=itemById(iid);return it&&it.kind!=='proj'}):[];
-    return `<section class="box wk-area" data-c="${AREA_C[a]||'think'}"><div class="wk-area-h"><span class="dot" aria-hidden="true"></span><h2>${SECNAME[a]||'其他'}</h2><span class="cnt">${dn}/${tot}</span></div>${
+    return `<section class="box wk-area" data-c="${AREA_C[a]||'think'}"><div class="wk-area-h"><span class="dot" aria-hidden="true"></span><h2>${SECNAME[a]||'其他'}</h2><span class="cnt">${dn}/${tot}</span></div><div class="wk-prog" aria-hidden="true"><i style="width:${tot?Math.round(dn/tot*100):0}%"></i></div>${
     groups.filter(x=>!part.includes(x)).map(([iid,g])=>{const it=itemById(iid);const [tab,sub]=it?tabFor(it):['week',''];
       return `<div class="wk-it">${it?`<button class="wk-it-h" type="button" data-act="goto" data-tab="${tab}" data-sub="${sub}" data-target="it-${esc(it.id)}">${it.kind==='proj'?`<span class="proj-id">${esc(it.id)}</span>`:''}<span>${esc(it.kind==='promo'?label(it):it.title)}</span></button>`:'<span class="wk-it-h">已删除的条目</span>'}<div class="todos">${[false,true].map(fin=>lines(it,g,fin)).join('')}</div></div>`}).join('')}${
     part.length?`<div class="wk-it wk-part"><button class="wk-it-h" type="button" data-act="goto" data-tab="research" data-sub="" data-target="r-collab"><span>Participate Project</span></button><div class="todos">${[false,true].map(fin=>part.map(([iid,g])=>lines(itemById(iid),g,fin,true)).join('')).join('')}</div></div>`:''}</section>`}).join('');
@@ -1275,10 +1342,10 @@ function placeInd(anim){
   if(anim===false||!Motion.ok())return;
   if(!from)ind.animate([{opacity:0},{opacity:1}],{duration:200,easing:'ease-out'});
   else if(from.x!==to.x||from.w!==to.w){
-    ind.animate([{transform:`translateX(${from.x}px)`,width:from.w+'px'},{transform:`translateX(${to.x}px)`,width:to.w+'px'}],{duration:380,easing:Motion.EASE});
+    ind.animate([{transform:`translateX(${from.x}px)`,width:from.w+'px'},{transform:`translateX(${to.x}px)`,width:to.w+'px'}],{duration:440,easing:Motion.EASE});
     if(tabs.scrollWidth>tabs.clientWidth+1)tabs.scrollTo({left:Math.max(0,to.x-(tabs.clientWidth-to.w)/2),behavior:'smooth'})}
 }
-addEventListener('resize',()=>placeInd(false),{passive:true});
+addEventListener('resize',()=>{placeInd(false);if(U.tab)fitAll(document.getElementById('p-'+U.tab))},{passive:true});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>placeInd(false));
 function ensurePanels(){const host=document.getElementById('panels');if(host.dataset.ready)return;
   host.innerHTML=PANEL_IDS.map(id=>`<div class="panel" data-panel="${id}" id="p-${id}" role="tabpanel" hidden></div>`).join('');host.dataset.ready='1'}
@@ -1293,6 +1360,7 @@ function render(){
   let el=aid&&document.getElementById(aid);
   if(!el&&key){const sel=`[data-act="${key[0]}"]`+(key[1]?`[data-id="${CSS.escape(key[1])}"]`:'')+(key[2]?`[data-v="${CSS.escape(key[2])}"]`:'');el=document.getElementById('p-'+U.tab).querySelector(sel)}
   if(el&&el!==document.body)el.focus({preventScroll:true});
+  fitAll(document.getElementById('p-'+U.tab));
   Motion.after(sig,snap);
 }
 function renderAllPanels(){for(const id of PANEL_IDS)if(T.stale[id]!==false)renderPanel(id)}
@@ -1323,7 +1391,10 @@ function toast(msg,undo){const t=document.getElementById('toast');t.innerHTML=es
    they were (FLIP), new ones fade in, removed ones fade out as detached ghosts, a new tab or week slides in.
    Opening a section animates its height. All of it is skipped when the system asks for reduced motion. */
 const Motion=(()=>{
-  const EASE='cubic-bezier(.32,.72,0,1)';
+  /* the spring and the fade curve come from the CSS tokens (--spring falls back to a cubic curve where linear() is missing) */
+  const LIN=(()=>{try{return CSS.supports('transition-timing-function','linear(0, 1)')}catch(e){return false}})();
+  const EASE=LIN&&getComputedStyle(document.documentElement).getPropertyValue('--spring').trim()||'cubic-bezier(.32,.72,0,1)';
+  const OUT='cubic-bezier(.22,1,.36,1)';
   const SEL='.td,.lc,.it,.grp-s,.sub-x,.wk-area,.wk-it,.log-e,.tl-p,.fr,.stu,.inbox-i,.row-foot,.sub-k,.cluster-k,.ch-box,form';
   const rm=matchMedia('(prefers-reduced-motion: reduce)');
   const ok=()=>!rm.matches&&typeof Element.prototype.animate==='function';
@@ -1342,16 +1413,17 @@ const Motion=(()=>{
     for(const el of panel.querySelectorAll(SEL)){let k=key(el);if(!k)continue;n[k]=(n[k]||0)+1;if(n[k]>1)k+='#'+n[k];m.set(k,el)}
     return m}
   const shown=r=>r.width>0||r.height>0;
+  const CNT='.cnt,.meter>span',BARS='.bar i,.wk-prog i';
   function before(sig){
     const panel=document.getElementById('p-'+U.tab);
     if(!ok()||sig!==lastSig||!panel)return null;
     const els=collect(panel),rects=new Map();
     for(const [k,el] of els){const r=el.getBoundingClientRect();if(shown(r))rects.set(k,r)}
-    return {els,rects,bars:[...panel.querySelectorAll('.bar i')].map(b=>b.style.width)}}
+    return {els,rects,bars:[...panel.querySelectorAll(BARS)].map(b=>b.style.width),cnts:[...panel.querySelectorAll(CNT)].map(e=>e.textContent)}}
   function after(sig,snap){
     const panel=document.getElementById('p-'+U.tab);const prev=lastSig;lastSig=sig;
     if(!ok()||!panel)return;
-    if(!snap){if(prev&&prev!==sig)enter(panel,prev,sig);return}
+    if(!snap){if(prev&&prev!==sig)enter(panel,prev,sig);else if(!prev)panel.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:560,easing:OUT});return}
     const now=collect(panel),vh=innerHeight,vis=r=>r.bottom>-80&&r.top<vh+80;
     const up=el=>{const p=el.parentElement&&el.parentElement.closest(SEL);return p&&panel.contains(p)?p:null};
     const moved=new Map(),fresh=new Map();
@@ -1359,49 +1431,71 @@ const Motion=(()=>{
       if(o)moved.set(el,{dx:o.left-r.left,dy:o.top-r.top,show:vis(o)||vis(r)});else if(!snap.els.has(k))fresh.set(el,r)}
     for(const [el,m] of moved){
       const p=up(el),pm=p&&moved.get(p);const x=m.dx-(pm?pm.dx:0),y=m.dy-(pm?pm.dy:0);
-      if(m.show&&(Math.abs(x)>=1||Math.abs(y)>=1))el.animate([{transform:`translate(${x}px,${y}px)`},{transform:'none'}],{duration:360,easing:EASE})}
+      if(!m.show||Math.abs(x)<1&&Math.abs(y)<1)continue;
+      el.animate([{transform:`translate(${x}px,${y}px)`},{transform:'none'}],{duration:460,easing:EASE});
+      /* a row sinking past others (a ticked one going to the end) dims as they cross, so the rows rising stay readable */
+      if(y<-12&&el.matches('.td,.lc'))el.animate([{opacity:1},{opacity:.28,offset:.16},{opacity:.28,offset:.3},{opacity:1}],{duration:460,easing:'linear'})}
+    let fi=0;  // new rows come in one after another, a beat apart
     for(const [el,r] of fresh){const p=up(el);if(p&&fresh.has(p)||!vis(r))continue;
-      el.animate([{opacity:0,transform:'translateY(-6px) scale(.985)'},{opacity:1,transform:'none'}],{duration:280,easing:EASE})}
+      el.animate([{opacity:0,transform:'translateY(-6px) scale(.985)'},{opacity:1,transform:'none'}],{duration:340,delay:Math.min(fi++,8)*18,easing:OUT,fill:'backwards'})}
     const okey=new Map([...snap.els].map(([k,el])=>[el,k]));let n=0;
     for(const [k,el] of snap.els){
       if(now.has(k))continue;const r=snap.rects.get(k);if(!r||!vis(r)||r.height>700)continue;
       const p=el.parentElement&&el.parentElement.closest(SEL),pk=p&&okey.get(p);if(pk&&!now.has(pk))continue;
       if(++n>16)break;ghost(el,r)}
-    panel.querySelectorAll('.bar i').forEach((b,i)=>{const w=snap.bars[i];if(w!=null&&w!==b.style.width)b.animate([{width:w},{width:b.style.width}],{duration:520,easing:EASE})})}
+    panel.querySelectorAll(BARS).forEach((b,i)=>{const w=snap.bars[i];if(w!=null&&w!==b.style.width)b.animate([{width:w},{width:b.style.width}],{duration:640,easing:EASE})});
+    /* a counter that changed rolls up into its new value */
+    const cn=[...panel.querySelectorAll(CNT)];
+    if(snap.cnts.length===cn.length)cn.forEach((e,i)=>{if(e.textContent!==snap.cnts[i]&&vis(e.getBoundingClientRect()))e.animate([{opacity:0,transform:'translateY(.5em)'},{opacity:1,transform:'none'}],{duration:380,easing:OUT})})}
   /* a removed row lingers for a moment where it was, then fades */
   function ghost(el,r){
     el.removeAttribute('id');el.querySelectorAll('[id]').forEach(x=>x.removeAttribute('id'));
     el.inert=true;el.setAttribute('aria-hidden','true');
     Object.assign(el.style,{position:'fixed',left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',margin:'0',zIndex:'25',pointerEvents:'none'});
     document.body.appendChild(el);
-    const a=el.animate([{opacity:1,transform:'none'},{opacity:0,transform:'scale(.97)'}],{duration:220,easing:'ease-out',fill:'forwards'});
+    const a=el.animate([{opacity:1,transform:'none'},{opacity:0,transform:'scale(.97)'}],{duration:260,easing:OUT,fill:'forwards'});
     a.onfinish=()=>el.remove()}
+  /* a new page comes in from the side its tab (or week) is on, like the tab pill moving there */
+  const ORDER=['week','research','exp','admin','dim','think','tl','settings'];
   function enter(panel,prev,sig){
-    const [pt,pw]=prev.split('|'),[t,w]=sig.split('|');
-    const from=pt===t&&t==='week'&&pw!==w?{opacity:0,transform:`translateX(${w>pw?32:-32}px)`}:{opacity:0,transform:'translateY(10px)'};
-    panel.animate([from,{opacity:1,transform:'none'}],{duration:340,easing:EASE})}
+    const [pt,pw]=prev.split('|'),[t,w]=sig.split('|');let dx=0;
+    if(pt===t&&t==='week'&&pw!==w)dx=w>pw?28:-28;
+    else if(pt!==t){const i=ORDER.indexOf(pt),j=ORDER.indexOf(t);if(i>=0&&j>=0)dx=j>i?24:-24}
+    panel.animate([{transform:dx?`translateX(${dx}px)`:'translateY(10px)'},{transform:'none'}],{duration:520,easing:EASE});
+    panel.animate([{opacity:0},{opacity:1}],{duration:300,easing:OUT})}
   /* open / close a section body by animating its height (and padding, and the parent's gap) */
   function slide(body,open){
     const box=body.parentElement;
     const cur=()=>{const c=getComputedStyle(body);return {h:body.getBoundingClientRect().height,pt:parseFloat(c.paddingTop)||0,pb:parseFloat(c.paddingBottom)||0,bt:parseFloat(c.borderTopWidth)||0,mt:parseFloat(c.marginTop)||0,o:+c.opacity}};
     const from=body.hidden?null:cur();
-    if(body._slide){body._slide.cancel();body._slide=null}
+    if(body._slide){body._slide.forEach(x=>x.cancel());body._slide=null}
     body.hidden=false;delete body.dataset.closing;body.style.overflow='';
     if(!ok()){body.hidden=!open;return}
+    fitAll(body);
     const nat=cur(),pc=box&&getComputedStyle(box),gap=pc&&/grid|flex/.test(pc.display)&&body.previousElementSibling?parseFloat(pc.rowGap)||0:0;
     const zero={h:0,pt:0,pb:0,bt:0,mt:nat.mt-gap,o:0};
     const a0=from||zero,a1=open?nat:zero;
-    const f=v=>({height:v.h+'px',paddingTop:v.pt+'px',paddingBottom:v.pb+'px',borderTopWidth:v.bt+'px',marginTop:v.mt+'px',opacity:v.o});
+    const f=v=>({height:v.h+'px',paddingTop:v.pt+'px',paddingBottom:v.pb+'px',borderTopWidth:v.bt+'px',marginTop:v.mt+'px'});
     body.style.overflow='hidden';if(!open)body.dataset.closing='1';
-    const a=body.animate([f(a0),f(a1)],{duration:Math.min(440,Math.max(240,200+Math.abs(a1.h-a0.h)*.18)),easing:EASE,fill:open?'none':'forwards'});
-    body._slide=a;
-    a.onfinish=()=>{body._slide=null;body.style.overflow='';if(!open){delete body.dataset.closing;if(!(box&&box.classList.contains('open')))body.hidden=true;a.cancel()}}}
+    /* the space opens on the spring and the content fades in a beat later; closing fades the content first */
+    const d=Math.min(520,Math.max(300,260+Math.abs(a1.h-a0.h)*.22));
+    const a=body.animate([f(a0),f(a1)],{duration:open?d:d*.85,easing:open?EASE:OUT,fill:open?'none':'forwards'});
+    const o=body.animate(open?[{opacity:a0.o,transform:'translateY(-6px)'},{opacity:1,transform:'none'}]:[{opacity:a0.o,transform:'none'},{opacity:0,transform:'translateY(-4px)'}],{duration:open?d*.8:d*.5,delay:open&&!from?d*.1:0,easing:OUT,fill:'both'});
+    body._slide=[a,o];
+    a.onfinish=()=>{body._slide=null;o.cancel();body.style.overflow='';if(!open){delete body.dataset.closing;if(!(box&&box.classList.contains('open')))body.hidden=true;a.cancel()}}}
   function show(el){if(el._hide){el._hide.cancel();el._hide=null}el.hidden=false}
   function hide(el){if(el.hidden||el._hide)return;if(!ok()){el.hidden=true;return}
     const a=el.animate([{opacity:1,transform:'translate(-50%,0) scale(1)'},{opacity:0,transform:'translate(-50%,6px) scale(.98)'}],{duration:200,easing:'ease-in',fill:'forwards'});
     el._hide=a;a.onfinish=()=>{el._hide=null;el.hidden=true;a.cancel()}}
   return {EASE,ok,before,after,slide,show,hide}
 })();
+/* iOS Safari shows :active only when the page listens to touches */
+document.addEventListener('touchstart',()=>{},{passive:true});
+/* the tab bar gets its shadow once the masthead has scrolled away */
+(()=>{const m=document.querySelector('.mast');if(m&&'IntersectionObserver' in window)new IntersectionObserver(([e])=>document.documentElement.classList.toggle('scrolled',!e.isIntersecting)).observe(m)})();
+/* text areas grow with their text (hidden ones are fitted when their section opens) */
+function fitTA(t){if(!t.offsetParent||t.classList.contains('code'))return;t.style.height='auto';t.style.height=t.scrollHeight+t.offsetHeight-t.clientHeight+'px'}
+function fitAll(root){if(root)root.querySelectorAll('textarea.field').forEach(fitTA)}
 function applyTheme(){const r=document.documentElement;if(U.theme==='system')r.removeAttribute('data-theme');else r.setAttribute('data-theme',U.theme)}
 function download(){const blob=new Blob([JSON.stringify(D,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='phd-plans-'+TODAY_ISO+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 function readFile(input){return new Promise((res,rej)=>{const f=input.files&&input.files[0];if(!f)return rej(new Error('没有选择文件'));const r=new FileReader();r.onload=()=>{try{res(JSON.parse(r.result))}catch(e){rej(new Error('不是有效的 JSON 文件'))}};r.onerror=()=>rej(new Error('读取文件失败'));r.readAsText(f)})}
@@ -1409,7 +1503,8 @@ function readFile(input){return new Promise((res,rej)=>{const f=input.files&&inp
 /* ============================== events ============================== */
 document.addEventListener('change',async e=>{
   const t=e.target,act=t.dataset&&t.dataset.act,id=t.dataset&&t.dataset.id;if(!act||!D&&act!=='seed-file')return;
-  if(t.type==='checkbox'&&/^(done|rec|check|absorb)$/.test(act)){const row=t.closest('.td,.lc');if(row)row.classList.toggle('done',t.checked)}
+  if(t.type==='checkbox'&&/^(done|rec|check|absorb)$/.test(act)){const row=t.closest('.td,.lc');if(row)row.classList.toggle('done',t.checked);
+    if(t.checked&&Motion.ok()){t.classList.remove('pop');void t.offsetWidth;t.classList.add('pop')}}
   switch(act){
     case 'st':{const it=itemById(id);if(!it)return;const old=st(it);it.st=t.value;addLog(it.id,`状态：${old} → ${t.value}`,{auto:true});commit('状态');return}
     case 'rec':{const w=ensureWeek(t.dataset.v);const it=itemById(t.dataset.item);const wt=it&&(it.weekly||[]).find(x=>x.id===id);
@@ -1429,7 +1524,7 @@ document.addEventListener('change',async e=>{
 });
 let typeTimer;
 document.addEventListener('input',e=>{
-  const t=e.target;
+  const t=e.target;if(t.tagName==='TEXTAREA')fitTA(t);
   if(t.dataset&&t.dataset.act==='letter'&&D){D.letters[+t.dataset.id]=t.value;clearTimeout(typeTimer);typeTimer=setTimeout(()=>Sync.changed('推荐信'),600);return}
   if(t.id==='inbox-text'){U.draft=t.value;saveUI();return}
   if(t.dataset&&t.dataset.wk&&t.dataset.field&&D){ensureWeek(t.dataset.wk)[t.dataset.field]=t.value;clearTimeout(typeTimer);typeTimer=setTimeout(()=>Sync.changed('周计划'),600)}
