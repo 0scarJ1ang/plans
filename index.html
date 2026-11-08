@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="app-build" content="1108-0933-a9687d">
+<meta name="app-build" content="1108-0943-ac9c85">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>PhD Plans and Thinking</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -411,7 +411,7 @@ textarea.goal{font-size:15px;min-height:0}
 form.add select.field{max-width:100%}
 .more{display:none;border:0;background:none;color:var(--muted);font-size:16px;line-height:1;padding:2px 6px;border-radius:5px;cursor:pointer;margin-left:auto}
 @media (hover:none){.td .act{display:none}.td.show-act .act{display:flex;flex-wrap:wrap;flex-basis:100%;justify-content:flex-end;gap:6px}.td .more{display:inline-block;margin-left:0}}
-@media (max-width:560px){.it-h{flex-basis:100%}.it-row{padding:2px 8px 6px 4px}.it-row>.it-meta{margin-left:30px}.ichip{max-width:42vw}}
+@media (max-width:560px){.it-row{padding:3px 8px 3px 4px}.ichip{max-width:42vw}}
 .tag.restore{display:inline-flex;gap:8px;align-items:center;padding:5px 9px;font-size:12px}
 .filters{display:grid;gap:8px}
 #settings-btn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
@@ -541,6 +541,42 @@ textarea.goal{resize:none}
 .it-row select.st,.it-row:hover select.st{background-color:var(--sunk);border-color:transparent;border-radius:999px;padding:4px 24px 4px 11px}
 .it-row select.st:focus-visible{border-color:var(--accent-hi)}
 .td .more{color:color-mix(in srgb,var(--muted) 75%,transparent)}
+/* ---- masthead: title, date and sync state on the left; search and settings as round icons on the right ----
+   On a phone the search is a magnifier until tapped, then the field grows out of it across the whole row. */
+.brand-box{min-width:0}
+.brand-sub{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 6px;margin:4px 0 0;font:400 12px/1.4 var(--f-body);color:var(--muted)}
+.brand-sub .sep{opacity:.6}
+.brand-sub .sync{border:0;background:none;padding:0;font:inherit;color:var(--muted);border-radius:4px;box-shadow:none}
+.brand-sub .sync[data-s="ok"]{color:var(--ok)}
+.brand-sub .sync[data-s="dirty"],.brand-sub .sync[data-s="saving"]{color:var(--warn)}
+.brand-sub .sync[data-s="error"],.brand-sub .sync[data-s="auth"],.brand-sub .sync[data-s="offline"]{color:var(--bad);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.iconbtn.gear{width:36px;height:36px;padding:0;display:inline-grid;place-items:center;border-radius:999px;border-color:transparent;background:var(--sunk);color:var(--muted)}
+.iconbtn.gear:hover{color:var(--ink);background:var(--sunk)}
+.search .ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search input{padding-left:34px}
+@media (max-width:560px){
+  .mast-row{flex-wrap:nowrap;align-items:flex-start;position:relative}
+  .brand-box{flex:1 1 auto}
+  .mast-tools{flex:0 0 auto;gap:6px;margin-top:-1px}
+  .search{flex:0 0 36px;max-width:none}
+  .search input{width:36px;height:36px;padding:0;border-radius:999px;font-size:16px;color:transparent;cursor:pointer}
+  .search input::placeholder{color:transparent}
+  .search input::-webkit-search-cancel-button{display:none}
+  .search kbd{display:none}
+  .search .ico{left:50%;transform:translate(-50%,-50%)}
+  .search:focus-within{position:absolute;inset:0;z-index:45;display:flex;align-items:center;background:var(--bg)}  /* above the sticky tab bar, so its results are too */
+  .search:focus-within input{width:100%;height:40px;padding:8px 12px 8px 36px;border-radius:12px;color:var(--ink);cursor:text}
+  .search:focus-within input::placeholder{color:var(--muted)}
+  .search:focus-within input::-webkit-search-cancel-button{display:revert}
+  .search:focus-within .ico{left:12px;transform:translateY(-50%)}
+}
+@media (max-width:560px) and (prefers-reduced-motion: no-preference){.search:focus-within{animation:sopen .34s var(--out)}}
+@keyframes sopen{from{clip-path:inset(11px 42px calc(100% - 47px) calc(100% - 78px) round 18px)}to{clip-path:inset(0 0 0 0 round 0)}}
+@media (max-width:400px){.brand{font-size:20px}}
+/* list cards: count, star and status sit together on the right; with a short title they share its line */
+.it-side{display:flex;align-items:center;gap:6px;margin-left:auto;flex:none}
+.it-row>.it-meta{margin-left:auto}
+@media (max-width:560px){.it-h{flex:1 1 auto}}
 /* ---- motion ---- */
 /* one spring for everything that moves (lands softly, about 0.5% past the target); a plain deceleration for fades */
 :root{--spring:cubic-bezier(.32,.72,0,1);--out:cubic-bezier(.22,1,.36,1)}
@@ -596,15 +632,18 @@ html{-webkit-tap-highlight-color:transparent}
 <header class="mast">
   <div class="wrap">
     <div class="mast-row">
-      <h1 class="brand">PhD Plans and Thinking<small id="today-line">—</small></h1>
+      <div class="brand-box">
+        <h1 class="brand">PhD Plans and Thinking</h1>
+        <p class="brand-sub"><span id="today-line">—</span><span class="sep" aria-hidden="true">·</span><button class="sync" id="sync" type="button" data-s="none">—</button></p>
+      </div>
       <div class="mast-tools">
         <div class="search">
           <input id="q" type="search" placeholder="搜索全部内容…" autocomplete="off" aria-label="搜索全部内容">
           <kbd>/</kbd>
+          <svg class="ico" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
           <div class="results" id="results" hidden></div>
         </div>
-        <button class="sync" id="sync" type="button" data-s="none">—</button>
-        <button class="iconbtn" id="settings-btn" type="button" data-act="tab" data-v="settings">设置</button>
+        <button class="iconbtn gear" id="settings-btn" type="button" data-act="tab" data-v="settings" aria-label="设置" title="设置"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       </div>
     </div>
   </div>
@@ -936,8 +975,7 @@ function itemView(it,o={}){
   return `<div class="it${exp?' open':''}${proj?' proj':''}" id="it-${id}" data-key="${id}">
     <div class="it-row">
       <button class="it-h" type="button" data-act="exp" data-id="${id}" aria-expanded="${exp}"><span class="car"></span>${proj?`<span class="proj-id">${id}</span>`:''}<span class="it-t" data-find>${esc(it.title)}</span>${proj&&it.target?`<span class="tgt">${esc(it.target)}</span>`:''}</button>
-      <span class="it-meta">${it.kind==='person'?ageBadge(it.last,30,90):''}${openT.length+wOpen?`<span>${openT.length+wOpen} 项</span>`:''}${next?dueBadge(next):''}</span>
-      ${o.noEdit?'':`<button class="pen" type="button" data-act="item-edit" data-id="${id}" aria-label="编辑：${esc(it.title)}" title="编辑">✎</button>`}${o.star?`<button class="star${it.sel?' on':''}" type="button" data-act="sel" data-id="${id}" aria-pressed="${!!it.sel}" title="${it.sel?'取消 Selected':'标为 Selected'}">${it.sel?'★':'☆'}</button>`:''}${o.noStatus?'':stSel(it)}
+      <span class="it-side"><span class="it-meta">${it.kind==='person'?ageBadge(it.last,30,90):''}${openT.length+wOpen?`<span>${openT.length+wOpen} 项</span>`:''}${next?dueBadge(next):''}</span>${o.star?`<button class="star${it.sel?' on':''}" type="button" data-act="sel" data-id="${id}" aria-pressed="${!!it.sel}" title="${it.sel?'取消 Selected':'标为 Selected'}">${it.sel?'★':'☆'}</button>`:''}${o.noStatus?'':stSel(it)}</span>
     </div>
     <div class="xb"${exp?'':' hidden'}>
       ${body}
@@ -990,7 +1028,7 @@ function note(id,o={}){
     <div class="btnrow"><button class="btn" type="submit">保存</button><button class="btn ghost" type="button" data-act="blk-cancel">取消</button></div></form></div></div>`;
   const k='blk:'+id;const open=isOpen(k,o.open);
   return `<div class="it note${open?' open':''}" id="b-${id}" data-key="${k}">
-    <div class="it-row"><button class="it-h" type="button" data-act="exp" data-id="${k}" data-def="${o.open?1:0}" aria-expanded="${open}"><span class="car"></span><span class="it-t" data-find>${esc(b.title)}</span>${b.badge?`<span class="rank">${esc(b.badge)}</span>`:''}</button><button class="pen" type="button" data-act="blk-edit" data-id="${id}" aria-label="编辑：${esc(b.title)}" title="编辑">✎</button></div>
+    <div class="it-row"><button class="it-h" type="button" data-act="exp" data-id="${k}" data-def="${o.open?1:0}" aria-expanded="${open}"><span class="car"></span><span class="it-t" data-find>${esc(b.title)}</span>${b.badge?`<span class="rank">${esc(b.badge)}</span>`:''}</button></div>
     <div class="xb"${open?'':' hidden'}>${blockBody(id,b)||'<p class="blank">空。</p>'}
       <div class="row-foot"><button class="linkbtn muted" type="button" data-act="blk-edit" data-id="${id}">编辑</button><button class="linkbtn danger" type="button" data-act="hide" data-id="${k}" data-v="${esc(b.title)}">删除</button></div></div>
   </div>`}
@@ -1668,7 +1706,8 @@ function doSearch(){
 q.addEventListener('input',doSearch);
 q.addEventListener('focus',()=>{if(q.value.trim())doSearch()});
 q.addEventListener('keydown',e=>{if(e.key==='Escape'){q.value='';res.hidden=true;q.blur()}if(e.key==='Enter'){const f=res.querySelector('button');if(f)f.click()}});
-res.addEventListener('click',e=>{const b=e.target.closest('[data-hit]');if(!b)return;const h=hits[+b.dataset.hit];res.hidden=true;if(!h)return;
+res.addEventListener('mousedown',e=>e.preventDefault());  // tapping a result must not blur the field first (on a phone the field would fold away under the finger)
+res.addEventListener('click',e=>{const b=e.target.closest('[data-hit]');if(!b)return;const h=hits[+b.dataset.hit];res.hidden=true;q.blur();if(!h)return;
   U.tab=h.tab;saveUI();try{history.replaceState(null,'','#'+h.tab)}catch(e){}renderTabs();for(const id of PANEL_IDS)document.getElementById('p-'+id).hidden=id!==h.tab;
   reveal(h.el);requestAnimationFrame(()=>flash(h.el))});
 document.addEventListener('click',e=>{if(!e.target.closest('.search'))res.hidden=true});
